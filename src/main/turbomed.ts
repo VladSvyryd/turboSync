@@ -1,0 +1,76 @@
+import { PowerShell } from 'node-powershell'
+
+const executeOn = async (powershellCommand: string) => {
+  const ps = new PowerShell()
+  try {
+    const res = await ps.invoke(powershellCommand)
+    console.log('Turbomed Answer', res.raw)
+    return { data: JSON.parse(res.raw.replaceAll("'", '"')) }
+  } catch (error) {
+    const err = error as any
+    console.log({ error })
+    return { error: err?.message ?? error }
+  } finally {
+    await ps.dispose()
+  }
+}
+export async function getActivePatient() {
+  const isOnlineAndWithActivePatient = await getTurbomedIsOn()
+  console.log({ isOnlineAndWithActivePatient })
+  if (isOnlineAndWithActivePatient?.data?.error)
+    return {
+      error: `(Turbomed aus/Aktiver Patient da?)\n${isOnlineAndWithActivePatient?.data?.error}`
+    }
+
+  const cmd = PowerShell.command`
+                $progId = 'TMMain.Application';
+                try {
+                  $app            = [System.Runtime.InteropServices.Marshal]::GetActiveObject($progId)
+                  $oPatient       = $app.AktiverPatient()
+                  $nummer         = $oPatient.Nummer()
+                  $namensdaten    = $oPatient.Namensdaten()
+                  $vorname        = $namensdaten.Vorname()
+                  $nachname       = $namensdaten.Nachname()
+                  $adressdaten    = $oPatient.Adressdaten().Postanschrift("Privat", 1)
+                  $ort            = $adressdaten.Ort()
+                  $plz            = $adressdaten.Postleitzahl()
+                  $strasse        = $adressdaten.Strasse()
+                  $hausnummer     = $adressdaten.Hausnummer()
+                  $json          +=
+                  "{'id': '$nummer',
+                    'firstName': '$vorname',
+                    'secondName': '$nachname',
+                    'city': '$ort',
+                    'zip': '$plz',
+                    'street': '$strasse',
+                    'houseNumber': '$hausnummer'
+                  }"
+                  echo $json;
+                  [System.GC]::Collect()
+                }
+                catch [System.Runtime.InteropServices.COMException] {
+                  echo "{'error':'$_.Exception.Message'}";
+                  [System.GC]::Collect()
+                }
+
+            `
+  return await executeOn(cmd)
+}
+
+export async function getTurbomedIsOn() {
+  const cmd = PowerShell.command`
+   $progId = 'TMMain.Application';
+    try {
+       $app = [System.Runtime.InteropServices.Marshal]::GetActiveObject($progId);
+       $p = $app.AktiverPatient()
+       $nummer = $p.Nummer()
+       echo "{'id':$nummer}";
+       [System.GC]::Collect()
+    }
+    catch [System.Runtime.InteropServices.COMException] {
+      echo "{'error':'$_.Exception.Message'}";
+      [System.GC]::Collect()
+    }
+`
+  return await executeOn(cmd)
+}

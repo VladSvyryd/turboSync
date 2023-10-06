@@ -7,6 +7,13 @@ const colors = {
   //   700: '#2a69ac'
   // }
 }
+const styles = {
+  global: {
+    body: {
+      backgroundColor: 'transparent'
+    }
+  }
+}
 
-const theme = extendTheme({ colors })
+const theme = extendTheme({ colors, styles })
 export default theme

@@ -17,7 +17,7 @@ function createWindow(): void {
     minHeight,
     show: false,
     autoHideMenuBar: true,
-    // frame: false,
+    frame: false,
     alwaysOnTop: true,
     transparent: true, // this breaks resize feature
     ...(process.platform === 'linux' ? { icon } : {}),

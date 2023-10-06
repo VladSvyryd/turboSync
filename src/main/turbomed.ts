@@ -4,11 +4,9 @@ const executeOn = async (powershellCommand: string) => {
   const ps = new PowerShell()
   try {
     const res = await ps.invoke(powershellCommand)
-    console.log('Turbomed Answer', res.raw)
     return { data: JSON.parse(res.raw.replaceAll("'", '"')) }
   } catch (error) {
     const err = error as any
-    console.log({ error })
     return { error: err?.message ?? error }
   } finally {
     await ps.dispose()
@@ -16,7 +14,6 @@ const executeOn = async (powershellCommand: string) => {
 }
 export async function getActivePatient() {
   const isOnlineAndWithActivePatient = await getTurbomedIsOn()
-  console.log({ isOnlineAndWithActivePatient })
   if (isOnlineAndWithActivePatient?.data?.error)
     return {
       error: `(Turbomed aus/Aktiver Patient da?)\n${isOnlineAndWithActivePatient?.data?.error}`

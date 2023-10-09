@@ -5,7 +5,7 @@ declare global {
   interface Window {
     electron: ElectronAPI
     api: {
-      ping: () => void
+      ping: (address:string) => void
       getActivePatient: () => Promise<{ data:Patient,error:any }>
       openNewWindow: (path:string) => void
     }

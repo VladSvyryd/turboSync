@@ -1,15 +1,23 @@
-import { FunctionComponent } from 'react'
+import { FunctionComponent, useEffect } from 'react'
 // import Versions from "../../components/Versions";
 
 import imgUrl from '../../assets/home.svg'
 import { Button, Stack } from '@chakra-ui/react'
 import { FiMove } from 'react-icons/fi'
 import { IoIosSettings } from 'react-icons/io'
+import { useSettingsStore } from '../../store'
 interface OwnProps {}
 
 type Props = OwnProps
 
 const index: FunctionComponent<Props> = () => {
+  const { apiBaseUrl } = useSettingsStore()
+
+  useEffect(() => {
+    if (apiBaseUrl === '') {
+      window.api.openNewWindow('settings')
+    }
+  }, [apiBaseUrl])
   return (
     <Stack
       style={{

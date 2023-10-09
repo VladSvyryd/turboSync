@@ -119,6 +119,14 @@ ipcMain.on('openNewWindow', (_, path) => {
   }
 })
 
+// ipcMain.on('ping', (_, path) => {
+//   ;['path'].forEach(function (host) {
+//     ping.promise.probe(host).then(function (res) {
+//       console.log(res)
+//     })
+//   })
+// })
+
 // In this file you can include the rest of your app"s specific main process
 // code. You can also put them in separate blackList and require them here.
 

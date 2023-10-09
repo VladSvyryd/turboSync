@@ -1,12 +1,11 @@
 import { contextBridge } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
-import { getActivePatient } from '../main/turbomed'
+import { getActivePatient } from './turbomed'
+import { pingAddress } from './ping'
 
 // Custom APIs for renderer
 const api = {
-  ping: () => {
-    console.log('pong')
-  },
+  ping: pingAddress,
   getActivePatient,
   openNewWindow: (path: string) => {
     electronAPI.ipcRenderer.send('openNewWindow', path)

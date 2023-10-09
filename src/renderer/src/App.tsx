@@ -7,7 +7,13 @@ function App() {
     <ChakraProvider
       theme={theme}
       toastOptions={{
-        defaultOptions: { position: 'top', duration: 5000, isClosable: true }
+        defaultOptions: {
+          status: 'error',
+          title: 'Ups! Server Problem.',
+          position: 'top',
+          duration: 5000,
+          isClosable: true
+        }
       }}
     >
       <Navigation />

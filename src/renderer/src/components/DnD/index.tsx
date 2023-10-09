@@ -3,69 +3,75 @@ import { DragEvent, ChangeEvent, FunctionComponent, useState, ReactNode } from '
 import { Stack, Text, useToast, VisuallyHiddenInput } from '@chakra-ui/react'
 import { TbFileTypeDocx } from 'react-icons/tb'
 
+const wrongFormatText = 'Nur .docx, .dotx, .dotm Dateien sind erlaubt.'
+const supportedFormats = new Set([
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.template'
+])
 interface OwnProps {
-  files: Array<string>
+  blackList: Array<string>
+  onDropFiles: (files: Array<File>) => void
   children: ReactNode
 }
 
 type Props = OwnProps
-const wrongFormatText = 'Nur .docx Dateien sind erlaubt.'
-const errorByFileText = 'Ups. Etwas ist schiefgegangen.'
-
-const index: FunctionComponent<Props> = ({ files, children }) => {
-  const uniqueFiles = new Set(files)
-  const [pickedFiles, setPickedFiles] = useState<File[]>([])
-  const [draggedOver, setDraggedOver] = useState(false)
+const index: FunctionComponent<Props> = ({ blackList, onDropFiles, children }) => {
   const toast = useToast()
+  const [draggedOver, setDraggedOver] = useState(false)
+  const uniqueFiles = new Set([...blackList])
 
-  const addFiles = (files: FileList | null) => {
-    if (files) {
-      Array.from(files).forEach((file, i) => {
-        console.log('file', uniqueFiles, file)
-        if (
-          file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-        ) {
-          if (uniqueFiles.has(file.name)) {
-            toast({
-              title: 'Warnung',
-              description: `${file.name} - Datei bereits ausgewählt.`,
-              status: 'warning'
-            })
-            return
-          }
-          setPickedFiles((prev) => [...prev, file])
-        } else {
-          toast({
-            title: 'Warnung',
-            description: wrongFormatText,
-            status: 'warning'
-          })
+  const processFiles = async (files: FileList) => {
+    const uploadFiles: Array<File> = []
+    const alreadyExistFiles: Array<File> = []
+    const wrongFormatFiles: Array<File> = []
+
+    Array.from(files).forEach((file) => {
+      console.log('file', file)
+      if (supportedFormats.has(file.type)) {
+        if (uniqueFiles.has(file.name)) {
+          alreadyExistFiles.push(file)
+
+          return
         }
-      })
-    } else {
+        uploadFiles.push(file)
+      } else {
+        wrongFormatFiles.push(file)
+      }
+    })
+
+    if (wrongFormatFiles.length > 0) {
       toast({
-        title: 'Fehler',
-        description: errorByFileText,
+        title: 'Warnung',
+        description: `${wrongFormatFiles.map((f) => f.name).join(', ')} - ${wrongFormatText}`,
         status: 'error'
       })
     }
+    if (alreadyExistFiles.length > 0) {
+      toast({
+        title: 'Warnung',
+        description: `${alreadyExistFiles
+          .map((f) => f.name)
+          .join(', ')} - Dateien sind bereits in der Liste.`,
+        status: 'warning'
+      })
+    }
+
+    onDropFiles(uploadFiles)
   }
-  const handleDropHandler = (ev: DragEvent<HTMLDivElement>) => {
+  const handleDropHandler = async (ev: DragEvent<HTMLDivElement>) => {
     ev.preventDefault()
-    addFiles(ev.dataTransfer.files)
+    await processFiles(ev.dataTransfer.files)
     setDraggedOver(false)
   }
 
-  const handleInputChange = (ev: ChangeEvent<HTMLInputElement>) => {
-    addFiles(ev.target.files)
+  const handleInputChange = async (ev: ChangeEvent<HTMLInputElement>) => {
+    if (ev.target.files) await processFiles(ev.target.files)
   }
   const handleDragOVerHandler = (ev: DragEvent<HTMLDivElement>) => {
     ev.preventDefault()
     setDraggedOver(true)
   }
   const handleDragLeaveHandle = (ev: DragEvent<HTMLDivElement>) => {
-    console.log('leave')
-
     ev.preventDefault()
     setDraggedOver(false)
   }
@@ -96,7 +102,7 @@ const index: FunctionComponent<Props> = ({ files, children }) => {
           >
             <TbFileTypeDocx size={50} />
             <Text fontWeight={500} textAlign={'center'}>
-              Datei(n) hierhin ziehen oder auswählen.*
+              Datei(n) hierhin ziehen*
             </Text>
           </Stack>
         </Stack>

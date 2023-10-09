@@ -11,6 +11,9 @@ const styles = {
   global: {
     body: {
       backgroundColor: 'transparent'
+    },
+    html: {
+      height: '100vh'
     }
   }
 }

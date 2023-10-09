@@ -112,7 +112,7 @@ ipcMain.on('openNewPO', () => {
 })
 
 // In this file you can include the rest of your app"s specific main process
-// code. You can also put them in separate files and require them here.
+// code. You can also put them in separate blackList and require them here.
 
 // function isWithinDisplayBounds(pos: { x: number; y: number }) {
 //   const displays = screen.getAllDisplays()

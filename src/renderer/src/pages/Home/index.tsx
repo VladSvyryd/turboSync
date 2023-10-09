@@ -2,7 +2,7 @@ import { FunctionComponent } from 'react'
 // import Versions from "../../components/Versions";
 
 import imgUrl from '../../assets/home.svg'
-import { Box, Button, Stack } from '@chakra-ui/react'
+import { Button, Stack } from '@chakra-ui/react'
 import { FiMove } from 'react-icons/fi'
 
 interface OwnProps {}

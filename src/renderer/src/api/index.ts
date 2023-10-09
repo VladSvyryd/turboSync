@@ -1,7 +1,8 @@
 import axios from 'axios'
+import { useSettingsStore } from '../store'
 
 export const ServerApi = axios.create({
-  baseURL: 'http://localhost:3333',
+  baseURL: `http://${useSettingsStore.getState().apiBaseUrl}`,
   headers: {
     'Content-Type': 'application/json'
   }

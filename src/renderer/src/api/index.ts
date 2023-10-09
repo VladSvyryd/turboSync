@@ -1,3 +1,11 @@
+import axios from 'axios'
+
+export const ServerApi = axios.create({
+  baseURL: 'http://localhost:3333',
+  headers: {
+    'Content-Type': 'application/json'
+  }
+})
 export const fetcherWithQuery = async (url: string, options?: RequestInit) => {
   const res = await fetch(url, options)
 

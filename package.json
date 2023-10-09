@@ -26,6 +26,7 @@
     "@electron-toolkit/utils": "^2.0.0",
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
+    "axios": "^1.5.1",
     "chakra-ui-contextmenu": "^1.0.5",
     "electron-updater": "^6.1.1",
     "framer-motion": "^10.16.4",

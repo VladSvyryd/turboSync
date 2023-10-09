@@ -3,6 +3,7 @@ import { List, ListItem, ScaleFade, Spinner, Stack } from '@chakra-ui/react'
 import ListButton from '../../components/ListButton/ListButton'
 import DeleteSubmitModal from './DeleteSubmitModal'
 import ErrorModal from './ErrorModal'
+import { ServerApi } from '../../api'
 
 interface OwnProps {
   files?: Array<string>
@@ -25,15 +26,9 @@ const DocList: FunctionComponent<Props> = ({ files, onInteractionWithList, loadi
         setError(activePatient?.error)
         return
       }
-      const processTemplate = await fetch(`http://192.168.185.59:3333/api/processTemplate`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          ...activePatient.data,
-          docTitle: docUniqTitle
-        })
+      const processTemplate = await ServerApi.post(`/api/processTemplate`, {
+        ...activePatient.data,
+        docTitle: docUniqTitle
       })
       console.log('processTemplate', processTemplate)
     } catch (e) {
@@ -45,14 +40,10 @@ const DocList: FunctionComponent<Props> = ({ files, onInteractionWithList, loadi
   }
   const handleDeleteDoc = async (docUniqTitle: string) => {
     try {
-      const deleteTemplate = await fetch(`http://192.168.185.59:3333/api/deleteTemplate`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
+      const deleteTemplate = await ServerApi.delete(`/api/deleteTemplate`, {
+        data: {
           docTitle: docUniqTitle
-        })
+        }
       })
 
       console.log('deleteTemplate', deleteTemplate)

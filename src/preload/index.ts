@@ -8,8 +8,8 @@ const api = {
     console.log('pong')
   },
   getActivePatient,
-  open: () => {
-    electronAPI.ipcRenderer.send('openNewPO')
+  openNewWindow: (path: string) => {
+    electronAPI.ipcRenderer.send('openNewWindow', path)
   }
 }
 

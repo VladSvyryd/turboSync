@@ -43,7 +43,6 @@ const index: FunctionComponent<Props> = () => {
     }
     await mutate()
   }
-
   if (isValidating && !data) {
     return <Progress size="xs" isIndeterminate />
   }

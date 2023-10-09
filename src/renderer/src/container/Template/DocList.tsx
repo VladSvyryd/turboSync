@@ -1,9 +1,10 @@
 import { FunctionComponent, useState } from 'react'
-import { List, ListItem, ScaleFade, Spinner, Stack } from '@chakra-ui/react'
+import { List, ListItem, ScaleFade, Spinner, Stack, useToast } from '@chakra-ui/react'
 import ListButton from '../../components/ListButton/ListButton'
 import DeleteSubmitModal from './DeleteSubmitModal'
 import ErrorModal from './ErrorModal'
 import { ServerApi } from '../../api'
+import { AxiosError } from 'axios'
 
 interface OwnProps {
   files?: Array<string>
@@ -14,6 +15,7 @@ interface OwnProps {
 type Props = OwnProps
 
 const DocList: FunctionComponent<Props> = ({ files, onInteractionWithList, loading }) => {
+  const toast = useToast()
   const [loadingProcessTemplate, setLoadingProcessTemplate] = useState<null | string>(null)
   const [error, setError] = useState<string | null>(null)
   const [deleteModal, setDeleteModal] = useState<string | null>(null)
@@ -32,8 +34,10 @@ const DocList: FunctionComponent<Props> = ({ files, onInteractionWithList, loadi
       })
       console.log('processTemplate', processTemplate)
     } catch (e) {
-      console.log(e)
-      setError(JSON.stringify(e))
+      const err = e as AxiosError<{ message: string }>
+      toast({
+        description: err.response?.data?.message ?? 'Fehler beim Verarbeiten der Vorlage.'
+      })
     } finally {
       setLoadingProcessTemplate(null)
     }
@@ -76,9 +80,8 @@ const DocList: FunctionComponent<Props> = ({ files, onInteractionWithList, loadi
       />
       <List sx={{ py: 2 }} spacing={1}>
         {files?.map((title) => (
-          <ListItem>
+          <ListItem key={title}>
             <ListButton
-              key={title}
               title={title}
               onClick={handleDocClick}
               loading={loadingProcessTemplate === title}

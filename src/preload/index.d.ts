@@ -7,7 +7,7 @@ declare global {
     api: {
       ping: () => void
       getActivePatient: () => Promise<{ data:Patient,error:any }>
-      open: () => Promise<void>
+      openNewWindow: (path:string) => void
     }
   }
 }

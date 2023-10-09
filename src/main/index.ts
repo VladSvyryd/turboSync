@@ -2,6 +2,7 @@ import { app, shell, BrowserWindow, ipcMain, screen } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
+import * as url from 'url'
 
 const minWidth = 100
 const minHeight = 150
@@ -23,7 +24,8 @@ function createWindow(): void {
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
-      sandbox: false
+      sandbox: false,
+      devTools: true
     }
   })
 
@@ -77,7 +79,7 @@ app.on('window-all-closed', () => {
   }
 })
 
-ipcMain.on('openNewPO', () => {
+ipcMain.on('openNewWindow', (_, path) => {
   if (popWindow) {
     popWindow.destroy()
   }
@@ -105,9 +107,15 @@ ipcMain.on('openNewPO', () => {
   // popWindow.setPosition()
   popWindow.removeMenu()
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
-    popWindow.loadURL('http://localhost:5173/templates')
+    popWindow.loadURL(`http://localhost:5173/${path}`)
   } else {
-    popWindow.loadFile(join(__dirname, '../renderer/index.html#templates'))
+    const loadUrl = url.format({
+      pathname: join(__dirname, `../renderer/index.html`),
+      hash: `/${path}`,
+      protocol: 'file:',
+      slashes: true
+    })
+    popWindow.loadURL(loadUrl)
   }
 })
 

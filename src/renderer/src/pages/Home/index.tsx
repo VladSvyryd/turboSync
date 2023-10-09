@@ -4,7 +4,7 @@ import { FunctionComponent } from 'react'
 import imgUrl from '../../assets/home.svg'
 import { Button, Stack } from '@chakra-ui/react'
 import { FiMove } from 'react-icons/fi'
-
+import { IoIosSettings } from 'react-icons/io'
 interface OwnProps {}
 
 type Props = OwnProps
@@ -21,7 +21,7 @@ const index: FunctionComponent<Props> = () => {
       {/*<Versions></Versions>*/}
       <button
         onClick={async () => {
-          window.api.open()
+          window.api.openNewWindow('templates')
         }}
         style={{
           width: '100%',
@@ -32,14 +32,25 @@ const index: FunctionComponent<Props> = () => {
         <img src={imgUrl} alt={'home'} style={{ width: '100%', height: 'auto' }} />
       </button>
 
-      <Button
-        sx={{
-          '-webkit-app-region': 'drag',
-          ' -webkit-user-select': 'none'
-        }}
-      >
-        <FiMove />
-      </Button>
+      <Stack flexDir={'row'}>
+        <Button
+          size={'sm'}
+          onClick={async () => {
+            window.api.openNewWindow('settings')
+          }}
+        >
+          <IoIosSettings />
+        </Button>
+        <Button
+          size={'sm'}
+          sx={{
+            '-webkit-app-region': 'drag',
+            ' -webkit-user-select': 'none'
+          }}
+        >
+          <FiMove />
+        </Button>
+      </Stack>
     </Stack>
   )
 }

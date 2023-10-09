@@ -74,7 +74,7 @@ const ListButton: FunctionComponent<Props> = ({ title, onClick, loading, context
       >
         <List spacing={1}>
           {contextMenuLinks.map((link) => (
-            <ListItem>
+            <ListItem key={link.title}>
               <Button
                 onClick={link.onClick}
                 ref={initialFocusRef}

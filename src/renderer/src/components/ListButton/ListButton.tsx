@@ -5,17 +5,18 @@ import { FaChevronRight } from 'react-icons/fa'
 import { usePopper } from 'react-popper'
 import { VirtualElement } from '@popperjs/core'
 import ListButtonWithContext from './ListButtonWithContext'
+import { DocFile } from '../../types'
 
 export type ContextMenu = Array<{
   title: string
-  onClick: (title: string, handleClose: () => void) => void
+  onClick: (title: DocFile, handleClose: () => void) => void
   leftIcon?: ReactElement
   rightIcon?: ReactElement
   contextMenuLinks?: ContextMenu
 }>
 interface OwnProps {
-  title: string
-  onClick: (title: string) => void
+  docFile: DocFile
+  onClick: (file: DocFile) => void
   loading: boolean
   contextMenuLinks: ContextMenu
   placement?: 'bottom' | 'end'
@@ -36,7 +37,7 @@ function generateGetBoundingClientRect(x = 0, y = 0) {
 }
 
 const ListButton: FunctionComponent<Props> = ({
-  title,
+  docFile,
   onClick,
   loading,
   contextMenuLinks,
@@ -67,21 +68,21 @@ const ListButton: FunctionComponent<Props> = ({
     <>
       <Button
         variant={'ghost'}
-        onContextMenu={(e) => handleContextMenu(e, title)}
-        onClick={() => onClick(title)}
+        onContextMenu={(e) => handleContextMenu(e, docFile.name)}
+        onClick={() => onClick(docFile)}
         leftIcon={leftIcon ?? <SiGoogledocs />}
         w={'100%'}
         justifyContent={'start'}
         borderRadius={0}
         isDisabled={loading}
         isLoading={loading}
-        loadingText={`${title} (in Arbeit)`}
-        isActive={Boolean(referenceElement?.contextMenu === title)}
+        loadingText={`${docFile.name} (in Arbeit)`}
+        isActive={Boolean(referenceElement?.contextMenu === docFile.name)}
         rightIcon={rightIcon}
       >
-        <Text noOfLines={1}>{title}</Text>
+        <Text noOfLines={1}>{docFile.name}</Text>
       </Button>
-      {Boolean(referenceElement?.contextMenu === title) && (
+      {Boolean(referenceElement?.contextMenu === docFile.name) && (
         <Box
           pos={'absolute'}
           top={0}
@@ -96,7 +97,7 @@ const ListButton: FunctionComponent<Props> = ({
         />
       )}
 
-      {Boolean(referenceElement?.contextMenu === title) && (
+      {Boolean(referenceElement?.contextMenu === docFile.name) && (
         <Box
           ref={setPopperElement}
           zIndex={101}
@@ -109,7 +110,7 @@ const ListButton: FunctionComponent<Props> = ({
               link.contextMenuLinks ? (
                 <ListButtonWithContext
                   title={link.title}
-                  onClick={() => link.onClick(link.title, handleClose)}
+                  onClick={() => link.onClick(docFile, handleClose)}
                   loading={false}
                   contextMenuLinks={link.contextMenuLinks}
                   placement={'end-start'}
@@ -120,13 +121,13 @@ const ListButton: FunctionComponent<Props> = ({
                 <ListItem key={link.title}>
                   <Button
                     onClick={() => {
-                      if (link.onClick) link.onClick(link.title, handleClose)
+                      if (link.onClick) link.onClick(docFile, handleClose)
                     }}
                     width={'100%'}
                     ref={initialFocusRef}
                     justifyContent={'start'}
                     borderRadius={0}
-                    loadingText={`${title} (in Arbeit)`}
+                    loadingText={`${docFile.name} (in Arbeit)`}
                     leftIcon={link.leftIcon}
                     colorScheme={'teal'}
                   >

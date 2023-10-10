@@ -27,9 +27,9 @@ const DocList: FunctionComponent<Props> = ({ files, listId, onInteractionWithLis
   const [error, setError] = useState<string | null>(null)
   const [deleteModal, setDeleteModal] = useState<string | null>(null)
 
-  const handleDocClick = async (docUniqTitle: string) => {
+  const handleDocClick = async (docFile: DocFile) => {
     try {
-      setLoadingProcessTemplate(docUniqTitle)
+      setLoadingProcessTemplate(docFile.name)
       const activePatient = await window.api.getActivePatient()
       if (!Boolean(activePatient?.data?.id)) {
         setError(activePatient?.error)
@@ -37,7 +37,8 @@ const DocList: FunctionComponent<Props> = ({ files, listId, onInteractionWithLis
       }
       const processTemplate = await ServerApi.post(`/api/processTemplate`, {
         ...activePatient.data,
-        docTitle: docUniqTitle
+        docTitle: docFile.name,
+        docPath: docFile.path
       })
       console.log('processTemplate', processTemplate)
     } catch (e) {
@@ -102,7 +103,7 @@ const DocList: FunctionComponent<Props> = ({ files, listId, onInteractionWithLis
         {files?.map((file) => (
           <ListItem key={file.name}>
             <ListButton
-              title={file.name}
+              docFile={file}
               onClick={handleDocClick}
               loading={loadingProcessTemplate === file.name}
               contextMenuLinks={[

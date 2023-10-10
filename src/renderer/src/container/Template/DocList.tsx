@@ -53,7 +53,7 @@ const DocList: FunctionComponent<Props> = ({ files, listId, onInteractionWithLis
     try {
       await ServerApi.delete(`/api/deleteTemplate`, {
         data: {
-          docTitle: docUniqTitle
+          docPath: docUniqTitle
         }
       })
     } catch (e) {
@@ -133,7 +133,7 @@ const DocList: FunctionComponent<Props> = ({ files, listId, onInteractionWithLis
                 {
                   title: 'Löschen',
                   onClick: async () => {
-                    setDeleteModal(file.name)
+                    setDeleteModal(file.path)
                   },
                   leftIcon: <FaTrash />
                 }

@@ -9,7 +9,7 @@ import { DocFile } from '../../types'
 
 export type ContextMenu = Array<{
   title: string
-  onClick: (title: DocFile, handleClose: () => void) => void
+  onClick: (title: string, handleClose: () => void) => void
   leftIcon?: ReactElement
   rightIcon?: ReactElement
   contextMenuLinks?: ContextMenu
@@ -110,7 +110,7 @@ const ListButton: FunctionComponent<Props> = ({
               link.contextMenuLinks ? (
                 <ListButtonWithContext
                   title={link.title}
-                  onClick={() => link.onClick(docFile, handleClose)}
+                  onClick={() => link.onClick(docFile.name, handleClose)}
                   loading={false}
                   contextMenuLinks={link.contextMenuLinks}
                   placement={'end-start'}
@@ -121,7 +121,7 @@ const ListButton: FunctionComponent<Props> = ({
                 <ListItem key={link.title}>
                   <Button
                     onClick={() => {
-                      if (link.onClick) link.onClick(docFile, handleClose)
+                      if (link.onClick) link.onClick(docFile.name, handleClose)
                     }}
                     width={'100%'}
                     ref={initialFocusRef}

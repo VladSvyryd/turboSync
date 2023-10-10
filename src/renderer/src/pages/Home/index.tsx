@@ -37,7 +37,14 @@ const index: FunctionComponent<Props> = () => {
           // margin:10
         }}
       >
-        <img src={imgUrl} alt={'home'} style={{ width: '100%', height: 'auto' }} />
+        <img
+          src={imgUrl}
+          alt={'home'}
+          style={{
+            width: '100%',
+            height: 'auto'
+          }}
+        />
       </button>
 
       <Stack flexDir={'row'}>
@@ -53,7 +60,7 @@ const index: FunctionComponent<Props> = () => {
           size={'sm'}
           sx={{
             '-webkit-app-region': 'drag',
-            ' -webkit-user-select': 'none'
+            '-webkit-user-select': 'none'
           }}
         >
           <FiMove />

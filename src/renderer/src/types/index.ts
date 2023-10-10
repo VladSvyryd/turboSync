@@ -17,4 +17,5 @@ export enum SignType {
 export type DocFile = {
   name: string
   path: string
+  networkPath: string
 }

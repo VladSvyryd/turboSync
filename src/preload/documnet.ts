@@ -1,5 +1,5 @@
 import { shell } from 'electron'
 
-export const openDoc = (filePath: string) => {
-  shell.openPath(filePath)
+export const openDoc = async (filePath: string) => {
+  await shell.openPath('\\' + filePath)
 }

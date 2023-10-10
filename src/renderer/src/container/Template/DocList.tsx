@@ -8,6 +8,8 @@ import { AxiosError } from 'axios'
 import { TbArrowsTransferDown } from 'react-icons/tb'
 import { FaTrash, FaFileWord, FaChevronRight } from 'react-icons/fa'
 import { FaArrowRightArrowLeft } from 'react-icons/fa6'
+import { MdDocumentScanner } from 'react-icons/md'
+
 import { DocFile, SignType } from '../../types'
 import { useListStore } from '../../store/ListStore'
 
@@ -110,11 +112,17 @@ const DocList: FunctionComponent<Props> = ({ files, listId, onInteractionWithLis
                 {
                   title: 'Öffnen',
                   onClick: async (_, closeMenu) => {
-                    window.api.openDoc(file.path)
+                    window.api.openDoc(file.networkPath)
                     if (closeMenu) closeMenu()
                   },
                   leftIcon: <FaFileWord />
                 },
+                {
+                  title: 'Nachreichen',
+                  onClick: async () => {},
+                  leftIcon: <MdDocumentScanner />
+                },
+
                 {
                   title: 'Verschieben',
                   onClick: async () => {},

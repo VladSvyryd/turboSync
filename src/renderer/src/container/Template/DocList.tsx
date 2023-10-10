@@ -141,7 +141,8 @@ const DocList: FunctionComponent<Props> = ({ files, listId, onInteractionWithLis
                 },
                 {
                   title: 'Löschen',
-                  onClick: async () => {
+                  onClick: async (_, closeMenu) => {
+                    closeMenu()
                     setDeleteModal(file.path)
                   },
                   leftIcon: <FaTrash />

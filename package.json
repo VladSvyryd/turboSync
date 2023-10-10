@@ -26,6 +26,7 @@
     "@electron-toolkit/utils": "^2.0.0",
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
+    "@popperjs/core": "^2.11.8",
     "axios": "^1.5.1",
     "chakra-ui-contextmenu": "^1.0.5",
     "electron-updater": "^6.1.1",
@@ -33,6 +34,7 @@
     "node-powershell": "^5.0.1",
     "ping": "^0.4.4",
     "react-icons": "^4.11.0",
+    "react-popper": "^2.3.0",
     "react-router-dom": "^6.16.0",
     "swr": "^2.2.4",
     "zustand": "^4.4.3"

@@ -7,3 +7,14 @@ export type Patient = {
   street: string
   houseNumber: string
 }
+
+export enum SignType {
+  PRINT = 'PRINT',
+  LINK = 'LINK',
+  SIGNPAD = 'SIGNPAD'
+}
+
+export type DocFile = {
+  name: string
+  path: string
+}

@@ -8,6 +8,7 @@ declare global {
       ping: (address:string) => void
       getActivePatient: () => Promise<{ data:Patient,error:any }>
       openNewWindow: (path:string) => void
+      openDoc: (docTitle:string) => void
     }
   }
 }

@@ -5,17 +5,24 @@ import DeleteSubmitModal from './DeleteSubmitModal'
 import ErrorModal from './ErrorModal'
 import { ServerApi } from '../../api'
 import { AxiosError } from 'axios'
+import { TbArrowsTransferDown } from 'react-icons/tb'
+import { FaTrash, FaFileWord, FaChevronRight } from 'react-icons/fa'
+import { FaArrowRightArrowLeft } from 'react-icons/fa6'
+import { DocFile, SignType } from '../../types'
+import { useListStore } from '../../store/ListStore'
 
 interface OwnProps {
-  files?: Array<string>
+  listId: SignType
+  files?: Array<DocFile>
   loading?: boolean
   onInteractionWithList: () => void
 }
 
 type Props = OwnProps
 
-const DocList: FunctionComponent<Props> = ({ files, onInteractionWithList, loading }) => {
+const DocList: FunctionComponent<Props> = ({ files, listId, onInteractionWithList, loading }) => {
   const toast = useToast()
+  const { titles } = useListStore()
   const [loadingProcessTemplate, setLoadingProcessTemplate] = useState<null | string>(null)
   const [error, setError] = useState<string | null>(null)
   const [deleteModal, setDeleteModal] = useState<string | null>(null)
@@ -44,13 +51,26 @@ const DocList: FunctionComponent<Props> = ({ files, onInteractionWithList, loadi
   }
   const handleDeleteDoc = async (docUniqTitle: string) => {
     try {
-      const deleteTemplate = await ServerApi.delete(`/api/deleteTemplate`, {
+      await ServerApi.delete(`/api/deleteTemplate`, {
         data: {
           docTitle: docUniqTitle
         }
       })
-
-      console.log('deleteTemplate', deleteTemplate)
+    } catch (e) {
+      console.log(e)
+      setError(JSON.stringify(e))
+    } finally {
+      onInteractionWithList()
+      setDeleteModal(null)
+    }
+  }
+  const handleMoveDoc = async (docUniqTitle: string, to: SignType) => {
+    try {
+      await ServerApi.put(`/api/moveTemplate`, {
+        from: listId,
+        docTitle: docUniqTitle,
+        to
+      })
     } catch (e) {
       console.log(e)
       setError(JSON.stringify(e))
@@ -79,18 +99,43 @@ const DocList: FunctionComponent<Props> = ({ files, onInteractionWithList, loadi
         }}
       />
       <List sx={{ py: 2 }} spacing={1}>
-        {files?.map((title) => (
-          <ListItem key={title}>
+        {files?.map((file) => (
+          <ListItem key={file.name}>
             <ListButton
-              title={title}
+              title={file.name}
               onClick={handleDocClick}
-              loading={loadingProcessTemplate === title}
+              loading={loadingProcessTemplate === file.name}
               contextMenuLinks={[
+                {
+                  title: 'Öffnen',
+                  onClick: async (_, closeMenu) => {
+                    window.api.openDoc(file.path)
+                    if (closeMenu) closeMenu()
+                  },
+                  leftIcon: <FaFileWord />
+                },
+                {
+                  title: 'Verschieben',
+                  onClick: async () => {},
+                  leftIcon: <TbArrowsTransferDown />,
+                  rightIcon: <FaChevronRight size={10} />,
+                  contextMenuLinks: Object.keys(titles)
+                    .filter((k) => k !== listId)
+                    .map((title) => ({
+                      title: titles[title],
+                      onClick: async () => {
+                        await handleMoveDoc(file.name, title as SignType)
+                        onInteractionWithList()
+                      },
+                      leftIcon: <FaArrowRightArrowLeft />
+                    }))
+                },
                 {
                   title: 'Löschen',
                   onClick: async () => {
-                    setDeleteModal(title)
-                  }
+                    setDeleteModal(file.name)
+                  },
+                  leftIcon: <FaTrash />
                 }
               ]}
             />

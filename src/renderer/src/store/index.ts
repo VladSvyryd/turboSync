@@ -14,7 +14,7 @@ export const useSettingsStore = create<SettingsState>()(
         setApiBaseUrl: (apiBaseUrl) => set(() => ({ apiBaseUrl }))
       }),
       {
-        name: 'bear-storage'
+        name: 'settings-storage'
       }
     )
   )

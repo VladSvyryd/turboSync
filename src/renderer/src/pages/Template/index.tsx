@@ -3,7 +3,8 @@ import { Progress, useToast } from '@chakra-ui/react'
 import useSWR from 'swr'
 import { fetcherWithQuery, ServerApi } from '../../api'
 import DnD from '../../components/DnD'
-import DocList from '../../container/Template/DocList'
+import DocFolders from '../../components/Doc/DocFolders'
+import { DocFile, SignType } from '../../types'
 
 interface OwnProps {}
 
@@ -12,7 +13,9 @@ type Props = OwnProps
 const index: FunctionComponent<Props> = () => {
   const toast = useToast()
   const url = `${ServerApi.getUri()}/api/templates`
-  const { data, isValidating, mutate } = useSWR<{ files: Array<string> }>(url, fetcherWithQuery, {
+  const { data, isValidating, mutate } = useSWR<{
+    folders: Array<{ name: SignType; files: Array<DocFile> }>
+  }>(url, fetcherWithQuery, {
     onError: (err) => {
       console.log(err)
       toast({
@@ -41,20 +44,21 @@ const index: FunctionComponent<Props> = () => {
     }
     await mutate()
   }
+
+  const allFiles = data?.folders.flatMap((folder) => folder.files).map((f) => f.name) ?? []
+
   if (isValidating && !data) {
     return <Progress size="xs" isIndeterminate />
   }
 
   return (
-    <>
-      <DnD blackList={data?.files ?? []} onDropFiles={handleAddFiles}>
-        <DocList
-          onInteractionWithList={mutate}
-          files={data?.files}
-          loading={Boolean(isValidating && data)}
-        />
-      </DnD>
-    </>
+    <DnD blackList={allFiles} onDropFiles={handleAddFiles}>
+      <DocFolders
+        folders={data?.folders ?? []}
+        loading={isValidating && !data}
+        onInteractionWithList={mutate}
+      />
+    </DnD>
   )
 }
 

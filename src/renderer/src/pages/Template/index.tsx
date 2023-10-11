@@ -1,18 +1,51 @@
-import { FunctionComponent } from 'react'
-import { Progress, useToast } from '@chakra-ui/react'
+import { FunctionComponent, useState } from 'react'
+import { Button, Progress, Stack, useToast } from '@chakra-ui/react'
 import useSWR from 'swr'
 import { fetcherWithQuery, ServerApi } from '../../api'
 import DnD from '../../components/DnD'
 import DocFolders from '../../components/Doc/DocFolders'
 import { DocFile, SignType } from '../../types'
+import SignTypePicker from '../../components/Modals/SignTypePicker'
+import { BsPrinterFill, BsQrCodeScan } from 'react-icons/bs'
+import { LiaSignatureSolid } from 'react-icons/lia'
 
 interface OwnProps {}
 
 type Props = OwnProps
 
+const buttons = [
+  {
+    id: SignType.SIGNPAD,
+    title: 'QR-Code',
+    header: (
+      <Stack direction={'row'} justifyContent={'center'} gap={5}>
+        <BsQrCodeScan size={60} />
+      </Stack>
+    )
+  },
+  {
+    id: SignType.PRINT,
+    title: 'QR-Code / SignPad',
+    header: (
+      <Stack direction={'row'} justifyContent={'center'} gap={5}>
+        <BsQrCodeScan size={60} />, <LiaSignatureSolid size={64} />
+      </Stack>
+    )
+  },
+  {
+    id: SignType.LINK,
+    title: 'QR-Code / SignPad / Drucken',
+    header: (
+      <Stack direction={'row'} justifyContent={'center'} gap={5}>
+        <BsQrCodeScan size={60} /> <LiaSignatureSolid size={60} /> <BsPrinterFill size={60} />
+      </Stack>
+    )
+  }
+]
 const index: FunctionComponent<Props> = () => {
   const toast = useToast()
   const url = `${ServerApi.getUri()}/api/templates`
+  const [modalOn, setModalOn] = useState(false)
   const { data, isValidating, mutate } = useSWR<{
     folders: Array<{ name: SignType; files: Array<DocFile> }>
   }>(url, fetcherWithQuery, {
@@ -25,6 +58,8 @@ const index: FunctionComponent<Props> = () => {
   })
 
   const handleAddFiles = async (uploadFiles: Array<File>) => {
+    setModalOn(true)
+    return
     if (uploadFiles.length === 0) {
       return
     }
@@ -52,13 +87,24 @@ const index: FunctionComponent<Props> = () => {
   }
 
   return (
-    <DnD blackList={allFiles} onDropFiles={handleAddFiles}>
-      <DocFolders
-        folders={data?.folders ?? []}
-        loading={isValidating && !data}
-        onInteractionWithList={mutate}
+    <>
+      <Button onClick={() => setModalOn(true)}> KLICK</Button>
+      <SignTypePicker
+        signTypeButtons={buttons}
+        isOpen={modalOn}
+        onClose={() => {
+          setModalOn(false)
+        }}
+        onPick={() => {}}
       />
-    </DnD>
+      <DnD blackList={allFiles} onDropFiles={handleAddFiles}>
+        <DocFolders
+          folders={data?.folders ?? []}
+          loading={isValidating && !data}
+          onInteractionWithList={mutate}
+        />
+      </DnD>
+    </>
   )
 }
 

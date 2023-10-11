@@ -1,5 +1,5 @@
 import { FunctionComponent, useState } from 'react'
-import { List, ListItem, ScaleFade, Spinner, Stack, useToast } from '@chakra-ui/react'
+import { List, ListItem, ScaleFade, Spinner, Stack, Text, useToast } from '@chakra-ui/react'
 import ListButton from '../../components/ListButton/ListButton'
 import DeleteSubmitModal from './DeleteSubmitModal'
 import ErrorModal from './ErrorModal'
@@ -12,6 +12,9 @@ import { MdDocumentScanner } from 'react-icons/md'
 
 import { DocFile, SignType } from '../../types'
 import { useListStore } from '../../store/ListStore'
+import SignTypePicker from '../../components/Modals/SignTypePicker'
+import { BsPrinterFill, BsQrCodeScan } from 'react-icons/bs'
+import { LiaSignatureSolid } from 'react-icons/lia'
 
 interface OwnProps {
   listId: SignType
@@ -22,14 +25,95 @@ interface OwnProps {
 
 type Props = OwnProps
 
+const PRINT_BUTTONS = [
+  {
+    id: SignType.SIGNPAD,
+    title: 'QR-Code',
+    header: (
+      <Stack direction={'row'} justifyContent={'center'} gap={5}>
+        <BsQrCodeScan size={60} />
+      </Stack>
+    )
+  },
+  {
+    id: SignType.PRINT,
+    title: 'SignPad',
+    header: (
+      <Stack direction={'row'} justifyContent={'center'} gap={5}>
+        <LiaSignatureSolid size={64} />
+      </Stack>
+    )
+  },
+  {
+    id: SignType.LINK,
+    title: 'Drucken',
+    header: (
+      <Stack direction={'row'} justifyContent={'center'} gap={5}>
+        <BsPrinterFill size={60} />
+      </Stack>
+    )
+  }
+]
+const SIGNPAD_BUTTONS = [
+  {
+    id: SignType.SIGNPAD,
+    title: 'QR-Code',
+    header: (
+      <Stack direction={'row'} justifyContent={'center'} gap={5}>
+        <BsQrCodeScan size={60} />
+      </Stack>
+    )
+  },
+  {
+    id: SignType.PRINT,
+    title: 'SignPad',
+    header: (
+      <Stack direction={'row'} justifyContent={'center'} gap={5}>
+        <LiaSignatureSolid size={64} />
+      </Stack>
+    ),
+    disabled: true
+  },
+  {
+    id: SignType.LINK,
+    title: null,
+    header: (
+      <Stack direction={'row'} justifyContent={'center'} gap={5}>
+        <Text>Sie haben folgende Optionen</Text>
+      </Stack>
+    )
+  }
+]
+const getSelectionButtons = (signType: SignType) => {
+  switch (signType) {
+    case SignType.SIGNPAD: {
+      return SIGNPAD_BUTTONS
+    }
+    case SignType.PRINT: {
+      return PRINT_BUTTONS
+    }
+    default:
+      return PRINT_BUTTONS
+  }
+}
+
 const DocList: FunctionComponent<Props> = ({ files, listId, onInteractionWithList, loading }) => {
   const toast = useToast()
   const { titles } = useListStore()
   const [loadingProcessTemplate, setLoadingProcessTemplate] = useState<null | string>(null)
   const [error, setError] = useState<string | null>(null)
   const [deleteModal, setDeleteModal] = useState<string | null>(null)
-
+  const [activeSignTypePicker, setActiveSignTypePicker] = useState<DocFile | null>(null)
+  const selectionButtons = getSelectionButtons(listId)
   const handleDocClick = async (docFile: DocFile) => {
+    if (listId === SignType.LINK) {
+      await handleStartProcessTemplate(docFile)
+      return
+    }
+    setActiveSignTypePicker(docFile)
+  }
+
+  const handleStartProcessTemplate = async (docFile: DocFile) => {
     try {
       setLoadingProcessTemplate(docFile.name)
       const activePatient = await window.api.getActivePatient()
@@ -84,6 +168,14 @@ const DocList: FunctionComponent<Props> = ({ files, listId, onInteractionWithLis
   }
   return (
     <>
+      <SignTypePicker
+        signTypeButtons={selectionButtons}
+        isOpen={Boolean(activeSignTypePicker)}
+        onClose={() => {
+          setActiveSignTypePicker(null)
+        }}
+        onPick={() => {}}
+      />
       <DeleteSubmitModal
         isOpen={Boolean(deleteModal)}
         onClose={() => {

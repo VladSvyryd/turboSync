@@ -166,6 +166,24 @@ const DocList: FunctionComponent<Props> = ({ files, listId, onInteractionWithLis
       setDeleteModal(null)
     }
   }
+
+  const handlePickSignType = async (signType: SignType) => {
+    if (!activeSignTypePicker) return
+
+    switch (signType) {
+      case SignType.LINK: {
+        return await handleStartProcessTemplate(activeSignTypePicker)
+      }
+      default:
+        toast({
+          title: 'Next Feature.',
+          status: 'warning',
+          description: 'Nicht implementiert.'
+        })
+        return
+    }
+  }
+
   return (
     <>
       <SignTypePicker
@@ -174,7 +192,7 @@ const DocList: FunctionComponent<Props> = ({ files, listId, onInteractionWithLis
         onClose={() => {
           setActiveSignTypePicker(null)
         }}
-        onPick={() => {}}
+        onPick={handlePickSignType}
       />
       <DeleteSubmitModal
         isOpen={Boolean(deleteModal)}

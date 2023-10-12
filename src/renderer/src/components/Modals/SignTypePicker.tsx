@@ -45,17 +45,20 @@ const backgroundButton = [
   {
     transform: 'rotate(0deg) skewY(30deg)',
     backgroundColor: '#319795',
-    hoverBackgroundColor: theme.colors.orange[400]
+    hoverBackgroundColor: theme.colors.orange[400],
+    tapBackgroundColor: theme.colors.orange[200]
   },
   {
     transform: 'rotate(120deg) skewY(30deg)',
     backgroundColor: '#319795',
-    hoverBackgroundColor: theme.colors.green[400]
+    hoverBackgroundColor: theme.colors.green[400],
+    tapBackgroundColor: theme.colors.green[200]
   },
   {
     transform: 'rotate(240deg) skewY(30deg)',
     backgroundColor: '#319795',
-    hoverBackgroundColor: theme.colors.red[400]
+    hoverBackgroundColor: theme.colors.red[400],
+    tapBackgroundColor: theme.colors.red[200]
   }
 ]
 
@@ -109,6 +112,9 @@ const SignTypePicker: FunctionComponent<Props> = ({ isOpen, signTypeButtons, onC
                     disabled
                       ? { cursor: 'auto' }
                       : { backgroundColor: backgroundButton[index].hoverBackgroundColor }
+                  }
+                  whileTap={
+                    disabled ? {} : { backgroundColor: backgroundButton[index].tapBackgroundColor }
                   }
                   initial={'initial'}
                   variants={buttonVariants}

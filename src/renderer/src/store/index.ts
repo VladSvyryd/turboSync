@@ -4,6 +4,8 @@ import { devtools, persist } from 'zustand/middleware'
 interface SettingsState {
   apiBaseUrl: string
   setApiBaseUrl: (apiBaseUrl: string) => void
+  defaultPrinter: string | null
+  setDefaultPrinter: (defaultPrinter: string) => void
 }
 
 export const useSettingsStore = create<SettingsState>()(
@@ -11,7 +13,9 @@ export const useSettingsStore = create<SettingsState>()(
     persist(
       (set) => ({
         apiBaseUrl: '',
-        setApiBaseUrl: (apiBaseUrl) => set(() => ({ apiBaseUrl }))
+        setApiBaseUrl: (apiBaseUrl) => set(() => ({ apiBaseUrl })),
+        defaultPrinter: null,
+        setDefaultPrinter: (defaultPrinter) => set(() => ({ defaultPrinter }))
       }),
       {
         name: 'settings-storage'

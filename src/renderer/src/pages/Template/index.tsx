@@ -1,5 +1,5 @@
 import { FunctionComponent, useState } from 'react'
-import { Button, Progress, Stack, useToast } from '@chakra-ui/react'
+import { Progress, Stack, useToast } from '@chakra-ui/react'
 import useSWR from 'swr'
 import { fetcherWithQuery, ServerApi } from '../../api'
 import DnD from '../../components/DnD'
@@ -45,7 +45,8 @@ const buttons = [
 const index: FunctionComponent<Props> = () => {
   const toast = useToast()
   const url = `${ServerApi.getUri()}/api/templates`
-  const [modalOn, setModalOn] = useState(false)
+  const [activeSignTypePicket, setActiveSignTypePicket] = useState(false)
+  const [uploadFiles, setUploadFiles] = useState<Array<File>>([])
   const { data, isValidating, mutate } = useSWR<{
     folders: Array<{ name: SignType; files: Array<DocFile> }>
   }>(url, fetcherWithQuery, {
@@ -57,16 +58,13 @@ const index: FunctionComponent<Props> = () => {
     }
   })
 
-  const handleAddFiles = async (uploadFiles: Array<File>) => {
-    setModalOn(true)
-    return
-    if (uploadFiles.length === 0) {
-      return
-    }
+  const handleAddFiles = async (signType: SignType) => {
     const formdata = new FormData()
     uploadFiles.forEach((file) => {
       formdata.append('fileStore', file)
     })
+    formdata.append('signType', signType)
+
     const files = await ServerApi.post<{ success: boolean }>('/api/addTemplate', formdata, {
       headers: { 'Content-Type': 'multipart/form-data' }
     })
@@ -80,6 +78,14 @@ const index: FunctionComponent<Props> = () => {
     await mutate()
   }
 
+  const startSignTypePicker = (uploadFiles: Array<File>) => {
+    if (uploadFiles.length === 0) {
+      return
+    }
+    setUploadFiles(uploadFiles)
+    setActiveSignTypePicket(true)
+  }
+
   const allFiles = data?.folders.flatMap((folder) => folder.files).map((f) => f.name) ?? []
 
   if (isValidating && !data) {
@@ -88,16 +94,17 @@ const index: FunctionComponent<Props> = () => {
 
   return (
     <>
-      <Button onClick={() => setModalOn(true)}> KLICK</Button>
       <SignTypePicker
         signTypeButtons={buttons}
-        isOpen={modalOn}
+        isOpen={activeSignTypePicket}
         onClose={() => {
-          setModalOn(false)
+          setActiveSignTypePicket(false)
         }}
-        onPick={() => {}}
+        onPick={async (v) => {
+          await handleAddFiles(v)
+        }}
       />
-      <DnD blackList={allFiles} onDropFiles={handleAddFiles}>
+      <DnD blackList={allFiles} onDropFiles={startSignTypePicker}>
         <DocFolders
           folders={data?.folders ?? []}
           loading={isValidating && !data}

@@ -26,6 +26,7 @@ export async function getActivePatient() {
                   $oPatient       = $app.AktiverPatient()
                   $nummer         = $oPatient.Nummer()
                   $namensdaten    = $oPatient.Namensdaten()
+                  $geburtsdaten   = $oPatient.Geburtsdaten()
                   $vorname        = $namensdaten.Vorname()
                   $nachname       = $namensdaten.Nachname()
                   $adressdaten    = $oPatient.Adressdaten().Postanschrift("Privat", 1)
@@ -33,6 +34,8 @@ export async function getActivePatient() {
                   $plz            = $adressdaten.Postleitzahl()
                   $strasse        = $adressdaten.Strasse()
                   $hausnummer     = $adressdaten.Hausnummer()
+                  $geburtstag     = $geburtsdaten.datum()
+                  $geschlecht     = $geburtsdaten.geschlecht()
                   $json          +=
                   "{'id': '$nummer',
                     'firstName': '$vorname',
@@ -40,7 +43,9 @@ export async function getActivePatient() {
                     'city': '$ort',
                     'zip': '$plz',
                     'street': '$strasse',
-                    'houseNumber': '$hausnummer'
+                    'houseNumber': '$hausnummer',
+                    'birthday': '$geburtstag',
+                    'gender': '$geschlecht'
                   }"
                   echo $json;
                   [System.GC]::Collect()

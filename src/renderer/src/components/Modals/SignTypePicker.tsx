@@ -3,6 +3,7 @@ import { Box, Button, Modal, ModalContent, ModalOverlay, Stack, Text } from '@ch
 import { motion } from 'framer-motion'
 import theme from '../../theme'
 import { SignType } from '../../types'
+import { ModalOverlayStyle } from '../../types/variables'
 
 interface OwnProps {
   isOpen: boolean
@@ -65,7 +66,7 @@ const backgroundButton = [
 const SignTypePicker: FunctionComponent<Props> = ({ isOpen, signTypeButtons, onClose, onPick }) => {
   return (
     <Modal onClose={onClose} isOpen={isOpen} isCentered>
-      <ModalOverlay bg={'transparent'} backdropFilter="blur(1px)" />
+      <ModalOverlay {...ModalOverlayStyle} />
       <ModalContent bg={'transparent'} shadow={'none'}>
         <Box
           bg={'teal'}

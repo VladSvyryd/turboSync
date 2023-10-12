@@ -6,6 +6,8 @@ export type Patient = {
   zip: string
   street: string
   houseNumber: string
+  birthday: string
+  gender: string
 }
 
 export enum SignType {

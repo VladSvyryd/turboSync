@@ -18,5 +18,8 @@ const styles = {
   }
 }
 
-const theme = extendTheme({ colors, styles })
+const theme = extendTheme({
+  colors,
+  styles
+})
 export default theme

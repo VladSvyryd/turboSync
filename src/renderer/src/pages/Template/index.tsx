@@ -1,4 +1,4 @@
-import { FunctionComponent, useState } from 'react'
+import { FunctionComponent } from 'react'
 import { Progress, useToast } from '@chakra-ui/react'
 import useSWR from 'swr'
 import { fetcherWithQuery, ServerApi } from '../../api'
@@ -6,6 +6,7 @@ import DnD from '../../components/DnD'
 import DocFolders from '../../components/Doc/DocFolders'
 import { DocFile, SignType } from '../../types'
 import AddTemplateFlow from '../../container/Template/AddTemplateFlow'
+import { useUploadStore } from '../../store/UploadStore'
 
 interface OwnProps {}
 
@@ -13,8 +14,9 @@ type Props = OwnProps
 
 const index: FunctionComponent<Props> = () => {
   const toast = useToast()
+  const { fillUploadTemplates, setSignTypeModal } = useUploadStore()
+
   const url = `${ServerApi.getUri()}/api/templates`
-  const [uploadFiles, setUploadFiles] = useState<Array<File> | null>(null)
   const { data, isValidating, mutate } = useSWR<{
     folders: Array<{ name: SignType; files: Array<DocFile> }>
   }>(url, fetcherWithQuery, {
@@ -30,7 +32,8 @@ const index: FunctionComponent<Props> = () => {
     if (uploadFiles.length === 0) {
       return
     }
-    setUploadFiles(uploadFiles)
+    setSignTypeModal(true)
+    fillUploadTemplates(uploadFiles)
   }
 
   const allFiles = data?.folders.flatMap((folder) => folder.files).map((f) => f.name) ?? []
@@ -42,9 +45,8 @@ const index: FunctionComponent<Props> = () => {
   return (
     <>
       <AddTemplateFlow
-        uploadFiles={uploadFiles}
         onAddFlowDone={async () => {
-          setUploadFiles(null)
+          fillUploadTemplates(null)
           await mutate()
         }}
       />

@@ -20,6 +20,16 @@ const styles = {
 
 const theme = extendTheme({
   colors,
-  styles
+  styles,
+  components: {
+    Modal: {
+      baseStyle: {
+        overlay: {
+          bg: 'transparent',
+          backdropFilter: 'blur(1px)'
+        }
+      }
+    }
+  }
 })
 export default theme

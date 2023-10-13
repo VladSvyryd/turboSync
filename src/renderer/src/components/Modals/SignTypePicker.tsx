@@ -3,7 +3,6 @@ import { Box, Button, Modal, ModalContent, ModalOverlay, Stack, Text } from '@ch
 import { motion } from 'framer-motion'
 import theme from '../../theme'
 import { SignType } from '../../types'
-import { ModalOverlayStyle } from '../../types/variables'
 
 interface OwnProps {
   isOpen: boolean
@@ -15,14 +14,6 @@ interface OwnProps {
     title: ReactNode
     disabled?: boolean
   }>
-}
-const buttonVariants = {
-  initial: {
-    backgroundColor: '#319795'
-  },
-  hover: {
-    backgroundColor: 'hsl(240, 100, 50)'
-  }
 }
 
 type Props = OwnProps
@@ -66,7 +57,7 @@ const backgroundButton = [
 const SignTypePicker: FunctionComponent<Props> = ({ isOpen, signTypeButtons, onClose, onPick }) => {
   return (
     <Modal onClose={onClose} isOpen={isOpen} isCentered>
-      <ModalOverlay {...ModalOverlayStyle} />
+      <ModalOverlay />
       <ModalContent bg={'transparent'} shadow={'none'}>
         <Box
           bg={'teal'}
@@ -118,7 +109,6 @@ const SignTypePicker: FunctionComponent<Props> = ({ isOpen, signTypeButtons, onC
                     disabled ? {} : { backgroundColor: backgroundButton[index].tapBackgroundColor }
                   }
                   initial={'initial'}
-                  variants={buttonVariants}
                   className="background"
                   overflow={'hidden'}
                   position={'absolute'}

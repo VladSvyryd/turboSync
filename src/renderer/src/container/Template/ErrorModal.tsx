@@ -12,7 +12,7 @@ type Props = OwnProps
 const ErrorModal: FunctionComponent<Props> = ({ error, onClose }) => {
   return (
     <Modal isCentered isOpen={Boolean(error)} onClose={onClose}>
-      <ModalOverlay />
+      <ModalOverlay bg={'blackAlpha.500'} />
       <ModalContent>
         <Error
           cause={'Sind Sie sicher, dass Turbomed an ist und ein Patient ausgewählt ist?'}

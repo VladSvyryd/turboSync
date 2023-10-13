@@ -21,3 +21,20 @@ export type DocFile = {
   path: string
   networkPath: string
 }
+
+export enum ConditionOption {
+  MALE = 'MALE',
+  FEMALE = 'FEMALE',
+  UNDER18 = 'UNDER18',
+  RETIRED = 'RETIRED'
+}
+
+export type TemplateWithFile = {
+  templateInfo: {
+    id: string
+    title: string
+    requiredCondition: Array<ConditionOption> | null
+    signType: SignType
+  }
+  file: File
+}

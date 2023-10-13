@@ -83,8 +83,8 @@ ipcMain.on('openNewWindow', (_, path) => {
   if (popWindow) {
     popWindow.destroy()
   }
-  let newWindowHeight = 600
-  let newWindowWidth = 400
+  let newWindowHeight = 800
+  let newWindowWidth = 600
   const { x, y, width, height } = mainWindow.getBounds()
   let newWindowX = x - newWindowWidth
   let newWindowY = y

@@ -5,9 +5,10 @@ import { Stack, useToast } from '@chakra-ui/react'
 import { BsPrinterFill, BsQrCodeScan } from 'react-icons/bs'
 import { LiaSignatureSolid } from 'react-icons/lia'
 import { ServerApi } from '../../api'
+import TemplateInformation from '../../components/Modals/TemplateInformation'
+import { useUploadStore } from '../../store/UploadStore'
 
 interface OwnProps {
-  uploadFiles: Array<File> | null
   onAddFlowDone: () => void
 }
 
@@ -42,15 +43,16 @@ const buttons = [
     )
   }
 ]
-const AddTemplateFlow: FunctionComponent<Props> = ({ uploadFiles, onAddFlowDone }) => {
+const AddTemplateFlow: FunctionComponent<Props> = ({ onAddFlowDone }) => {
   const toast = useToast()
-
+  const { setSignTypeModal, setSignType, uploadTemplates, signTypeModal, setUploadTemplates } =
+    useUploadStore()
   const handleAddFiles = async (signType: SignType) => {
-    if (!uploadFiles) {
+    if (!uploadTemplates) {
       return
     }
     const formdata = new FormData()
-    uploadFiles.forEach((file) => {
+    uploadTemplates.forEach(({ file }) => {
       formdata.append('fileStore', file)
     })
     formdata.append('signType', signType)
@@ -59,24 +61,43 @@ const AddTemplateFlow: FunctionComponent<Props> = ({ uploadFiles, onAddFlowDone 
       headers: { 'Content-Type': 'multipart/form-data' }
     })
     const success = Boolean(files?.data?.success)
+
     if (!success) {
       toast({
         description: 'Datei hinzufügen fehlgeschlagen.'
       })
       return
     }
+    onAddFlowDone()
+  }
+  const showTemplateInformation = (signType: SignType) => {
+    setUploadTemplates(
+      uploadTemplates
+        ? uploadTemplates.map((template) => ({
+            ...template,
+            templateInfo: {
+              ...template.templateInfo,
+              signType
+            }
+          }))
+        : null
+    )
+    setSignType(signType)
+    setSignTypeModal(false)
   }
 
   return (
-    <SignTypePicker
-      signTypeButtons={buttons}
-      isOpen={uploadFiles !== null && uploadFiles.length > 0}
-      onClose={onAddFlowDone}
-      onPick={async (v) => {
-        await handleAddFiles(v)
-        onAddFlowDone()
-      }}
-    />
+    <>
+      <SignTypePicker
+        signTypeButtons={buttons}
+        isOpen={signTypeModal}
+        onClose={() => setSignTypeModal(false)}
+        onPick={async (v) => {
+          showTemplateInformation(v)
+        }}
+      />
+      <TemplateInformation />
+    </>
   )
 }
 

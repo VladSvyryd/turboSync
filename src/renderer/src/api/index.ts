@@ -1,5 +1,7 @@
-import axios from 'axios'
+import axios, { AxiosError } from 'axios'
 import { useSettingsStore } from '../store'
+import { TemplateType } from '../types'
+import { execToast } from '../App'
 
 export const ServerApi = axios.create({
   baseURL: `http://${useSettingsStore.getState().apiBaseUrl}`,
@@ -24,4 +26,44 @@ export const fetcherWithQuery = async (url: string, options?: RequestInit) => {
   }
 
   return res.json()
+}
+
+export const handleMoveTemplate = async (
+  uuid: TemplateType['uuid'],
+  to: TemplateType['signType'],
+  finallyCb?: () => void
+) => {
+  try {
+    await ServerApi.put(`/api/moveTemplate`, {
+      uuid,
+      to
+    })
+  } catch (e) {
+    handleAxiosError(e)
+  } finally {
+    if (finallyCb) finallyCb()
+  }
+}
+export const handleDeleteTemplate = async (uuid: TemplateType['uuid'], finallyCb?: () => void) => {
+  try {
+    await ServerApi.delete(`/api/deleteTemplate`, {
+      data: {
+        uuid
+      }
+    })
+  } catch (e) {
+    handleAxiosError(e)
+  } finally {
+    if (finallyCb) finallyCb()
+  }
+}
+
+const handleAxiosError = (e: any) => {
+  if (e instanceof AxiosError) {
+    execToast({
+      description: e?.response?.statusText ?? 'Fehler beim Verschieben der Vorlage.'
+    })
+    console.log(e?.response?.data?.error ?? 'No Error from BE')
+  }
+  console.log('Unknown Error', e)
 }

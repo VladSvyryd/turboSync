@@ -7,6 +7,7 @@ const colors = {
   //   700: '#2a69ac'
   // }
 }
+
 const styles = {
   global: {
     body: {
@@ -32,4 +33,5 @@ const theme = extendTheme({
     }
   }
 })
+
 export default theme

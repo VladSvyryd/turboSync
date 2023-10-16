@@ -37,7 +37,7 @@ const Error: FunctionComponent<Props> = ({ cause, moreInfo }) => {
       <AlertDescription maxWidth="sm">Es gab ein Problem mit der Anwendung.</AlertDescription>
       {cause && <AlertDescription maxWidth="sm">{cause}</AlertDescription>}
       {moreInfo && (
-        <Accordion>
+        <Accordion w={'100%'}>
           <AccordionItem>
             <h2>
               <AccordionButton>
@@ -48,7 +48,7 @@ const Error: FunctionComponent<Props> = ({ cause, moreInfo }) => {
               </AccordionButton>
             </h2>
             <AccordionPanel pb={4}>
-              <Code>{moreInfo}</Code>
+              <Code w={'100%'}>{moreInfo}</Code>
             </AccordionPanel>
           </AccordionItem>
         </Accordion>

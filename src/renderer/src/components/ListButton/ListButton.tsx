@@ -22,7 +22,7 @@ import { VirtualElement } from '@popperjs/core'
 import ListButtonWithContext from './ListButtonWithContext'
 import { ContextMenuKey, InternalErrorNumber, SignType, TemplateType } from '../../types'
 import DeleteSubmitModal from '../../container/Template/DeleteSubmitModal'
-import { ServerApi } from '../../api'
+import { handleDeleteTemplate, handleMoveTemplate } from '../../api'
 import ErrorModal from '../../container/Template/ErrorModal'
 import { TbArrowsTransferDown } from 'react-icons/tb'
 import { FaArrowRightArrowLeft } from 'react-icons/fa6'
@@ -65,7 +65,7 @@ const ListButton: FunctionComponent<Props> = ({
   rightIcon,
   onInteractionWithList
 }) => {
-  const errorColor = useToken('colors', 'red.400')
+  const errorColor = useToken('colors', 'red.500')
   const [referenceElement, setReferenceElement] = useState<
     (VirtualElement & { contextMenu: string }) | null
   >(null)
@@ -78,7 +78,7 @@ const ListButton: FunctionComponent<Props> = ({
 
   const { styles, attributes } = usePopper(referenceElement, popperElement)
   const initialFocusRef = useRef<any>()
-  const handleClose = () => {
+  const handleMenuClose = () => {
     setReferenceElement(null)
   }
 
@@ -89,22 +89,58 @@ const ListButton: FunctionComponent<Props> = ({
       getBoundingClientRect: generateGetBoundingClientRect(event.clientX, event.clientY) as any
     })
   }
-  const handleDeleteDoc = async (docUniqTitle: string) => {
-    try {
-      await ServerApi.delete(`/api/deleteTemplate`, {
-        data: {
-          docPath: docUniqTitle
-        }
-      })
-    } catch (e) {
-      console.log(e)
-      setError(JSON.stringify(e))
-    } finally {
-      onInteractionWithList()
-      setDeleteModal(null)
-    }
-  }
 
+  const renderContextMenu = useMemo(() => {
+    const menuPoints = [
+      {
+        id: ContextMenuKey.OPEN,
+        title: 'Öffnen',
+        onClick: () => {
+          window.api.openDoc(template.networkPath)
+          handleMenuClose()
+        },
+        leftIcon: <FaFileWord />
+      },
+      {
+        id: ContextMenuKey.UPLOAD,
+        title: 'Nachreichen',
+        onClick: async () => {},
+        leftIcon: <MdDocumentScanner />
+      },
+
+      {
+        id: ContextMenuKey.MOVE,
+        title: 'Verschieben',
+        onClick: async () => {},
+        leftIcon: <TbArrowsTransferDown />,
+        rightIcon: <FaChevronRight size={10} />,
+        contextMenuLinks: Object.keys(titles)
+          .filter((k) => k !== template.signType)
+          .map((title) => ({
+            title: titles[title],
+            onClick: async () => {
+              await handleMoveTemplate(template.uuid, title as SignType, () => {
+                onInteractionWithList()
+              })
+            },
+            leftIcon: <FaArrowRightArrowLeft />
+          }))
+      },
+      {
+        id: ContextMenuKey.DELETE,
+        title: 'Löschen',
+        onClick: async () => {
+          handleMenuClose()
+          setDeleteModal(template.uuid)
+        },
+        leftIcon: <FaTrash />
+      }
+    ]
+    if (!template.noFile) {
+      return menuPoints.filter((m) => m.id === ContextMenuKey.DELETE)
+    }
+    return menuPoints
+  }, [template.noFile])
   const renderButton = () => {
     if (!template.noFile) {
       return (
@@ -154,79 +190,11 @@ const ListButton: FunctionComponent<Props> = ({
         loadingText={`${template.title} (in Arbeit)`}
         isActive={Boolean(referenceElement?.contextMenu === template.uuid)}
         rightIcon={rightIcon}
-        // isDisabled={true}
       >
         <Text noOfLines={1}>{template.title}</Text>
       </Button>
     )
   }
-
-  const handleMoveDoc = async (docUniqTitle: string, to: SignType) => {
-    try {
-      await ServerApi.put(`/api/moveTemplate`, {
-        from: template.signType,
-        docTitle: docUniqTitle,
-        to
-      })
-    } catch (e) {
-      console.log(e)
-      setError(JSON.stringify(e))
-    } finally {
-      onInteractionWithList()
-    }
-  }
-
-  const renderContextMenu = useMemo(() => {
-    const menuPoints = [
-      {
-        id: ContextMenuKey.OPEN,
-        title: 'Öffnen',
-        onClick: async (_, closeMenu) => {
-          window.api.openDoc(template.networkPath)
-          if (closeMenu) closeMenu()
-        },
-        leftIcon: <FaFileWord />
-      },
-      {
-        id: ContextMenuKey.UPLOAD,
-        title: 'Nachreichen',
-        onClick: async () => {},
-        leftIcon: <MdDocumentScanner />
-      },
-
-      {
-        id: ContextMenuKey.MOVE,
-        title: 'Verschieben',
-        onClick: async () => {},
-        leftIcon: <TbArrowsTransferDown />,
-        rightIcon: <FaChevronRight size={10} />,
-        contextMenuLinks: Object.keys(titles)
-          .filter((k) => k !== template.signType)
-          .map((title) => ({
-            title: titles[title],
-            onClick: async () => {
-              await handleMoveDoc(template.uuid, title as SignType)
-              onInteractionWithList()
-            },
-            leftIcon: <FaArrowRightArrowLeft />
-          }))
-      },
-      {
-        id: ContextMenuKey.DELETE,
-        title: 'Löschen',
-        onClick: async (_, closeMenu) => {
-          closeMenu()
-          setDeleteModal(template.path)
-        },
-        leftIcon: <FaTrash />
-      }
-    ]
-    if (!template.noFile) {
-      return menuPoints.filter((m) => m.id === ContextMenuKey.DELETE)
-    }
-    return menuPoints
-  }, [template.noFile])
-
   return (
     <>
       <ErrorModal
@@ -242,7 +210,10 @@ const ListButton: FunctionComponent<Props> = ({
         }}
         onDelete={async () => {
           if (deleteModal) {
-            await handleDeleteDoc(deleteModal)
+            handleDeleteTemplate(deleteModal, () => {
+              onInteractionWithList()
+              setDeleteModal(null)
+            })
           }
         }}
       />
@@ -256,8 +227,8 @@ const ListButton: FunctionComponent<Props> = ({
           height={'100%'}
           backdropFilter="blur(1px)"
           zIndex={1}
-          onClick={handleClose}
-          onContextMenu={handleClose}
+          onClick={handleMenuClose}
+          onContextMenu={handleMenuClose}
         />
       )}
 
@@ -285,7 +256,7 @@ const ListButton: FunctionComponent<Props> = ({
                 <ListItem key={link.title}>
                   <Button
                     onClick={() => {
-                      if (link.onClick) link.onClick(template.uuid, handleClose)
+                      if (link.onClick) link.onClick()
                     }}
                     width={'100%'}
                     ref={initialFocusRef}

@@ -1,6 +1,6 @@
 import { FunctionComponent } from 'react'
 import SignTypePicker from '../../components/Modals/SignTypePicker'
-import { SignType } from '../../types'
+import { SignType, TemplateWithFile } from '../../types'
 import { Stack, useToast } from '@chakra-ui/react'
 import { BsPrinterFill, BsQrCodeScan } from 'react-icons/bs'
 import { LiaSignatureSolid } from 'react-icons/lia'
@@ -45,18 +45,20 @@ const buttons = [
 ]
 const AddTemplateFlow: FunctionComponent<Props> = ({ onAddFlowDone }) => {
   const toast = useToast()
-  const { setSignTypeModal, setSignType, uploadTemplates, signTypeModal, setUploadTemplates } =
-    useUploadStore()
-  const handleAddFiles = async (signType: SignType) => {
-    if (!uploadTemplates) {
-      return
-    }
+  const {
+    signType,
+    setSignTypeModal,
+    setSignType,
+    uploadTemplates,
+    signTypeModal,
+    setUploadTemplates
+  } = useUploadStore()
+  const handleAddFiles = async (templateWithFile: Array<TemplateWithFile>) => {
     const formdata = new FormData()
-    uploadTemplates.forEach(({ file }) => {
+    templateWithFile.forEach(({ file, ...rest }) => {
       formdata.append('fileStore', file)
+      formdata.append('templateInfo', JSON.stringify(rest.templateInfo))
     })
-    formdata.append('signType', signType)
-
     const files = await ServerApi.post<{ success: boolean }>('/api/addTemplate', formdata, {
       headers: { 'Content-Type': 'multipart/form-data' }
     })
@@ -96,7 +98,7 @@ const AddTemplateFlow: FunctionComponent<Props> = ({ onAddFlowDone }) => {
           showTemplateInformation(v)
         }}
       />
-      <TemplateInformation />
+      {signType && <TemplateInformation onSubmit={handleAddFiles} />}
     </>
   )
 }

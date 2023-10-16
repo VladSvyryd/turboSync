@@ -11,9 +11,9 @@ export type Patient = {
 }
 
 export enum SignType {
-  PRINT = 'PRINT',
   LINK = 'LINK',
-  SIGNPAD = 'SIGNPAD'
+  SIGNPAD = 'SIGNPAD',
+  PRINT = 'PRINT'
 }
 
 export type DocFile = {
@@ -37,4 +37,39 @@ export type TemplateWithFile = {
     signType: SignType
   }
   file: File
+}
+
+export type ResponseFolder = {
+  signType: SignType
+  templates: Array<TemplateType & { networkPath: string }>
+}
+
+export type TemplateType = {
+  id: number
+  uuid: string
+  createdAt: Date
+  updatedAt: Date
+  path: string
+  title: string
+  deleted: boolean
+  requiredCondition: ConditionOption[]
+  signType: SignType
+  networkPath: string
+  noFile: boolean
+}
+
+export enum ContextMenuKey {
+  OPEN = 'OPEN',
+  DELETE = 'DELETE',
+  MOVE = 'MOVE',
+  RENAME = 'RENAME',
+  UPLOAD = 'UPLOAD'
+}
+
+export const InternalErrorNumber = {
+  FILE_NOT_FOUND: '404'
+}
+export const InternalErrors = {
+  code: InternalErrorNumber.FILE_NOT_FOUND,
+  title: 'Not Found'
 }

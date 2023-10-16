@@ -2,10 +2,10 @@ import { FunctionComponent } from 'react'
 import { Divider, Stack } from '@chakra-ui/react'
 import DocList from '../../container/Template/DocList'
 import DocFolderTitle from './DocFolderTitle'
-import { DocFile, SignType } from '../../types'
+import { ResponseFolder, SignType } from '../../types'
 
 interface OwnProps {
-  folders: Array<{ name: SignType; files: Array<DocFile> }>
+  folders: Array<ResponseFolder>
   loading: boolean
   onInteractionWithList: () => void
 }
@@ -16,16 +16,14 @@ const FolderOrder = [SignType.LINK, SignType.SIGNPAD, SignType.PRINT]
 
 const DocFolders: FunctionComponent<Props> = ({ onInteractionWithList, folders, loading }) => {
   return folders
-    .sort(
-      (a, b) => FolderOrder.indexOf(a.name as SignType) - FolderOrder.indexOf(b.name as SignType)
-    )
+    .sort((a, b) => FolderOrder.indexOf(a.signType) - FolderOrder.indexOf(b.signType))
     .map((folder) => (
-      <Stack key={folder.name} py={2}>
-        <DocFolderTitle title={folder.name} />
+      <Stack key={folder.signType} py={2}>
+        <DocFolderTitle title={folder.signType} />
         <DocList
-          listId={folder.name}
+          listId={folder.signType}
           onInteractionWithList={onInteractionWithList}
-          files={folder.files}
+          files={folder.templates}
           loading={loading}
         />
         <Divider />

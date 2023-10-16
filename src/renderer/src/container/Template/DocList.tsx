@@ -1,24 +1,18 @@
 import { FunctionComponent, useState } from 'react'
 import { List, ListItem, ScaleFade, Spinner, Stack, Text, useToast } from '@chakra-ui/react'
 import ListButton from '../../components/ListButton/ListButton'
-import DeleteSubmitModal from './DeleteSubmitModal'
 import ErrorModal from './ErrorModal'
 import { ServerApi } from '../../api'
 import { AxiosError } from 'axios'
-import { TbArrowsTransferDown } from 'react-icons/tb'
-import { FaTrash, FaFileWord, FaChevronRight } from 'react-icons/fa'
-import { FaArrowRightArrowLeft } from 'react-icons/fa6'
-import { MdDocumentScanner } from 'react-icons/md'
 
-import { DocFile, SignType } from '../../types'
-import { useListStore } from '../../store/ListStore'
+import { SignType, TemplateType } from '../../types'
 import SignTypePicker from '../../components/Modals/SignTypePicker'
 import { BsPrinterFill, BsQrCodeScan } from 'react-icons/bs'
 import { LiaSignatureSolid } from 'react-icons/lia'
 
 interface OwnProps {
   listId: SignType
-  files?: Array<DocFile>
+  files?: Array<TemplateType>
   loading?: boolean
   onInteractionWithList: () => void
 }
@@ -99,13 +93,11 @@ const getSelectionButtons = (signType: SignType) => {
 
 const DocList: FunctionComponent<Props> = ({ files, listId, onInteractionWithList, loading }) => {
   const toast = useToast()
-  const { titles } = useListStore()
   const [loadingProcessTemplate, setLoadingProcessTemplate] = useState<null | string>(null)
   const [error, setError] = useState<string | null>(null)
-  const [deleteModal, setDeleteModal] = useState<string | null>(null)
-  const [activeSignTypePicker, setActiveSignTypePicker] = useState<DocFile | null>(null)
+  const [activeSignTypePicker, setActiveSignTypePicker] = useState<TemplateType | null>(null)
   const selectionButtons = getSelectionButtons(listId)
-  const handleDocClick = async (docFile: DocFile) => {
+  const handleDocClick = async (docFile: TemplateType) => {
     if (listId === SignType.LINK) {
       await handleStartProcessTemplate(docFile)
       return
@@ -113,9 +105,9 @@ const DocList: FunctionComponent<Props> = ({ files, listId, onInteractionWithLis
     setActiveSignTypePicker(docFile)
   }
 
-  const handleStartProcessTemplate = async (docFile: DocFile) => {
+  const handleStartProcessTemplate = async (docFile: TemplateType) => {
     try {
-      setLoadingProcessTemplate(docFile.name)
+      setLoadingProcessTemplate(docFile.uuid)
       const activePatient = await window.api.getActivePatient()
       if (!Boolean(activePatient?.data?.id)) {
         setError(activePatient?.error)
@@ -123,7 +115,7 @@ const DocList: FunctionComponent<Props> = ({ files, listId, onInteractionWithLis
       }
       const processTemplate = await ServerApi.post(`/api/processTemplate`, {
         ...activePatient.data,
-        docTitle: docFile.name,
+        docTitle: docFile.uuid,
         docPath: docFile.path
       })
       console.log('processTemplate', processTemplate)
@@ -134,36 +126,6 @@ const DocList: FunctionComponent<Props> = ({ files, listId, onInteractionWithLis
       })
     } finally {
       setLoadingProcessTemplate(null)
-    }
-  }
-  const handleDeleteDoc = async (docUniqTitle: string) => {
-    try {
-      await ServerApi.delete(`/api/deleteTemplate`, {
-        data: {
-          docPath: docUniqTitle
-        }
-      })
-    } catch (e) {
-      console.log(e)
-      setError(JSON.stringify(e))
-    } finally {
-      onInteractionWithList()
-      setDeleteModal(null)
-    }
-  }
-  const handleMoveDoc = async (docUniqTitle: string, to: SignType) => {
-    try {
-      await ServerApi.put(`/api/moveTemplate`, {
-        from: listId,
-        docTitle: docUniqTitle,
-        to
-      })
-    } catch (e) {
-      console.log(e)
-      setError(JSON.stringify(e))
-    } finally {
-      onInteractionWithList()
-      setDeleteModal(null)
     }
   }
 
@@ -194,17 +156,7 @@ const DocList: FunctionComponent<Props> = ({ files, listId, onInteractionWithLis
         }}
         onPick={handlePickSignType}
       />
-      <DeleteSubmitModal
-        isOpen={Boolean(deleteModal)}
-        onClose={() => {
-          setDeleteModal(null)
-        }}
-        onDelete={async () => {
-          if (deleteModal) {
-            await handleDeleteDoc(deleteModal)
-          }
-        }}
-      />
+
       <ErrorModal
         error={error}
         onClose={() => {
@@ -213,51 +165,12 @@ const DocList: FunctionComponent<Props> = ({ files, listId, onInteractionWithLis
       />
       <List sx={{ py: 2 }} spacing={1}>
         {files?.map((file) => (
-          <ListItem key={file.name}>
+          <ListItem key={file.uuid}>
             <ListButton
-              docFile={file}
+              template={file}
               onClick={handleDocClick}
-              loading={loadingProcessTemplate === file.name}
-              contextMenuLinks={[
-                {
-                  title: 'Öffnen',
-                  onClick: async (_, closeMenu) => {
-                    window.api.openDoc(file.networkPath)
-                    if (closeMenu) closeMenu()
-                  },
-                  leftIcon: <FaFileWord />
-                },
-                {
-                  title: 'Nachreichen',
-                  onClick: async () => {},
-                  leftIcon: <MdDocumentScanner />
-                },
-
-                {
-                  title: 'Verschieben',
-                  onClick: async () => {},
-                  leftIcon: <TbArrowsTransferDown />,
-                  rightIcon: <FaChevronRight size={10} />,
-                  contextMenuLinks: Object.keys(titles)
-                    .filter((k) => k !== listId)
-                    .map((title) => ({
-                      title: titles[title],
-                      onClick: async () => {
-                        await handleMoveDoc(file.name, title as SignType)
-                        onInteractionWithList()
-                      },
-                      leftIcon: <FaArrowRightArrowLeft />
-                    }))
-                },
-                {
-                  title: 'Löschen',
-                  onClick: async (_, closeMenu) => {
-                    closeMenu()
-                    setDeleteModal(file.path)
-                  },
-                  leftIcon: <FaTrash />
-                }
-              ]}
+              loading={loadingProcessTemplate === file.uuid}
+              onInteractionWithList={onInteractionWithList}
             />
           </ListItem>
         ))}

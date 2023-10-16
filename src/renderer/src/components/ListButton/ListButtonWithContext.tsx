@@ -66,8 +66,7 @@ const ListButton: FunctionComponent<Props> = ({
       </PopoverTrigger>
       <PopoverContent
         sx={{
-          zIndex: 2,
-          width: 150
+          zIndex: 2
         }}
       >
         <List>
@@ -78,7 +77,7 @@ const ListButton: FunctionComponent<Props> = ({
                   if (link.onClick) link.onClick(link.title, handleClose)
                 }}
                 ref={initialFocusRef}
-                w={150}
+                w={'100%'}
                 justifyContent={'start'}
                 borderRadius={0}
                 loadingText={`${title} (in Arbeit)`}

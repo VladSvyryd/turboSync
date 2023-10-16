@@ -1,11 +1,32 @@
-import { FunctionComponent, ReactElement, useRef, useState } from 'react'
-import { Box, Button, List, ListItem, Text } from '@chakra-ui/react'
+import { FunctionComponent, ReactElement, useMemo, useRef, useState } from 'react'
+import {
+  Box,
+  Button,
+  List,
+  ListItem,
+  Popover,
+  PopoverArrow,
+  PopoverBody,
+  PopoverCloseButton,
+  PopoverContent,
+  PopoverHeader,
+  PopoverTrigger,
+  Text,
+  useToken
+} from '@chakra-ui/react'
 import { SiGoogledocs } from 'react-icons/si'
-import { FaChevronRight } from 'react-icons/fa'
+import { FaChevronRight, FaFileWord, FaTrash } from 'react-icons/fa'
+import { MdDocumentScanner, MdOutlineSyncDisabled } from 'react-icons/md'
 import { usePopper } from 'react-popper'
 import { VirtualElement } from '@popperjs/core'
 import ListButtonWithContext from './ListButtonWithContext'
-import { DocFile } from '../../types'
+import { ContextMenuKey, InternalErrorNumber, SignType, TemplateType } from '../../types'
+import DeleteSubmitModal from '../../container/Template/DeleteSubmitModal'
+import { ServerApi } from '../../api'
+import ErrorModal from '../../container/Template/ErrorModal'
+import { TbArrowsTransferDown } from 'react-icons/tb'
+import { FaArrowRightArrowLeft } from 'react-icons/fa6'
+import { useListStore } from '../../store/ListStore'
 
 export type ContextMenu = Array<{
   title: string
@@ -15,13 +36,13 @@ export type ContextMenu = Array<{
   contextMenuLinks?: ContextMenu
 }>
 interface OwnProps {
-  docFile: DocFile
-  onClick: (file: DocFile) => void
+  template: TemplateType
+  onClick: (file: TemplateType) => void
   loading: boolean
-  contextMenuLinks: ContextMenu
   placement?: 'bottom' | 'end'
   leftIcon?: ReactElement
   rightIcon?: ReactElement
+  onInteractionWithList: () => void
 }
 
 type Props = OwnProps
@@ -37,19 +58,23 @@ function generateGetBoundingClientRect(x = 0, y = 0) {
 }
 
 const ListButton: FunctionComponent<Props> = ({
-  docFile,
+  template,
   onClick,
   loading,
-  contextMenuLinks,
   leftIcon,
-  rightIcon
+  rightIcon,
+  onInteractionWithList
 }) => {
+  const errorColor = useToken('colors', 'red.400')
   const [referenceElement, setReferenceElement] = useState<
     (VirtualElement & { contextMenu: string }) | null
   >(null)
+  const { titles } = useListStore()
 
   const [popperElement, setPopperElement] = useState<any>(null)
   // const [arrowElement, setArrowElement] = useState<any>(null)
+  const [deleteModal, setDeleteModal] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null)
 
   const { styles, attributes } = usePopper(referenceElement, popperElement)
   const initialFocusRef = useRef<any>()
@@ -64,32 +89,171 @@ const ListButton: FunctionComponent<Props> = ({
       getBoundingClientRect: generateGetBoundingClientRect(event.clientX, event.clientY) as any
     })
   }
-  return (
-    <>
+  const handleDeleteDoc = async (docUniqTitle: string) => {
+    try {
+      await ServerApi.delete(`/api/deleteTemplate`, {
+        data: {
+          docPath: docUniqTitle
+        }
+      })
+    } catch (e) {
+      console.log(e)
+      setError(JSON.stringify(e))
+    } finally {
+      onInteractionWithList()
+      setDeleteModal(null)
+    }
+  }
+
+  const renderButton = () => {
+    if (!template.noFile) {
+      return (
+        <Popover>
+          <PopoverTrigger>
+            <Button
+              variant={'ghost'}
+              onContextMenu={(e) => handleContextMenu(e, template.uuid)}
+              // onClick={() => onClick(template)}
+              leftIcon={leftIcon ?? <SiGoogledocs />}
+              w={'100%'}
+              justifyContent={'start'}
+              borderRadius={0}
+              isLoading={loading}
+              loadingText={`${template.title} (in Arbeit)`}
+              isActive={Boolean(referenceElement?.contextMenu === template.uuid)}
+              rightIcon={<MdOutlineSyncDisabled color={errorColor} />}
+              color={'blackAlpha.600'}
+            >
+              <Text noOfLines={1}>{template.title}</Text>
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent>
+            <PopoverArrow />
+            <PopoverCloseButton />
+            <PopoverHeader>Datei fehlt!</PopoverHeader>
+            <PopoverBody>
+              Nach der Prüfung wurde leider festgestellt, dass diese Datei nicht gefunden werden
+              konnte. Dies handelt sich um einen Serverfehler. Bitte kontaktieren Sie den Support.
+              (Error: {InternalErrorNumber.FILE_NOT_FOUND})
+            </PopoverBody>
+          </PopoverContent>
+        </Popover>
+      )
+    }
+    return (
       <Button
         variant={'ghost'}
-        onContextMenu={(e) => handleContextMenu(e, docFile.name)}
-        onClick={() => onClick(docFile)}
+        onContextMenu={(e) => handleContextMenu(e, template.uuid)}
+        onClick={() => onClick(template)}
         leftIcon={leftIcon ?? <SiGoogledocs />}
         w={'100%'}
         justifyContent={'start'}
         borderRadius={0}
         isDisabled={loading}
         isLoading={loading}
-        loadingText={`${docFile.name} (in Arbeit)`}
-        isActive={Boolean(referenceElement?.contextMenu === docFile.name)}
+        loadingText={`${template.title} (in Arbeit)`}
+        isActive={Boolean(referenceElement?.contextMenu === template.uuid)}
         rightIcon={rightIcon}
+        // isDisabled={true}
       >
-        <Text noOfLines={1}>{docFile.name}</Text>
+        <Text noOfLines={1}>{template.title}</Text>
       </Button>
-      {Boolean(referenceElement?.contextMenu === docFile.name) && (
+    )
+  }
+
+  const handleMoveDoc = async (docUniqTitle: string, to: SignType) => {
+    try {
+      await ServerApi.put(`/api/moveTemplate`, {
+        from: template.signType,
+        docTitle: docUniqTitle,
+        to
+      })
+    } catch (e) {
+      console.log(e)
+      setError(JSON.stringify(e))
+    } finally {
+      onInteractionWithList()
+    }
+  }
+
+  const renderContextMenu = useMemo(() => {
+    const menuPoints = [
+      {
+        id: ContextMenuKey.OPEN,
+        title: 'Öffnen',
+        onClick: async (_, closeMenu) => {
+          window.api.openDoc(template.networkPath)
+          if (closeMenu) closeMenu()
+        },
+        leftIcon: <FaFileWord />
+      },
+      {
+        id: ContextMenuKey.UPLOAD,
+        title: 'Nachreichen',
+        onClick: async () => {},
+        leftIcon: <MdDocumentScanner />
+      },
+
+      {
+        id: ContextMenuKey.MOVE,
+        title: 'Verschieben',
+        onClick: async () => {},
+        leftIcon: <TbArrowsTransferDown />,
+        rightIcon: <FaChevronRight size={10} />,
+        contextMenuLinks: Object.keys(titles)
+          .filter((k) => k !== template.signType)
+          .map((title) => ({
+            title: titles[title],
+            onClick: async () => {
+              await handleMoveDoc(template.uuid, title as SignType)
+              onInteractionWithList()
+            },
+            leftIcon: <FaArrowRightArrowLeft />
+          }))
+      },
+      {
+        id: ContextMenuKey.DELETE,
+        title: 'Löschen',
+        onClick: async (_, closeMenu) => {
+          closeMenu()
+          setDeleteModal(template.path)
+        },
+        leftIcon: <FaTrash />
+      }
+    ]
+    if (!template.noFile) {
+      return menuPoints.filter((m) => m.id === ContextMenuKey.DELETE)
+    }
+    return menuPoints
+  }, [template.noFile])
+
+  return (
+    <>
+      <ErrorModal
+        error={error}
+        onClose={() => {
+          setError(null)
+        }}
+      />
+      <DeleteSubmitModal
+        isOpen={Boolean(deleteModal)}
+        onClose={() => {
+          setDeleteModal(null)
+        }}
+        onDelete={async () => {
+          if (deleteModal) {
+            await handleDeleteDoc(deleteModal)
+          }
+        }}
+      />
+      {renderButton()}
+      {Boolean(referenceElement?.contextMenu === template.uuid) && (
         <Box
           pos={'absolute'}
           top={0}
           left={0}
           width={'100%'}
           height={'100%'}
-          // bg="blackAlpha.100"
           backdropFilter="blur(1px)"
           zIndex={1}
           onClick={handleClose}
@@ -97,7 +261,7 @@ const ListButton: FunctionComponent<Props> = ({
         />
       )}
 
-      {Boolean(referenceElement?.contextMenu === docFile.name) && (
+      {Boolean(referenceElement?.contextMenu === template.uuid) && (
         <Box
           ref={setPopperElement}
           zIndex={101}
@@ -106,11 +270,11 @@ const ListButton: FunctionComponent<Props> = ({
           {...attributes.popper}
         >
           <List>
-            {contextMenuLinks.map((link) =>
+            {renderContextMenu.map((link) =>
               link.contextMenuLinks ? (
                 <ListButtonWithContext
                   title={link.title}
-                  onClick={() => link.onClick(docFile.name, handleClose)}
+                  onClick={() => link.onClick()}
                   loading={false}
                   contextMenuLinks={link.contextMenuLinks}
                   placement={'end-start'}
@@ -121,13 +285,13 @@ const ListButton: FunctionComponent<Props> = ({
                 <ListItem key={link.title}>
                   <Button
                     onClick={() => {
-                      if (link.onClick) link.onClick(docFile.name, handleClose)
+                      if (link.onClick) link.onClick(template.uuid, handleClose)
                     }}
                     width={'100%'}
                     ref={initialFocusRef}
                     justifyContent={'start'}
                     borderRadius={0}
-                    loadingText={`${docFile.name} (in Arbeit)`}
+                    loadingText={`${template.title} (in Arbeit)`}
                     leftIcon={link.leftIcon}
                     colorScheme={'teal'}
                   >

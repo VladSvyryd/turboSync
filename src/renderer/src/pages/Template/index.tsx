@@ -4,7 +4,7 @@ import useSWR from 'swr'
 import { fetcherWithQuery, ServerApi } from '../../api'
 import DnD from '../../components/DnD'
 import DocFolders from '../../components/Doc/DocFolders'
-import { DocFile, SignType } from '../../types'
+import { ResponseFolder } from '../../types'
 import AddTemplateFlow from '../../container/Template/AddTemplateFlow'
 import { useUploadStore } from '../../store/UploadStore'
 
@@ -18,7 +18,7 @@ const index: FunctionComponent<Props> = () => {
 
   const url = `${ServerApi.getUri()}/api/templates`
   const { data, isValidating, mutate } = useSWR<{
-    folders: Array<{ name: SignType; files: Array<DocFile> }>
+    folders: Array<ResponseFolder>
   }>(url, fetcherWithQuery, {
     onError: (err) => {
       console.log(err)
@@ -36,7 +36,7 @@ const index: FunctionComponent<Props> = () => {
     fillUploadTemplates(uploadFiles)
   }
 
-  const allFiles = data?.folders.flatMap((folder) => folder.files).map((f) => f.name) ?? []
+  const allFiles = data?.folders.flatMap((folder) => folder.templates).map((f) => f.title) ?? []
 
   if (isValidating && !data) {
     return <Progress size="xs" isIndeterminate />

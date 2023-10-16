@@ -1,6 +1,6 @@
 import axios, { AxiosError } from 'axios'
 import { useSettingsStore } from '../store'
-import { TemplateType } from '../types'
+import { Patient, Template } from '../types'
 import { execToast } from '../App'
 
 export const ServerApi = axios.create({
@@ -29,8 +29,8 @@ export const fetcherWithQuery = async (url: string, options?: RequestInit) => {
 }
 
 export const handleMoveTemplate = async (
-  uuid: TemplateType['uuid'],
-  to: TemplateType['signType'],
+  uuid: Template['uuid'],
+  to: Template['signType'],
   finallyCb?: () => void
 ) => {
   try {
@@ -44,7 +44,7 @@ export const handleMoveTemplate = async (
     if (finallyCb) finallyCb()
   }
 }
-export const handleDeleteTemplate = async (uuid: TemplateType['uuid'], finallyCb?: () => void) => {
+export const handleDeleteTemplate = async (uuid: Template['uuid'], finallyCb?: () => void) => {
   try {
     await ServerApi.delete(`/api/deleteTemplate`, {
       data: {
@@ -53,6 +53,24 @@ export const handleDeleteTemplate = async (uuid: TemplateType['uuid'], finallyCb
     })
   } catch (e) {
     handleAxiosError(e)
+  } finally {
+    if (finallyCb) finallyCb()
+  }
+}
+export const getTemplatePdfPreview = async (
+  uuid: Template['uuid'],
+  data?: Patient,
+  finallyCb?: () => void
+) => {
+  try {
+    const res = await ServerApi.post<{ networkPath: string }>(`/api/createPreviewPdf`, {
+      uuid,
+      ...data
+    })
+    return res.data.networkPath
+  } catch (e) {
+    handleAxiosError(e)
+    return null
   } finally {
     if (finallyCb) finallyCb()
   }

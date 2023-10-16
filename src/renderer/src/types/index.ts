@@ -41,10 +41,10 @@ export type TemplateWithFile = {
 
 export type ResponseFolder = {
   signType: SignType
-  templates: Array<TemplateType & { networkPath: string }>
+  templates: Array<Template & { networkPath: string }>
 }
 
-export type TemplateType = {
+export type Template = {
   id: number
   uuid: string
   createdAt: Date
@@ -60,6 +60,7 @@ export type TemplateType = {
 
 export enum ContextMenuKey {
   OPEN = 'OPEN',
+  EDIT = 'EDIT',
   DELETE = 'DELETE',
   MOVE = 'MOVE',
   RENAME = 'RENAME',

@@ -11,7 +11,10 @@ const api = {
   openNewWindow: (path: string) => {
     electronAPI.ipcRenderer.send('openNewWindow', path)
   },
-  openDoc
+  openDoc,
+  openPDFPreviewWindow: (path: string) => {
+    electronAPI.ipcRenderer.send('openPDFPreviewWindow', path)
+  }
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to

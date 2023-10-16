@@ -9,6 +9,7 @@ const minHeight = 150
 
 let mainWindow: BrowserWindow
 let popWindow: BrowserWindow
+let pdfWindow: BrowserWindow
 function createWindow(): void {
   // Create the browser window.
   mainWindow = new BrowserWindow({
@@ -25,7 +26,8 @@ function createWindow(): void {
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       sandbox: false,
-      devTools: true
+      devTools: true,
+      plugins: true
     }
   })
 
@@ -101,6 +103,7 @@ ipcMain.on('openNewWindow', (_, path) => {
     y: newWindowY,
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
+      plugins: true,
       sandbox: false
     }
   })
@@ -117,6 +120,40 @@ ipcMain.on('openNewWindow', (_, path) => {
     })
     popWindow.loadURL(loadUrl)
   }
+})
+
+ipcMain.on('openPDFPreviewWindow', async (_, path) => {
+  if (pdfWindow) {
+    pdfWindow.destroy()
+  }
+  let newWindowHeight = 800
+  let newWindowWidth = 600
+
+  pdfWindow = new BrowserWindow({
+    parent: popWindow,
+    height: newWindowHeight,
+    width: newWindowWidth,
+    show: false,
+    webPreferences: {
+      plugins: true,
+      sandbox: false,
+      webviewTag: true
+    }
+  })
+  pdfWindow.removeMenu()
+  if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
+    pdfWindow.loadURL(`http://localhost:5173/pdf?path=${path}`)
+  } else {
+    const loadUrl = url.format({
+      pathname: join(__dirname, `../renderer/index.html`),
+      hash: `/pdf`,
+      protocol: 'file:',
+      slashes: true
+    })
+    pdfWindow.loadURL(loadUrl)
+  }
+  pdfWindow.maximize()
+  pdfWindow.show()
 })
 
 // ipcMain.on('ping', (_, path) => {

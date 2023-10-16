@@ -1,8 +1,9 @@
 import { FunctionComponent, Suspense } from 'react'
 import { BrowserRouter, HashRouter, Route, Routes } from 'react-router-dom'
 import Home from '../pages/Home'
-import Template from '../pages/Template'
+import Template from '../pages/Templates'
 import Settings from '../pages/Settings'
+import PDFViewer from '../pages/PDFViewer'
 
 interface OwnProps {}
 
@@ -34,6 +35,14 @@ const Navigation: FunctionComponent<Props> = () => {
           element={
             <Suspense fallback={'Loading...'}>
               <Settings />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/pdf"
+          element={
+            <Suspense fallback={'Loading...'}>
+              <PDFViewer />
             </Suspense>
           }
         />

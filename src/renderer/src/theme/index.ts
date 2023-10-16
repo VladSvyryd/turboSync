@@ -13,7 +13,7 @@ const styles = {
     body: {
       backgroundColor: 'transparent'
     },
-    html: {
+    'html, #root': {
       height: '100vh'
     }
   }

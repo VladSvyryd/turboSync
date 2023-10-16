@@ -5,14 +5,14 @@ import ErrorModal from './ErrorModal'
 import { ServerApi } from '../../api'
 import { AxiosError } from 'axios'
 
-import { SignType, TemplateType } from '../../types'
+import { SignType, Template } from '../../types'
 import SignTypePicker from '../../components/Modals/SignTypePicker'
 import { BsPrinterFill, BsQrCodeScan } from 'react-icons/bs'
 import { LiaSignatureSolid } from 'react-icons/lia'
 
 interface OwnProps {
   listId: SignType
-  files?: Array<TemplateType>
+  files?: Array<Template>
   loading?: boolean
   onInteractionWithList: () => void
 }
@@ -95,9 +95,9 @@ const DocList: FunctionComponent<Props> = ({ files, listId, onInteractionWithLis
   const toast = useToast()
   const [loadingProcessTemplate, setLoadingProcessTemplate] = useState<null | string>(null)
   const [error, setError] = useState<string | null>(null)
-  const [activeSignTypePicker, setActiveSignTypePicker] = useState<TemplateType | null>(null)
+  const [activeSignTypePicker, setActiveSignTypePicker] = useState<Template | null>(null)
   const selectionButtons = getSelectionButtons(listId)
-  const handleDocClick = async (docFile: TemplateType) => {
+  const handleDocClick = async (docFile: Template) => {
     if (listId === SignType.LINK) {
       await handleStartProcessTemplate(docFile)
       return
@@ -105,7 +105,7 @@ const DocList: FunctionComponent<Props> = ({ files, listId, onInteractionWithLis
     setActiveSignTypePicker(docFile)
   }
 
-  const handleStartProcessTemplate = async (docFile: TemplateType) => {
+  const handleStartProcessTemplate = async (docFile: Template) => {
     try {
       setLoadingProcessTemplate(docFile.uuid)
       const activePatient = await window.api.getActivePatient()
@@ -115,8 +115,7 @@ const DocList: FunctionComponent<Props> = ({ files, listId, onInteractionWithLis
       }
       const processTemplate = await ServerApi.post(`/api/processTemplate`, {
         ...activePatient.data,
-        docTitle: docFile.uuid,
-        docPath: docFile.path
+        uuid: docFile.uuid
       })
       console.log('processTemplate', processTemplate)
     } catch (e) {

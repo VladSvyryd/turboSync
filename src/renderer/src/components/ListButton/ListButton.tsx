@@ -20,13 +20,15 @@ import { MdDocumentScanner, MdOutlineSyncDisabled } from 'react-icons/md'
 import { usePopper } from 'react-popper'
 import { VirtualElement } from '@popperjs/core'
 import ListButtonWithContext from './ListButtonWithContext'
-import { ContextMenuKey, InternalErrorNumber, SignType, TemplateType } from '../../types'
+import { ContextMenuKey, InternalErrorNumber, SignType, Template } from '../../types'
 import DeleteSubmitModal from '../../container/Template/DeleteSubmitModal'
-import { handleDeleteTemplate, handleMoveTemplate } from '../../api'
+import { getTemplatePdfPreview, handleDeleteTemplate, handleMoveTemplate } from '../../api'
 import ErrorModal from '../../container/Template/ErrorModal'
 import { TbArrowsTransferDown } from 'react-icons/tb'
-import { FaArrowRightArrowLeft } from 'react-icons/fa6'
+import { FaArrowRightArrowLeft, FaFilePdf } from 'react-icons/fa6'
+import { AiFillEdit } from 'react-icons/ai'
 import { useListStore } from '../../store/ListStore'
+import LoadingOverlay from '../Loading/LoadingOverlay'
 
 export type ContextMenu = Array<{
   title: string
@@ -36,8 +38,8 @@ export type ContextMenu = Array<{
   contextMenuLinks?: ContextMenu
 }>
 interface OwnProps {
-  template: TemplateType
-  onClick: (file: TemplateType) => void
+  template: Template
+  onClick: (file: Template) => void
   loading: boolean
   placement?: 'bottom' | 'end'
   leftIcon?: ReactElement
@@ -75,7 +77,7 @@ const ListButton: FunctionComponent<Props> = ({
   // const [arrowElement, setArrowElement] = useState<any>(null)
   const [deleteModal, setDeleteModal] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
-
+  const [loadingOverlay, setLoadingOverlay] = useState<string | null>(null)
   const { styles, attributes } = usePopper(referenceElement, popperElement)
   const initialFocusRef = useRef<any>()
   const handleMenuClose = () => {
@@ -100,6 +102,29 @@ const ListButton: FunctionComponent<Props> = ({
           handleMenuClose()
         },
         leftIcon: <FaFileWord />
+      },
+      {
+        id: ContextMenuKey.EDIT,
+        title: 'Ändern',
+        onClick: () => {
+          // window.api.openDoc(template.networkPath)
+          handleMenuClose()
+        },
+        leftIcon: <AiFillEdit />
+      },
+      {
+        id: ContextMenuKey.EDIT,
+        title: 'Vorschau',
+        onClick: async () => {
+          setLoadingOverlay(template.uuid)
+          handleMenuClose()
+          const activePatient = await window.api.getActivePatient()
+          const networkPath = await getTemplatePdfPreview(template.uuid, activePatient.data)
+          console.log('networkPath', networkPath)
+          window.api.openPDFPreviewWindow(networkPath ?? 'error')
+          setLoadingOverlay(null)
+        },
+        leftIcon: <FaFilePdf />
       },
       {
         id: ContextMenuKey.UPLOAD,
@@ -141,6 +166,13 @@ const ListButton: FunctionComponent<Props> = ({
     }
     return menuPoints
   }, [template.noFile])
+
+  const renderColor = (template: Template) => {
+    if (template.requiredCondition.length !== 0) {
+      return 'red.500'
+    }
+    return 'initial'
+  }
   const renderButton = () => {
     if (!template.noFile) {
       return (
@@ -149,7 +181,6 @@ const ListButton: FunctionComponent<Props> = ({
             <Button
               variant={'ghost'}
               onContextMenu={(e) => handleContextMenu(e, template.uuid)}
-              // onClick={() => onClick(template)}
               leftIcon={leftIcon ?? <SiGoogledocs />}
               w={'100%'}
               justifyContent={'start'}
@@ -190,6 +221,7 @@ const ListButton: FunctionComponent<Props> = ({
         loadingText={`${template.title} (in Arbeit)`}
         isActive={Boolean(referenceElement?.contextMenu === template.uuid)}
         rightIcon={rightIcon}
+        color={renderColor(template)}
       >
         <Text noOfLines={1}>{template.title}</Text>
       </Button>
@@ -197,6 +229,7 @@ const ListButton: FunctionComponent<Props> = ({
   }
   return (
     <>
+      {loadingOverlay === template.uuid && <LoadingOverlay title={'PDF wird erzeugt..'} />}
       <ErrorModal
         error={error}
         onClose={() => {

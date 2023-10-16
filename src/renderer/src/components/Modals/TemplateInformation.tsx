@@ -137,9 +137,10 @@ const TemplateInformation: FunctionComponent<Props> = ({ onSubmit }) => {
             colorScheme="blue"
             mr={3}
             onClick={() => {
-              if (isLast) {
+              if (!isLast && steps.length === 2) {
                 const stepsCopy = steps
                 stepsCopy.pop()
+                console.log(stepsCopy)
                 onSubmit(stepsCopy)
                 handleCloseModal()
                 return
@@ -148,7 +149,7 @@ const TemplateInformation: FunctionComponent<Props> = ({ onSubmit }) => {
             }}
             isDisabled={stepperDisabled}
           >
-            {isLast ? 'Hinzufügen' : 'Weiter'}
+            {!isLast && steps.length === 2 ? 'Hinzufügen' : 'Weiter'}
           </Button>
           <Button onClick={handleCloseModal}>Cancel</Button>
         </ModalFooter>

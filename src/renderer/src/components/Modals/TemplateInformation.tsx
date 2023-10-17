@@ -13,48 +13,19 @@ import {
 } from '@chakra-ui/react'
 import { SignType, TemplateWithFile } from '../../types'
 import { useUploadStore } from '../../store/UploadStore'
-import TemplateInfoForm from '../Forms/TemplateInfoForm'
 import UploadTemplatesStepper from '../Steppers/UploadTemplatesStepper'
+import { getBlurColorBySignType, templateTitleIsValid } from '../../util'
+import TemplateForm from '../Forms/TemplateForm'
 
 interface OwnProps {
   onSubmit: (templateWithFile: Array<TemplateWithFile>) => void
 }
 
 type Props = OwnProps
-const getBlurColor = (signType: SignType | null) => {
-  switch (signType) {
-    case SignType.LINK: {
-      const r = 245
-      const g = 101
-      const b = 101
-      return {
-        bg: `rgba(${r}, ${g}, ${b},0.12)}`,
-        boxShadow: `rgba(${r}, ${g}, ${b},0.1) 0px 0px 0px 1px,rgba(${r}, ${g}, ${b},0.2) 0px 5px 10px,rgba(${r}, ${g}, ${b},0.4) 0px 0px 30px;`
-      }
-    }
-    case SignType.SIGNPAD: {
-      const r = 237
-      const g = 137
-      const b = 54
-      return {
-        bg: `rgba(${r}, ${g}, ${b},0.12)`,
-        boxShadow: `rgba(${r}, ${g}, ${b},0.1) 0px 0px 0px 1px,rgba(${r}, ${g}, ${b},0.2) 0px 5px 10px,rgba(${r}, ${g}, ${b},0.4) 0px 0px 30px;`
-      }
-    }
-    default:
-      const r = 72
-      const g = 187
-      const b = 120
-      return {
-        bg: `rgba(${r}, ${g}, ${b},0.12)`,
-        boxShadow: `rgba(${r}, ${g}, ${b},0.1) 0px 0px 0px 1px,rgba(${r}, ${g}, ${b},0.2) 0px 5px 10px,rgba(${r}, ${g}, ${b},0.4) 0px 0px 30px;`
-      }
-  }
-}
 
 const TemplateInformation: FunctionComponent<Props> = ({ onSubmit }) => {
   const initialRef = useRef(null)
-  const { uploadTemplates, signType, updateUploadTemplate, setSignType, fillUploadTemplates } =
+  const { uploadTemplates, signType, setSignType, updateUploadTemplate, fillUploadTemplates } =
     useUploadStore()
   const dummyFinishTemplate = {
     file: new File([], ''),
@@ -75,22 +46,27 @@ const TemplateInformation: FunctionComponent<Props> = ({ onSubmit }) => {
   const isLast = isCompleteStep(steps.length - 1)
   const activeUploadTemplateIndex = activeStep - 1
   const activeUploadTemplate = steps[activeUploadTemplateIndex]
-  const changeStepperDisabled = () => {
-    const v = activeUploadTemplate?.templateInfo.title
-    return !!!v && String(v).trim().length === 0
-  }
-  const stepperDisabled = changeStepperDisabled()
+  const stepperDisabled = !templateTitleIsValid(activeUploadTemplate?.templateInfo.title ?? '')
   const renderForm = () => {
     if (isLast && uploadTemplates && steps.length !== 2) {
       return
     }
     return (
-      <TemplateInfoForm
-        templateWithFile={activeUploadTemplate}
+      <TemplateForm
+        template={{
+          title: activeUploadTemplate.templateInfo.title,
+          signType: activeUploadTemplate.templateInfo.signType,
+          requiredCondition: activeUploadTemplate.templateInfo.requiredCondition
+        }}
         inputFocusRef={initialRef}
-        onTemplateInfoChange={(result) =>
-          updateUploadTemplate(activeUploadTemplate.templateInfo.id, result.templateInfo)
-        }
+        onChange={(result) => {
+          updateUploadTemplate(activeUploadTemplate.templateInfo.id, {
+            ...activeUploadTemplate.templateInfo,
+            title: result.title,
+            signType: result.signType,
+            requiredCondition: result.requiredCondition
+          })
+        }}
       />
     )
   }
@@ -117,14 +93,14 @@ const TemplateInformation: FunctionComponent<Props> = ({ onSubmit }) => {
     fillUploadTemplates(null)
     setSignType(null)
   }
-  const overlayColors = getBlurColor(signType)
-
+  const overlayColors = getBlurColorBySignType(signType)
+  const isOpen = Boolean(signType)
   return (
     <Modal
       size={'xl'}
       isCentered
       initialFocusRef={initialRef}
-      isOpen={Boolean(signType)}
+      isOpen={isOpen}
       onClose={handleCloseModal}
     >
       <ModalOverlay bg={overlayColors.bg} />

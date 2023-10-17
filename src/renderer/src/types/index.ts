@@ -57,6 +57,11 @@ export type Template = {
   networkPath: string
   noFile: boolean
 }
+export type EditableTemplate = {
+  title: string
+  requiredCondition: ConditionOption[] | null
+  signType: SignType
+}
 
 export enum ContextMenuKey {
   OPEN = 'OPEN',

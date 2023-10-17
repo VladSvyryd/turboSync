@@ -14,6 +14,7 @@ import { useListStore } from '../../../store/ListStore'
 import LoadingOverlay from '../../Loading/LoadingOverlay'
 import DeleteSubmitModal from '../../../container/Template/DeleteSubmitModal'
 import { AnimatePresence, motion } from 'framer-motion'
+import EditTemplate from '../../Modals/EditTemplate'
 
 interface OwnProps {
   template: Template
@@ -35,7 +36,7 @@ const ButtonContextMenu: FunctionComponent<Props> = ({
   const [popperElement, setPopperElement] = useState<any>(null)
 
   const { styles, attributes } = usePopper(referenceElement, popperElement)
-
+  const [editTemplate, setEditTemplate] = useState<Template | null>(null)
   const initialFocusRef = useRef<any>()
   const [deleteModal, setDeleteModal] = useState<string | null>(null)
 
@@ -59,7 +60,7 @@ const ButtonContextMenu: FunctionComponent<Props> = ({
         id: ContextMenuKey.EDIT,
         title: 'Ändern',
         onClick: () => {
-          // window.api.openDoc(template.networkPath)
+          setEditTemplate(template)
           handleMenuClose()
         },
         leftIcon: <AiFillEdit />
@@ -119,16 +120,6 @@ const ButtonContextMenu: FunctionComponent<Props> = ({
     return menuPoints
   }, [template.noFile])
 
-  const xy = useMemo(() => {
-    const offset: { x: number; y: number } = { x: 0, y: 40 }
-    const transform = styles.popper['transform'] ?? ''
-    const xy = transform.substring(transform.indexOf('(') + 1, transform.lastIndexOf(')'))
-    const [x, y] = xy.split(',').map((s) => parseInt(s.replace('px', '')))
-    const xWithOffset = x - offset.x
-    const yWithOffset = y - offset.y
-    return { x: `${xWithOffset}px`, y: `${yWithOffset}px` }
-  }, [styles.popper])
-  console.log(xy)
   return (
     <>
       {loadingOverlay === template.uuid && <LoadingOverlay title={'PDF wird erzeugt..'} />}
@@ -146,7 +137,7 @@ const ButtonContextMenu: FunctionComponent<Props> = ({
           }
         }}
       />
-
+      <EditTemplate template={editTemplate} setTemplate={setEditTemplate} onSubmit={() => {}} />
       <AnimatePresence>
         {isOpen && (
           <>

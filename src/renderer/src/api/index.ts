@@ -75,6 +75,17 @@ export const getTemplatePdfPreview = async (
     if (finallyCb) finallyCb()
   }
 }
+export const deleteTemplatePdfPreview = async (path: Template['uuid']) => {
+  try {
+    const res = await ServerApi.delete(`/api/deletePreviewPdf`, {
+      data: { path }
+    })
+    return res.data.networkPath
+  } catch (e) {
+    handleAxiosError(e)
+    return null
+  }
+}
 
 const handleAxiosError = (e: any) => {
   if (e instanceof AxiosError) {

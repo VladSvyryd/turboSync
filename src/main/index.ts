@@ -135,6 +135,7 @@ ipcMain.on('openPDFPreviewWindow', async (_, path) => {
     width: newWindowWidth,
     show: false,
     webPreferences: {
+      preload: join(__dirname, '../preload/index.js'),
       plugins: true,
       sandbox: false,
       webviewTag: true
@@ -146,6 +147,7 @@ ipcMain.on('openPDFPreviewWindow', async (_, path) => {
   } else {
     const loadUrl = url.format({
       pathname: join(__dirname, `../renderer/index.html`),
+
       hash: `/pdf`,
       protocol: 'file:',
       slashes: true
@@ -154,6 +156,9 @@ ipcMain.on('openPDFPreviewWindow', async (_, path) => {
   }
   pdfWindow.maximize()
   pdfWindow.show()
+  pdfWindow.on('close', async () => {
+    pdfWindow.webContents.send('onPDFWindowClose')
+  })
 })
 
 // ipcMain.on('ping', (_, path) => {

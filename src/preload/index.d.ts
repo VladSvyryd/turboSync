@@ -10,6 +10,7 @@ declare global {
       openNewWindow: (path:string) => void
       openPDFPreviewWindow: (path:string) => void
       openDoc: (docTitle:string) => void
+      onPDFWindowClose: (callback:()=>void) => void
     }
   }
 }

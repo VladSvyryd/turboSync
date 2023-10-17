@@ -27,6 +27,14 @@ const index: FunctionComponent<Props> = () => {
       })
     }
   })
+  // const { data: activeUserData } = useSWR('activePatient', window.api.getActivePatient, {
+  //   onError: (err) => {
+  //     console.log(err)
+  //     toast({
+  //       description: `Fehler beim Abrufen der Daten. (${err.message})`
+  //     })
+  //   }
+  // })
 
   const startAddTemplateFlow = (uploadFiles: Array<File>) => {
     if (uploadFiles.length === 0) {

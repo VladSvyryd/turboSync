@@ -14,7 +14,9 @@ const api = {
   openDoc,
   openPDFPreviewWindow: (path: string) => {
     electronAPI.ipcRenderer.send('openPDFPreviewWindow', path)
-  }
+  },
+  onPDFWindowClose: (callback: () => void) =>
+    electronAPI.ipcRenderer.on('onPDFWindowClose', callback)
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to

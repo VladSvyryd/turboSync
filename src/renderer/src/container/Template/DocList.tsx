@@ -1,6 +1,6 @@
 import { FunctionComponent, useState } from 'react'
 import { List, ListItem, ScaleFade, Spinner, Stack, Text, useToast } from '@chakra-ui/react'
-import ListButton from '../../components/ListButton/ListButton'
+import ListButton from '../../components/ListButton/ListButton/ListButton'
 import ErrorModal from './ErrorModal'
 import { ServerApi } from '../../api'
 import { AxiosError } from 'axios'

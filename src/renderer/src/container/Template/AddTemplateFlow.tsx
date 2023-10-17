@@ -72,7 +72,7 @@ const AddTemplateFlow: FunctionComponent<Props> = ({ onAddFlowDone }) => {
     }
     onAddFlowDone()
   }
-  const showTemplateInformation = (signType: SignType) => {
+  const setupUploadTemplates = (signType: SignType) => {
     setUploadTemplates(
       uploadTemplates
         ? uploadTemplates.map((template) => ({
@@ -95,7 +95,7 @@ const AddTemplateFlow: FunctionComponent<Props> = ({ onAddFlowDone }) => {
         isOpen={signTypeModal}
         onClose={() => setSignTypeModal(false)}
         onPick={async (v) => {
-          showTemplateInformation(v)
+          setupUploadTemplates(v)
         }}
       />
       {signType && <TemplateInformation onSubmit={handleAddFiles} />}

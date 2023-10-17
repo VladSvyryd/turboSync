@@ -13,13 +13,14 @@ interface OwnProps {
 
 type Props = OwnProps
 
-const TemplateInfoForm: FunctionComponent<Props> = ({
+const TemplateForm: FunctionComponent<Props> = ({
   template,
   inputFocusRef,
   onChange,
   hideSignType = false
 }) => {
   const { titles } = useListStore()
+  console.log({ template })
   return (
     <Stack spacing={4} flex={1}>
       <FormControl w={'100%'}>
@@ -81,7 +82,7 @@ const TemplateInfoForm: FunctionComponent<Props> = ({
         {Object.values(ConditionOption).map((key) => {
           const currentConditions = new Set(template.requiredCondition)
           return (
-            <FormControl display="flex" alignItems="center">
+            <FormControl display="flex" alignItems="center" key={key}>
               <FormLabel htmlFor="options" mb="0" flex={1}>
                 {key}
               </FormLabel>
@@ -109,4 +110,4 @@ const TemplateInfoForm: FunctionComponent<Props> = ({
   )
 }
 
-export default TemplateInfoForm
+export default TemplateForm

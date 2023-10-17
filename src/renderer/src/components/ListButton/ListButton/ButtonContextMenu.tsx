@@ -1,51 +1,43 @@
-import { Dispatch, FunctionComponent, SetStateAction, useMemo, useRef, useState } from 'react'
+import { FunctionComponent, useMemo, useRef, useState } from 'react'
 import { Box, Button, List, ListItem } from '@chakra-ui/react'
 import ListButtonWithContext from './ListButtonWithContext'
 import { FaChevronRight, FaFileWord, FaTrash } from 'react-icons/fa'
 import { usePopper } from 'react-popper'
-import { ContextMenuKey, SignType, Template } from '../../../types'
+import { ContextMenuKey, SignType } from '../../../types'
 import { AiFillEdit } from 'react-icons/ai'
 import { getTemplatePdfPreview, handleDeleteTemplate, handleMoveTemplate } from '../../../api'
 import { FaArrowRightArrowLeft, FaFilePdf } from 'react-icons/fa6'
 import { MdDocumentScanner } from 'react-icons/md'
 import { TbArrowsTransferDown } from 'react-icons/tb'
-import { VirtualElement } from '@popperjs/core'
 import { useListStore } from '../../../store/ListStore'
 import LoadingOverlay from '../../Loading/LoadingOverlay'
 import DeleteSubmitModal from '../../../container/Template/DeleteSubmitModal'
 import { AnimatePresence, motion } from 'framer-motion'
-import EditTemplate from '../../Modals/EditTemplate'
+import { useTemplatesStore } from '../../../store/DocStore'
+import { mutate } from 'swr'
+import { fetchTemplatesUrl } from '../../../types/variables'
 
-interface OwnProps {
-  template: Template
-  referenceElement: (VirtualElement & { contextMenu: string }) | null
-  setReferenceElement: Dispatch<SetStateAction<(VirtualElement & { contextMenu: string }) | null>>
-  onInteractionWithList: () => void
-}
+interface OwnProps {}
 
 type Props = OwnProps
 
-const ButtonContextMenu: FunctionComponent<Props> = ({
-  template,
-  referenceElement,
-  setReferenceElement,
-  onInteractionWithList
-}) => {
+const ButtonContextMenu: FunctionComponent<Props> = ({}) => {
+  const { template, contextMenuRef, closeContextMenu, setEditTemplate } = useTemplatesStore()
+
   const { titles } = useListStore()
   const [loadingOverlay, setLoadingOverlay] = useState<string | null>(null)
   const [popperElement, setPopperElement] = useState<any>(null)
 
-  const { styles, attributes } = usePopper(referenceElement, popperElement)
-  const [editTemplate, setEditTemplate] = useState<Template | null>(null)
+  const { styles, attributes } = usePopper(contextMenuRef, popperElement)
   const initialFocusRef = useRef<any>()
   const [deleteModal, setDeleteModal] = useState<string | null>(null)
 
-  const isOpen = Boolean(referenceElement?.contextMenu === template.uuid)
+  const isOpen = Boolean(template)
   const handleMenuClose = () => {
-    setReferenceElement(null)
+    closeContextMenu()
   }
-
   const renderContextMenu = useMemo(() => {
+    if (!template) return []
     const menuPoints = [
       {
         id: ContextMenuKey.OPEN,
@@ -97,9 +89,10 @@ const ButtonContextMenu: FunctionComponent<Props> = ({
           .map((title) => ({
             title: titles[title],
             onClick: async () => {
-              await handleMoveTemplate(template.uuid, title as SignType, () => {
-                onInteractionWithList()
+              await handleMoveTemplate(template.uuid, title as SignType, async () => {
+                await mutate(fetchTemplatesUrl)
               })
+              handleMenuClose()
             },
             leftIcon: <FaArrowRightArrowLeft />
           }))
@@ -118,7 +111,8 @@ const ButtonContextMenu: FunctionComponent<Props> = ({
       return menuPoints.filter((m) => m.id === ContextMenuKey.DELETE)
     }
     return menuPoints
-  }, [template.noFile])
+  }, [template?.noFile])
+  if (!template) return null
 
   return (
     <>
@@ -131,13 +125,12 @@ const ButtonContextMenu: FunctionComponent<Props> = ({
         onDelete={async () => {
           if (deleteModal) {
             handleDeleteTemplate(deleteModal, () => {
-              onInteractionWithList()
+              // onInteractionWithList()
               setDeleteModal(null)
             })
           }
         }}
       />
-      <EditTemplate template={editTemplate} setTemplate={setEditTemplate} onSubmit={() => {}} />
       <AnimatePresence>
         {isOpen && (
           <>
@@ -171,6 +164,7 @@ const ButtonContextMenu: FunctionComponent<Props> = ({
                 {renderContextMenu.map((link) =>
                   link.contextMenuLinks ? (
                     <ListButtonWithContext
+                      key={link.title}
                       title={link.title}
                       onClick={() => link.onClick()}
                       loading={false}

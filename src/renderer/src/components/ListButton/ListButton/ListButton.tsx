@@ -17,6 +17,7 @@ import { VirtualElement } from '@popperjs/core'
 import { InternalErrorNumber, Template } from '../../../types'
 import ErrorModal from '../../../container/Template/ErrorModal'
 import ButtonContextMenu from './ButtonContextMenu'
+import { useTemplatesStore } from '../../../store/DocStore'
 
 export type ContextMenu = Array<{
   title: string
@@ -36,16 +37,6 @@ interface OwnProps {
 }
 
 type Props = OwnProps
-function generateGetBoundingClientRect(x = 0, y = 0) {
-  return () => ({
-    width: 0,
-    height: 0,
-    top: y,
-    right: x + 75,
-    bottom: y,
-    left: x + 75
-  })
-}
 
 const ListButton: FunctionComponent<Props> = ({
   template,
@@ -56,20 +47,10 @@ const ListButton: FunctionComponent<Props> = ({
   onInteractionWithList
 }) => {
   const errorColor = useToken('colors', 'red.500')
-  const [referenceElement, setReferenceElement] = useState<
-    (VirtualElement & { contextMenu: string }) | null
-  >(null)
 
+  const { template: activeTemplate, setContextMenuRef } = useTemplatesStore()
   // const [arrowElement, setArrowElement] = useState<any>(null)
   const [error, setError] = useState<string | null>(null)
-
-  const handleContextMenu = (event: React.MouseEvent, doc: string) => {
-    event.preventDefault()
-    setReferenceElement({
-      contextMenu: doc,
-      getBoundingClientRect: generateGetBoundingClientRect(event.clientX, event.clientY) as any
-    })
-  }
 
   const renderColor = (template: Template) => {
     if (template.requiredCondition.length !== 0) {
@@ -84,14 +65,14 @@ const ListButton: FunctionComponent<Props> = ({
           <PopoverTrigger>
             <Button
               variant={'ghost'}
-              onContextMenu={(e) => handleContextMenu(e, template.uuid)}
+              onContextMenu={(e) => setContextMenuRef(e, template)}
               leftIcon={leftIcon ?? <SiGoogledocs />}
               w={'100%'}
               justifyContent={'start'}
               borderRadius={0}
               isLoading={loading}
               loadingText={`${template.title} (in Arbeit)`}
-              isActive={Boolean(referenceElement?.contextMenu === template.uuid)}
+              isActive={Boolean(activeTemplate?.uuid === template.uuid)}
               rightIcon={<MdOutlineSyncDisabled color={errorColor} />}
               color={'blackAlpha.600'}
             >
@@ -114,7 +95,7 @@ const ListButton: FunctionComponent<Props> = ({
     return (
       <Button
         variant={'ghost'}
-        onContextMenu={(e) => handleContextMenu(e, template.uuid)}
+        onContextMenu={(e) => setContextMenuRef(e, template)}
         onClick={() => onClick(template)}
         leftIcon={leftIcon ?? <SiGoogledocs />}
         w={'100%'}
@@ -123,7 +104,7 @@ const ListButton: FunctionComponent<Props> = ({
         isDisabled={loading}
         isLoading={loading}
         loadingText={`${template.title} (in Arbeit)`}
-        isActive={Boolean(referenceElement?.contextMenu === template.uuid)}
+        isActive={Boolean(activeTemplate?.uuid === template.uuid)}
         rightIcon={rightIcon}
         color={renderColor(template)}
       >
@@ -140,12 +121,6 @@ const ListButton: FunctionComponent<Props> = ({
         }}
       />
       {renderButton()}
-      <ButtonContextMenu
-        referenceElement={referenceElement}
-        setReferenceElement={setReferenceElement}
-        template={template}
-        onInteractionWithList={onInteractionWithList}
-      />
     </>
   )
 }

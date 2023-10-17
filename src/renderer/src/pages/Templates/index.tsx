@@ -1,12 +1,15 @@
 import { FunctionComponent } from 'react'
 import { Progress, useToast } from '@chakra-ui/react'
 import useSWR from 'swr'
-import { fetcherWithQuery, ServerApi } from '../../api'
+import { fetcherWithQuery } from '../../api'
 import DnD from '../../components/DnD'
 import DocFolders from '../../components/Doc/DocFolders'
 import { ResponseFolder } from '../../types'
 import AddTemplateFlow from '../../container/Template/AddTemplateFlow'
 import { useUploadStore } from '../../store/UploadStore'
+import ButtonContextMenu from '../../components/ListButton/ListButton/ButtonContextMenu'
+import EditTemplate from '../../components/Modals/EditTemplate'
+import { fetchTemplatesUrl } from '../../types/variables'
 
 interface OwnProps {}
 
@@ -15,11 +18,9 @@ type Props = OwnProps
 const index: FunctionComponent<Props> = () => {
   const toast = useToast()
   const { fillUploadTemplates, setSignTypeModal } = useUploadStore()
-
-  const url = `${ServerApi.getUri()}/api/templates`
   const { data, isValidating, mutate } = useSWR<{
     folders: Array<ResponseFolder>
-  }>(url, fetcherWithQuery, {
+  }>(fetchTemplatesUrl, fetcherWithQuery, {
     onError: (err) => {
       console.log(err)
       toast({
@@ -27,6 +28,7 @@ const index: FunctionComponent<Props> = () => {
       })
     }
   })
+  console.log({ data })
   // const { data: activeUserData } = useSWR('activePatient', window.api.getActivePatient, {
   //   onError: (err) => {
   //     console.log(err)
@@ -65,6 +67,8 @@ const index: FunctionComponent<Props> = () => {
           onInteractionWithList={mutate}
         />
       </DnD>
+      <ButtonContextMenu />
+      <EditTemplate />
     </>
   )
 }

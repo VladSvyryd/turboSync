@@ -1,4 +1,4 @@
-import { Dispatch, FunctionComponent, SetStateAction, useRef } from 'react'
+import { FunctionComponent, useRef } from 'react'
 import {
   Button,
   Modal,
@@ -9,27 +9,42 @@ import {
   ModalHeader,
   ModalOverlay
 } from '@chakra-ui/react'
-import { Template } from '../../types'
 import { getBlurColorBySignType, templateTitleIsValid } from '../../util'
 import TemplateForm from '../Forms/TemplateForm'
-
-interface OwnProps {
-  template: Template | null
-  setTemplate: Dispatch<SetStateAction<Template | null>>
-  onSubmit: (template: Template | null) => void
-}
+import { updateTemplate } from '../../api'
+import { useTemplatesStore } from '../../store/DocStore'
+import { mutate } from 'swr'
+import { fetchTemplatesUrl } from '../../types/variables'
+interface OwnProps {}
 
 type Props = OwnProps
 
-const EditTemplate: FunctionComponent<Props> = ({ onSubmit, template, setTemplate }) => {
+const EditTemplate: FunctionComponent<Props> = ({}) => {
   const initialRef = useRef(null)
+  const { editTemplate, setEditTemplate } = useTemplatesStore()
 
   const handleCloseModal = () => {
-    setTemplate(null)
+    setEditTemplate(null)
   }
 
-  const overlayColors = getBlurColorBySignType(template?.signType)
-  if (!template) return null
+  const handleOnSubmit = async () => {
+    if (!editTemplate) return
+
+    // if requiredCondition is null, set it to empty array cause BE
+    await updateTemplate(
+      {
+        ...editTemplate,
+        requiredCondition: editTemplate.requiredCondition ? editTemplate.requiredCondition : []
+      },
+      () => {
+        handleCloseModal()
+      }
+    )
+    await mutate(fetchTemplatesUrl)
+  }
+
+  const overlayColors = getBlurColorBySignType(editTemplate?.signType)
+  if (!editTemplate) return null
   return (
     <Modal
       size={'xl'}
@@ -47,21 +62,17 @@ const EditTemplate: FunctionComponent<Props> = ({ onSubmit, template, setTemplat
         <ModalBody pb={6}>
           <TemplateForm
             hideSignType
-            template={template}
+            template={editTemplate}
             inputFocusRef={initialRef}
             onChange={(result) => {
-              setTemplate((prev) =>
-                prev
-                  ? {
-                      ...prev,
-                      title: result.title,
-                      signType: result.signType,
-                      requiredCondition: result.requiredCondition
-                        ? result.requiredCondition
-                        : (null as any)
-                    }
-                  : null
-              )
+              setEditTemplate({
+                ...editTemplate,
+                title: result.title,
+                signType: result.signType,
+                requiredCondition: result.requiredCondition
+                  ? result.requiredCondition
+                  : (null as any)
+              })
             }}
           />
         </ModalBody>
@@ -69,10 +80,8 @@ const EditTemplate: FunctionComponent<Props> = ({ onSubmit, template, setTemplat
           <Button
             colorScheme="blue"
             mr={3}
-            onClick={() => {
-              onSubmit(template)
-            }}
-            isDisabled={!templateTitleIsValid(template.title)}
+            onClick={handleOnSubmit}
+            isDisabled={!templateTitleIsValid(editTemplate.title)}
           >
             Übernehmen
           </Button>

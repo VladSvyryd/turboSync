@@ -7,25 +7,19 @@ import { ResponseFolder, SignType } from '../../types'
 interface OwnProps {
   folders: Array<ResponseFolder>
   loading: boolean
-  onInteractionWithList: () => void
 }
 
 type Props = OwnProps
 
 const FolderOrder = [SignType.LINK, SignType.SIGNPAD, SignType.PRINT]
 
-const DocFolders: FunctionComponent<Props> = ({ onInteractionWithList, folders, loading }) => {
+const DocFolders: FunctionComponent<Props> = ({ folders, loading }) => {
   return folders
     .sort((a, b) => FolderOrder.indexOf(a.signType) - FolderOrder.indexOf(b.signType))
     .map((folder) => (
       <Stack key={folder.signType} py={2}>
         <DocFolderTitle title={folder.signType} />
-        <DocList
-          listId={folder.signType}
-          onInteractionWithList={onInteractionWithList}
-          files={folder.templates}
-          loading={loading}
-        />
+        <DocList listId={folder.signType} files={folder.templates} loading={loading} />
         <Divider />
       </Stack>
     ))

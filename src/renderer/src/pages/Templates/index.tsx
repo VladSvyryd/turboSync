@@ -28,7 +28,6 @@ const index: FunctionComponent<Props> = () => {
       })
     }
   })
-  console.log({ data })
   // const { data: activeUserData } = useSWR('activePatient', window.api.getActivePatient, {
   //   onError: (err) => {
   //     console.log(err)
@@ -61,11 +60,7 @@ const index: FunctionComponent<Props> = () => {
         }}
       />
       <DnD blackList={allFiles} onDropFiles={startAddTemplateFlow}>
-        <DocFolders
-          folders={data?.folders ?? []}
-          loading={isValidating && !data}
-          onInteractionWithList={mutate}
-        />
+        <DocFolders folders={data?.folders ?? []} loading={isValidating && !data} />
       </DnD>
       <ButtonContextMenu />
       <EditTemplate />

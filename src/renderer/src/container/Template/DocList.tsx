@@ -14,7 +14,6 @@ interface OwnProps {
   listId: SignType
   files?: Array<Template>
   loading?: boolean
-  onInteractionWithList: () => void
 }
 
 type Props = OwnProps
@@ -91,7 +90,7 @@ const getSelectionButtons = (signType: SignType) => {
   }
 }
 
-const DocList: FunctionComponent<Props> = ({ files, listId, onInteractionWithList, loading }) => {
+const DocList: FunctionComponent<Props> = ({ files, listId, loading }) => {
   const toast = useToast()
   const [loadingProcessTemplate, setLoadingProcessTemplate] = useState<null | string>(null)
   const [error, setError] = useState<string | null>(null)
@@ -169,7 +168,6 @@ const DocList: FunctionComponent<Props> = ({ files, listId, onInteractionWithLis
               template={file}
               onClick={handleDocClick}
               loading={loadingProcessTemplate === file.uuid}
-              onInteractionWithList={onInteractionWithList}
             />
           </ListItem>
         ))}

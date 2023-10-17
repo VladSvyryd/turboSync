@@ -13,10 +13,8 @@ import {
 } from '@chakra-ui/react'
 import { SiGoogledocs } from 'react-icons/si'
 import { MdOutlineSyncDisabled } from 'react-icons/md'
-import { VirtualElement } from '@popperjs/core'
 import { InternalErrorNumber, Template } from '../../../types'
 import ErrorModal from '../../../container/Template/ErrorModal'
-import ButtonContextMenu from './ButtonContextMenu'
 import { useTemplatesStore } from '../../../store/DocStore'
 
 export type ContextMenu = Array<{
@@ -33,7 +31,6 @@ interface OwnProps {
   placement?: 'bottom' | 'end'
   leftIcon?: ReactElement
   rightIcon?: ReactElement
-  onInteractionWithList: () => void
 }
 
 type Props = OwnProps
@@ -43,8 +40,7 @@ const ListButton: FunctionComponent<Props> = ({
   onClick,
   loading,
   leftIcon,
-  rightIcon,
-  onInteractionWithList
+  rightIcon
 }) => {
   const errorColor = useToken('colors', 'red.500')
 

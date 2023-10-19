@@ -1,7 +1,7 @@
 import { FunctionComponent } from 'react'
 import { Progress, useToast } from '@chakra-ui/react'
 import useSWR from 'swr'
-import { fetcherWithQuery } from '../../api'
+import { fetcherWithQuery, handleDeleteTemplate } from '../../api'
 import DnD from '../../components/DnD'
 import DocFolders from '../../components/Doc/DocFolders'
 import { ResponseFolder } from '../../types'
@@ -10,6 +10,9 @@ import { useUploadStore } from '../../store/UploadStore'
 import ButtonContextMenu from '../../components/ListButton/ListButton/ButtonContextMenu'
 import EditTemplate from '../../components/Modals/EditTemplate'
 import { fetchTemplatesUrl } from '../../types/variables'
+import LoadingOverlay from '../../components/Loading/LoadingOverlay'
+import { useTemplatesStore } from '../../store/TemplateStore'
+import DeleteSubmitModal from '../../container/Template/DeleteSubmitModal'
 
 interface OwnProps {}
 
@@ -18,6 +21,7 @@ type Props = OwnProps
 const index: FunctionComponent<Props> = () => {
   const toast = useToast()
   const { fillUploadTemplates, setSignTypeModal } = useUploadStore()
+  const { previewLoading, deleteTemplateUUID, setDeleteTemplateUUID } = useTemplatesStore()
   const { data, isValidating, mutate } = useSWR<{
     folders: Array<ResponseFolder>
   }>(fetchTemplatesUrl, fetcherWithQuery, {
@@ -62,6 +66,21 @@ const index: FunctionComponent<Props> = () => {
       <DnD blackList={allFiles} onDropFiles={startAddTemplateFlow}>
         <DocFolders folders={data?.folders ?? []} loading={isValidating && !data} />
       </DnD>
+      {previewLoading && <LoadingOverlay title={'PDF wird erzeugt..'} />}
+      <DeleteSubmitModal
+        isOpen={Boolean(deleteTemplateUUID)}
+        onClose={() => {
+          setDeleteTemplateUUID(null)
+        }}
+        onDelete={async () => {
+          if (deleteTemplateUUID) {
+            await handleDeleteTemplate(deleteTemplateUUID, () => {
+              mutate()
+              setDeleteTemplateUUID(null)
+            })
+          }
+        }}
+      />
       <ButtonContextMenu />
       <EditTemplate />
     </>

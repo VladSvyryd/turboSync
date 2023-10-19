@@ -5,15 +5,13 @@ import { FaChevronRight, FaFileWord, FaTrash } from 'react-icons/fa'
 import { usePopper } from 'react-popper'
 import { ContextMenuKey, SignType } from '../../../types'
 import { AiFillEdit } from 'react-icons/ai'
-import { getTemplatePdfPreview, handleDeleteTemplate, handleMoveTemplate } from '../../../api'
+import { getTemplatePdfPreview, handleMoveTemplate } from '../../../api'
 import { FaArrowRightArrowLeft, FaFilePdf } from 'react-icons/fa6'
 import { MdDocumentScanner } from 'react-icons/md'
 import { TbArrowsTransferDown } from 'react-icons/tb'
 import { useListStore } from '../../../store/ListStore'
-import LoadingOverlay from '../../Loading/LoadingOverlay'
-import DeleteSubmitModal from '../../../container/Template/DeleteSubmitModal'
 import { AnimatePresence, motion } from 'framer-motion'
-import { useTemplatesStore } from '../../../store/DocStore'
+import { useTemplatesStore } from '../../../store/TemplateStore'
 import { mutate } from 'swr'
 import { fetchTemplatesUrl } from '../../../types/variables'
 
@@ -22,15 +20,20 @@ interface OwnProps {}
 type Props = OwnProps
 
 const ButtonContextMenu: FunctionComponent<Props> = ({}) => {
-  const { template, contextMenuRef, closeContextMenu, setEditTemplate } = useTemplatesStore()
+  const {
+    template,
+    contextMenuRef,
+    setDeleteTemplateUUID,
+    closeContextMenu,
+    setEditTemplate,
+    setPreviewLoading
+  } = useTemplatesStore()
 
   const { titles } = useListStore()
-  const [loadingOverlay, setLoadingOverlay] = useState<string | null>(null)
   const [popperElement, setPopperElement] = useState<any>(null)
 
   const { styles, attributes } = usePopper(contextMenuRef, popperElement)
   const initialFocusRef = useRef<any>()
-  const [deleteModal, setDeleteModal] = useState<string | null>(null)
 
   const isOpen = Boolean(template)
   const handleMenuClose = () => {
@@ -61,13 +64,13 @@ const ButtonContextMenu: FunctionComponent<Props> = ({}) => {
         id: ContextMenuKey.PREVIEW,
         title: 'Vorschau',
         onClick: async () => {
-          setLoadingOverlay(template.uuid)
+          setPreviewLoading(true)
           handleMenuClose()
           const activePatient = await window.api.getActivePatient()
           const networkPath = await getTemplatePdfPreview(template.uuid, activePatient.data)
           console.log('networkPath', networkPath)
           window.api.openPDFPreviewWindow(networkPath ?? 'error')
-          setLoadingOverlay(null)
+          setPreviewLoading(false)
         },
         leftIcon: <FaFilePdf />
       },
@@ -102,7 +105,7 @@ const ButtonContextMenu: FunctionComponent<Props> = ({}) => {
         title: 'Löschen',
         onClick: async () => {
           handleMenuClose()
-          setDeleteModal(template.uuid)
+          setDeleteTemplateUUID(template.uuid)
         },
         leftIcon: <FaTrash />
       }
@@ -116,21 +119,6 @@ const ButtonContextMenu: FunctionComponent<Props> = ({}) => {
 
   return (
     <>
-      {loadingOverlay === template.uuid && <LoadingOverlay title={'PDF wird erzeugt..'} />}
-      <DeleteSubmitModal
-        isOpen={Boolean(deleteModal)}
-        onClose={() => {
-          setDeleteModal(null)
-        }}
-        onDelete={async () => {
-          if (deleteModal) {
-            handleDeleteTemplate(deleteModal, () => {
-              // onInteractionWithList()
-              setDeleteModal(null)
-            })
-          }
-        }}
-      />
       <AnimatePresence>
         {isOpen && (
           <>

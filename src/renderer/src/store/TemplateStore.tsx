@@ -12,6 +12,10 @@ interface TemplatesState {
   editTemplate: Template | null
   setEditTemplate: (template: Template | null) => void
   closeContextMenu: () => void
+  previewLoading: boolean
+  setPreviewLoading: (loading: boolean) => void
+  deleteTemplateUUID: string | null
+  setDeleteTemplateUUID: (uuid: string | null) => void
 }
 export const useTemplatesStore = create<TemplatesState>()(
   devtools((set) => ({
@@ -41,6 +45,18 @@ export const useTemplatesStore = create<TemplatesState>()(
       set({
         template: null,
         contextMenuRef: null
+      })
+    },
+    previewLoading: false,
+    setPreviewLoading: (loading: boolean) => {
+      set({
+        previewLoading: loading
+      })
+    },
+    deleteTemplateUUID: null,
+    setDeleteTemplateUUID: (uuid: string | null) => {
+      set({
+        deleteTemplateUUID: uuid
       })
     }
   }))

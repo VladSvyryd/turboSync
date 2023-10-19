@@ -12,7 +12,7 @@ import {
 import { getBlurColorBySignType, templateTitleIsValid } from '../../util'
 import TemplateForm from '../Forms/TemplateForm'
 import { updateTemplate } from '../../api'
-import { useTemplatesStore } from '../../store/DocStore'
+import { useTemplatesStore } from '../../store/TemplateStore'
 import { mutate } from 'swr'
 import { fetchTemplatesUrl } from '../../types/variables'
 interface OwnProps {}

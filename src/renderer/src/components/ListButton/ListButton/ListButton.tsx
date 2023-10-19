@@ -15,7 +15,7 @@ import { SiGoogledocs } from 'react-icons/si'
 import { MdOutlineSyncDisabled } from 'react-icons/md'
 import { InternalErrorNumber, Template } from '../../../types'
 import ErrorModal from '../../../container/Template/ErrorModal'
-import { useTemplatesStore } from '../../../store/DocStore'
+import { useTemplatesStore } from '../../../store/TemplateStore'
 
 export type ContextMenu = Array<{
   title: string

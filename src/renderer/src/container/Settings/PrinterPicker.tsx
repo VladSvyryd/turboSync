@@ -2,18 +2,16 @@ import { FunctionComponent, useEffect, useState } from 'react'
 import PrinterSelectForm from '../../components/Forms/PrinterSelectForm'
 import { Button, Divider, Heading, Stack, Text, useToast } from '@chakra-ui/react'
 import { useSettingsStore } from '../../store'
-import useSWR from 'swr'
 
 interface OwnProps {}
 
 type Props = OwnProps
 
-const a = new Promise(window.api.getPrinters)
 const PrinterPicker: FunctionComponent<Props> = ({}) => {
   const toast = useToast()
   const [loading, setLoading] = useState(false)
-  const { data } = useSWR<Array<string>>('getPrinters', a, {})
-  console.log(data)
+  // const { data } = useSWR<Array<string>>('getPrinters', a, {})
+  // console.log(data)
   const [printers, setPrinters] = useState<Array<Electron.PrinterInfo>>([])
   const { defaultPrinter, setDefaultPrinter } = useSettingsStore()
   console.log(printers)
@@ -37,7 +35,6 @@ const PrinterPicker: FunctionComponent<Props> = ({}) => {
     })
     retrievePrinters()
   }, [])
-  console.log(defaultPrinter)
   return (
     <Stack px={4}>
       <Heading size={'sm'}>Drucker</Heading>

@@ -10,9 +10,11 @@ import {
   StepSeparator,
   StepStatus,
   StepTitle,
+  Text,
   useToken
 } from '@chakra-ui/react'
 import { TemplateWithFile } from '../../types'
+import { useListStore } from '../../store/ListStore'
 
 interface OwnProps {
   activeStep: number
@@ -30,6 +32,7 @@ const UploadTemplatesStepper: FunctionComponent<Props> = ({
   onClick
 }) => {
   const errorColor = useToken('colors', 'red.400')
+  const { titles } = useListStore()
   return (
     <Stepper
       size="md"
@@ -37,7 +40,7 @@ const UploadTemplatesStepper: FunctionComponent<Props> = ({
       orientation={'vertical'}
       sx={{
         width: '100%',
-        maxWidth: 150
+        maxWidth: activeStep === steps.length ? '100%' : 150
       }}
       index={activeStep}
     >
@@ -67,7 +70,7 @@ const UploadTemplatesStepper: FunctionComponent<Props> = ({
           <Box flexShrink="0">
             <StepTitle
               style={{
-                maxWidth: 120,
+                maxWidth: activeStep !== steps.length ? 120 : 200,
                 textOverflow: 'ellipsis',
                 whiteSpace: 'nowrap',
                 overflow: 'hidden'
@@ -85,7 +88,7 @@ const UploadTemplatesStepper: FunctionComponent<Props> = ({
               </StepDescription>
             )}
           </Box>
-
+          {activeStep === steps.length && <Text> {titles[step.templateInfo.signType]}</Text>}
           <StepSeparator />
         </Step>
       ))}

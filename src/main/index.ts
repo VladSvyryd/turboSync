@@ -136,6 +136,7 @@ ipcMain.on('openPDFPreviewWindow', async (_, path) => {
     height: newWindowHeight,
     width: newWindowWidth,
     show: false,
+    alwaysOnTop: false,
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       plugins: true,

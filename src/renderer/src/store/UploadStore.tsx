@@ -28,7 +28,8 @@ export const useUploadStore = create<UploadState>()(
             id: file.name,
             title: file.name.split('.')[0] ?? '',
             signType: SignType.LINK,
-            requiredCondition: null
+            requiredCondition: null,
+            expiredEveryMonths: 3
           },
           file
         }))

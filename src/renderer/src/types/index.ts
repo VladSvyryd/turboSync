@@ -35,6 +35,7 @@ export type TemplateWithFile = {
     title: string
     requiredCondition: Array<ConditionOption> | null
     signType: SignType
+    expiredEveryMonths: number
   }
   file: File
 }
@@ -56,11 +57,13 @@ export type Template = {
   signType: SignType
   networkPath: string
   noFile: boolean
+  expiredEveryMonths: number
 }
 export type EditableTemplate = {
   title: string
   requiredCondition: ConditionOption[] | null
   signType: SignType
+  expiredEveryMonths: number
 }
 
 export enum ContextMenuKey {

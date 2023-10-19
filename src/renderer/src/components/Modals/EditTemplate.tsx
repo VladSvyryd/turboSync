@@ -67,8 +67,7 @@ const EditTemplate: FunctionComponent<Props> = ({}) => {
             onChange={(result) => {
               setEditTemplate({
                 ...editTemplate,
-                title: result.title,
-                signType: result.signType,
+                ...result,
                 requiredCondition: result.requiredCondition
                   ? result.requiredCondition
                   : (null as any)

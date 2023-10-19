@@ -33,7 +33,8 @@ const TemplateInformation: FunctionComponent<Props> = ({ onSubmit }) => {
       id: 'FINISH',
       title: 'Finish',
       requiredCondition: null,
-      signType: SignType.PRINT
+      signType: SignType.PRINT,
+      expiredEveryMonths: -1
     }
   }
   const steps: Array<TemplateWithFile> = uploadTemplates
@@ -56,15 +57,14 @@ const TemplateInformation: FunctionComponent<Props> = ({ onSubmit }) => {
         template={{
           title: activeUploadTemplate.templateInfo.title,
           signType: activeUploadTemplate.templateInfo.signType,
-          requiredCondition: activeUploadTemplate.templateInfo.requiredCondition
+          requiredCondition: activeUploadTemplate.templateInfo.requiredCondition,
+          expiredEveryMonths: activeUploadTemplate.templateInfo.expiredEveryMonths
         }}
         inputFocusRef={initialRef}
         onChange={(result) => {
           updateUploadTemplate(activeUploadTemplate.templateInfo.id, {
             ...activeUploadTemplate.templateInfo,
-            title: result.title,
-            signType: result.signType,
-            requiredCondition: result.requiredCondition
+            ...result
           })
         }}
       />
@@ -113,10 +113,10 @@ const TemplateInformation: FunctionComponent<Props> = ({ onSubmit }) => {
             colorScheme="blue"
             mr={3}
             onClick={() => {
-              if (!isLast && steps.length === 2) {
+              console.log(!isLast, steps.length === 2)
+              if (isLast || steps.length === 2) {
                 const stepsCopy = steps
                 stepsCopy.pop()
-                console.log(stepsCopy)
                 onSubmit(stepsCopy)
                 handleCloseModal()
                 return
@@ -125,7 +125,7 @@ const TemplateInformation: FunctionComponent<Props> = ({ onSubmit }) => {
             }}
             isDisabled={stepperDisabled}
           >
-            {!isLast && steps.length === 2 ? 'Hinzufügen' : 'Weiter'}
+            {isLast || steps.length === 2 ? 'Hinzufügen' : 'Weiter'}
           </Button>
           <Button onClick={handleCloseModal}>Cancel</Button>
         </ModalFooter>

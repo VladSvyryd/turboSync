@@ -1,5 +1,18 @@
 import { FunctionComponent, RefObject } from 'react'
-import { FormControl, FormLabel, Input, Select, Stack, Switch } from '@chakra-ui/react'
+import {
+  FormControl,
+  FormLabel,
+  Input,
+  Select,
+  Slider,
+  SliderFilledTrack,
+  SliderMark,
+  SliderThumb,
+  SliderTrack,
+  Stack,
+  Switch,
+  Text
+} from '@chakra-ui/react'
 import { ConditionOption, EditableTemplate, SignType } from '../../types'
 import { useListStore } from '../../store/ListStore'
 import { templateTitleIsValid } from '../../util'
@@ -12,7 +25,11 @@ interface OwnProps {
 }
 
 type Props = OwnProps
-
+const labelStyles = {
+  mt: '2',
+  ml: '-2.5',
+  fontSize: 'sm'
+}
 const TemplateForm: FunctionComponent<Props> = ({
   template,
   inputFocusRef,
@@ -20,6 +37,12 @@ const TemplateForm: FunctionComponent<Props> = ({
   hideSignType = false
 }) => {
   const { titles } = useListStore()
+
+  const sliderMarkText = () => {
+    const months = template.expiredEveryMonths
+    if (months === 0) return 'Nie'
+    return `${months} ${months > 1 ? 'Monate' : 'Monat'}`
+  }
   return (
     <Stack spacing={4} flex={1}>
       <FormControl w={'100%'}>
@@ -30,7 +53,7 @@ const TemplateForm: FunctionComponent<Props> = ({
           size={'sm'}
           ref={inputFocusRef}
           placeholder="Neupatient"
-          value={template?.title ?? ''}
+          value={template.title ?? ''}
           onChange={(e) => {
             onChange({
               ...template,
@@ -39,6 +62,48 @@ const TemplateForm: FunctionComponent<Props> = ({
           }}
         />
       </FormControl>
+      <Stack direction={'row'} alignItems={'flex-end'}>
+        <Text fontSize={'md'} fontWeight={'medium'}>
+          Außerkraftsetzung
+        </Text>
+        <Stack pt={7} flex={1} pl={10} pr={10}>
+          <Slider
+            value={template.expiredEveryMonths}
+            min={0}
+            max={12}
+            step={1}
+            aria-label="slider-ex-6"
+            onChange={(val) => {
+              onChange({
+                ...template,
+                expiredEveryMonths: val
+              })
+            }}
+          >
+            {[...new Array(12)].map((_, i) => (
+              <SliderMark value={25} {...labelStyles}>
+                {i + 1}
+              </SliderMark>
+            ))}
+            <SliderMark
+              value={template.expiredEveryMonths}
+              textAlign="center"
+              color="blue.500"
+              mt="-10"
+              ml={template.expiredEveryMonths <= 0 ? '-3' : '-35'}
+              sx={{
+                textWrap: 'nowrap'
+              }}
+            >
+              {sliderMarkText()}
+            </SliderMark>
+            <SliderTrack>
+              <SliderFilledTrack />
+            </SliderTrack>
+            <SliderThumb boxSize={5} border={'2px solid'} borderColor={'blue.400'} />
+          </Slider>
+        </Stack>
+      </Stack>
       {!hideSignType && (
         <Select
           size={'sm'}

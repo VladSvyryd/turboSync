@@ -3,6 +3,7 @@ import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import * as url from 'url'
+import { wait } from '../preload/printer'
 
 const minWidth = 100
 const minHeight = 150
@@ -120,6 +121,7 @@ ipcMain.on('openNewWindow', (_, path) => {
     })
     popWindow.loadURL(loadUrl)
   }
+  console.log(path)
 })
 
 ipcMain.on('openPDFPreviewWindow', async (_, path) => {
@@ -147,7 +149,6 @@ ipcMain.on('openPDFPreviewWindow', async (_, path) => {
   } else {
     const loadUrl = url.format({
       pathname: join(__dirname, `../renderer/index.html`),
-
       hash: `/pdf`,
       protocol: 'file:',
       slashes: true
@@ -158,6 +159,45 @@ ipcMain.on('openPDFPreviewWindow', async (_, path) => {
   pdfWindow.show()
   pdfWindow.on('close', async () => {
     pdfWindow.webContents.send('onPDFWindowClose')
+  })
+})
+
+ipcMain.on('getPrinters', async (event) => {
+  let list = await popWindow.webContents.getPrintersAsync()
+  event.sender.send('receivePrinters', list)
+})
+ipcMain.on('print', async () => {
+  const printWindow = new BrowserWindow({
+    width: 800,
+    height: 600,
+    show: true,
+    webPreferences: {
+      preload: join(__dirname, '../preload/index.js'),
+      plugins: true,
+      sandbox: false,
+      webviewTag: true,
+      webSecurity: false
+    }
+  })
+  const path =
+    'file:\\192.168.185.59\\DigiSignStorage\\clipboard\\bb66e3bb-a8b0-4d2a-a86e-25ea5489bd0e.pdf'
+
+  // const printJob = await print(path, {
+  //   silent: true,
+  //   printer: 'Xerox Drucker (Name)'
+  // })
+  // console.log(url)
+  printWindow.loadURL(`http://localhost:5173/printer?path=${path}`)
+  printWindow.webContents.on('did-finish-load', async () => {
+    await wait(5000)
+
+    printWindow.webContents.print({
+      silent: false,
+      printBackground: false,
+      deviceName: 'PDFCreator'
+      // deviceName: 'Xerox Drucker (Name)'
+    })
+    // printWindow.destroy()
   })
 })
 

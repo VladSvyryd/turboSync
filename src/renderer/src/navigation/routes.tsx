@@ -4,6 +4,7 @@ import Home from '../pages/Home'
 import Template from '../pages/Templates'
 import Settings from '../pages/Settings'
 import PDFViewer from '../pages/PDFViewer'
+import PDFPrinter from '../pages/PDFPrinter'
 
 interface OwnProps {}
 
@@ -43,6 +44,14 @@ const Navigation: FunctionComponent<Props> = () => {
           element={
             <Suspense fallback={'Loading...'}>
               <PDFViewer />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/printer"
+          element={
+            <Suspense fallback={'Loading...'}>
+              <PDFPrinter />
             </Suspense>
           }
         />

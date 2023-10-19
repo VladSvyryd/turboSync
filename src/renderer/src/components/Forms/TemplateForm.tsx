@@ -20,7 +20,6 @@ const TemplateForm: FunctionComponent<Props> = ({
   hideSignType = false
 }) => {
   const { titles } = useListStore()
-  console.log({ template })
   return (
     <Stack spacing={4} flex={1}>
       <FormControl w={'100%'}>

@@ -15,8 +15,21 @@ const api = {
   openPDFPreviewWindow: (path: string) => {
     electronAPI.ipcRenderer.send('openPDFPreviewWindow', path)
   },
-  onPDFWindowClose: (callback: () => void) =>
+  onPDFWindowClose: (callback: () => void) => {
     electronAPI.ipcRenderer.on('onPDFWindowClose', callback)
+  },
+  getPrinters: () => {
+    electronAPI.ipcRenderer.send('getPrinters')
+  },
+  onReceivePrinters: (c) => {
+    electronAPI.ipcRenderer.on('receivePrinters', c)
+  },
+  print: (path: string) => {
+    electronAPI.ipcRenderer.send('print', path)
+  },
+  printPDF: (path: string) => {
+    electronAPI.ipcRenderer.send('printPDF', path)
+  }
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to

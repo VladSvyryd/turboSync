@@ -34,3 +34,21 @@ export const getBlurColorBySignType = (signType: SignType | null | undefined) =>
 export const templateTitleIsValid = (title: string) => {
   return String(title).trim().length !== 0
 }
+
+export enum PrinterStatus {
+  'ERROR' = 6,
+  'OFFLINE' = 128,
+  'OFF' = 130
+}
+export const decodePrinterStatus = (status: number) => {
+  switch (status) {
+    case PrinterStatus.ERROR:
+      return 'Problem'
+    case PrinterStatus.OFFLINE:
+      return 'Offline'
+    case PrinterStatus.OFF:
+      return 'Ausgeschaltet'
+    default:
+      return 'Bereit'
+  }
+}

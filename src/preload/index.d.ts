@@ -2,6 +2,7 @@ import { ElectronAPI } from '@electron-toolkit/preload'
 import {Patient} from "../renderer/src/types";
 
 declare global {
+
   interface Window {
     electron: ElectronAPI
     api: {
@@ -11,6 +12,10 @@ declare global {
       openPDFPreviewWindow: (path:string) => void
       openDoc: (docTitle:string) => void
       onPDFWindowClose: (callback:()=>void) => void
+      getPrinters: () => void
+      onReceivePrinters: (callback:(event: Electron.IpcMainEvent, ...args: any[])=>void) => void
+      print: (path:string) => void
+      printPDF: (path:string) => void
     }
   }
 }

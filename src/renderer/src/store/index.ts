@@ -4,8 +4,8 @@ import { devtools, persist } from 'zustand/middleware'
 interface SettingsState {
   apiBaseUrl: string
   setApiBaseUrl: (apiBaseUrl: string) => void
-  defaultPrinter: string | null
-  setDefaultPrinter: (defaultPrinter: string) => void
+  defaultPrinter: Electron.PrinterInfo | null
+  setDefaultPrinter: (defaultPrinter: Electron.PrinterInfo) => void
   defaultScanner: string | null
   setDefaultScanner: (defaultScanner: string) => void
 }

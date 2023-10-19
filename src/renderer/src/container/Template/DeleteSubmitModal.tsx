@@ -9,23 +9,26 @@ import {
   ModalHeader,
   ModalOverlay
 } from '@chakra-ui/react'
+import { useTemplatesStore } from '../../store/TemplateStore'
+import { Template } from '../../types'
 
 interface OwnProps {
-  isOpen: boolean
-  onClose: () => void
-  onDelete: () => void
+  onDelete: (uuid: Template['uuid']) => void
 }
 
 type Props = OwnProps
 
-const DeleteSubmitModal: FunctionComponent<Props> = ({ isOpen, onClose, onDelete }) => {
+const DeleteSubmitModal: FunctionComponent<Props> = ({ onDelete }) => {
   const initialDeleteModalRef = useRef<any>()
-
+  const { deleteTemplateUUID, setDeleteTemplateUUID } = useTemplatesStore()
+  const onClose = () => {
+    setDeleteTemplateUUID(null)
+  }
   return (
     <Modal
       isCentered
       initialFocusRef={initialDeleteModalRef}
-      isOpen={isOpen}
+      isOpen={Boolean(deleteTemplateUUID)}
       onClose={onClose}
       size={'xs'}
     >
@@ -42,8 +45,8 @@ const DeleteSubmitModal: FunctionComponent<Props> = ({ isOpen, onClose, onDelete
             colorScheme="blue"
             mr={3}
             onClick={() => {
-              onDelete()
-              onClose()
+              if (deleteTemplateUUID) onDelete(deleteTemplateUUID)
+              setDeleteTemplateUUID(null)
             }}
           >
             Löschen

@@ -21,7 +21,7 @@ type Props = OwnProps
 const index: FunctionComponent<Props> = () => {
   const toast = useToast()
   const { fillUploadTemplates, setSignTypeModal } = useUploadStore()
-  const { previewLoading, deleteTemplateUUID, setDeleteTemplateUUID } = useTemplatesStore()
+  const { previewLoading } = useTemplatesStore()
   const { data, isValidating, mutate } = useSWR<{
     folders: Array<ResponseFolder>
   }>(fetchTemplatesUrl, fetcherWithQuery, {
@@ -51,6 +51,12 @@ const index: FunctionComponent<Props> = () => {
 
   const allFiles = data?.folders.flatMap((folder) => folder.templates).map((f) => f.title) ?? []
 
+  const handleDelete = async (uuid: string) => {
+    await handleDeleteTemplate(uuid, () => {
+      mutate()
+    })
+  }
+
   if (isValidating && !data) {
     return <Progress size="xs" isIndeterminate />
   }
@@ -67,20 +73,7 @@ const index: FunctionComponent<Props> = () => {
         <DocFolders folders={data?.folders ?? []} loading={isValidating && !data} />
       </DnD>
       {previewLoading && <LoadingOverlay title={'PDF wird erzeugt..'} />}
-      <DeleteSubmitModal
-        isOpen={Boolean(deleteTemplateUUID)}
-        onClose={() => {
-          setDeleteTemplateUUID(null)
-        }}
-        onDelete={async () => {
-          if (deleteTemplateUUID) {
-            await handleDeleteTemplate(deleteTemplateUUID, () => {
-              mutate()
-              setDeleteTemplateUUID(null)
-            })
-          }
-        }}
-      />
+      <DeleteSubmitModal onDelete={handleDelete} />
       <ButtonContextMenu />
       <EditTemplate />
     </>

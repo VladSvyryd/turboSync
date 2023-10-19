@@ -9,7 +9,6 @@ type Props = OwnProps
 const index: FunctionComponent<Props> = ({}) => {
   const [searchParams] = useSearchParams()
   const path = searchParams.get('path') ?? '404'
-
   useEffect(() => {
     // get event from MainProcess about closing the window and execute the delete PDF Preview
     window.api.onPDFWindowClose(() => {

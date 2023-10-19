@@ -2,7 +2,7 @@ import { app, shell, BrowserWindow, ipcMain, screen } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
-import * as url from 'url'
+import { format } from 'url'
 import { wait } from '../preload/printer'
 
 const minWidth = 100
@@ -113,7 +113,7 @@ ipcMain.on('openNewWindow', (_, path) => {
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
     popWindow.loadURL(`http://localhost:5173/${path}`)
   } else {
-    const loadUrl = url.format({
+    const loadUrl = format({
       pathname: join(__dirname, `../renderer/index.html`),
       hash: `/${path}`,
       protocol: 'file:',
@@ -140,16 +140,17 @@ ipcMain.on('openPDFPreviewWindow', async (_, path) => {
       preload: join(__dirname, '../preload/index.js'),
       plugins: true,
       sandbox: false,
-      webviewTag: true
+      webviewTag: true,
+      devTools: true
     }
   })
   pdfWindow.removeMenu()
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
     pdfWindow.loadURL(`http://localhost:5173/pdf?path=${path}`)
   } else {
-    const loadUrl = url.format({
+    const loadUrl = format({
       pathname: join(__dirname, `../renderer/index.html`),
-      hash: `/pdf`,
+      hash: `/pdf?path=${path}`,
       protocol: 'file:',
       slashes: true
     })

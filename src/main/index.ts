@@ -3,7 +3,6 @@ import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import { format } from 'url'
-import { wait } from '../preload/printer'
 
 const minWidth = 100
 const minHeight = 150
@@ -177,12 +176,10 @@ ipcMain.on('print', async () => {
       preload: join(__dirname, '../preload/index.js'),
       plugins: true,
       sandbox: false,
-      webviewTag: true,
-      webSecurity: false
+      webviewTag: true
     }
   })
-  const path =
-    'file:\\192.168.185.59\\DigiSignStorage\\clipboard\\bb66e3bb-a8b0-4d2a-a86e-25ea5489bd0e.pdf'
+  const path = 'file:\\\\192.168.185.59\\DigiSignStorage\\clipboard\\TESTDOK.pdf'
 
   // const printJob = await print(path, {
   //   silent: true,
@@ -191,8 +188,6 @@ ipcMain.on('print', async () => {
   // console.log(url)
   printWindow.loadURL(`http://localhost:5173/printer?path=${path}`)
   printWindow.webContents.on('did-finish-load', async () => {
-    await wait(5000)
-
     printWindow.webContents.print({
       silent: false,
       printBackground: false,

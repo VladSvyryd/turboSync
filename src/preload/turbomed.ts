@@ -20,6 +20,7 @@ export async function getActivePatient() {
     }
 
   const cmd = PowerShell.command`
+                [console]::OutputEncoding = New-Object System.Text.UTF8Encoding
                 $progId = 'TMMain.Application';
                 try {
                   $app            = [System.Runtime.InteropServices.Marshal]::GetActiveObject($progId)

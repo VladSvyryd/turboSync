@@ -12,6 +12,7 @@ export const ServerApi = axios.create({
 export const fetcherUserBeforeQuery = async (url: string, options?: RequestInit) => {
   const { data } = await window.api.getActivePatient()
   const createQueryParams = new URL(url)
+  createQueryParams.searchParams.append('id', data.id)
   createQueryParams.searchParams.append('firstName', data.firstName)
   createQueryParams.searchParams.append('secondName', data.secondName)
   createQueryParams.searchParams.append('street', data.street)

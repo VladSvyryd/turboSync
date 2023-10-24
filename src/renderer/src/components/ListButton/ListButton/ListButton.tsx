@@ -8,12 +8,20 @@ import {
   PopoverContent,
   PopoverHeader,
   PopoverTrigger,
+  Stack,
   Text,
   useToken
 } from '@chakra-ui/react'
 import { SiGoogledocs } from 'react-icons/si'
 import { MdOutlineSyncDisabled } from 'react-icons/md'
-import { InternalErrorNumber, Template } from '../../../types'
+import {
+  ConditionOption,
+  DocumentStatus,
+  ExpiredStatus,
+  ExtendedDocumentStatus,
+  InternalErrorNumber,
+  Template
+} from '../../../types'
 import ErrorModal from '../../../container/Template/ErrorModal'
 import { useTemplatesStore } from '../../../store/TemplateStore'
 
@@ -35,6 +43,46 @@ interface OwnProps {
 
 type Props = OwnProps
 
+const getColorByExtendedDocStatus = (status?: ExtendedDocumentStatus) => {
+  switch (status) {
+    case ExpiredStatus.EXPIRED:
+      return 'red.500'
+    case undefined:
+      return 'red.500'
+    case DocumentStatus.SIGNED:
+      return 'blue.500'
+    case DocumentStatus.INPROGRESS:
+      return 'orange.500'
+    default:
+      return 'green.500'
+  }
+}
+const renderColor = (template: Template) => {
+  if (template.computedConditions === null) {
+    return 'initial'
+  }
+  const lastDocStatus = template.computedConditions.lastDocStatus
+  if (lastDocStatus) {
+    return getColorByExtendedDocStatus(lastDocStatus)
+  }
+
+  if (
+    (Object.hasOwn(template.computedConditions, ConditionOption.FEMALE) &&
+      template.computedConditions.FEMALE) ||
+    (Object.hasOwn(template.computedConditions, ConditionOption.MALE) &&
+      template.computedConditions.MALE) ||
+    (Object.hasOwn(template.computedConditions, ConditionOption.UNDER18) &&
+      template.computedConditions.UNDER18) ||
+    (Object.hasOwn(template.computedConditions, ConditionOption.RETIRED) &&
+      template.computedConditions.RETIRED)
+  ) {
+    return getColorByExtendedDocStatus(lastDocStatus)
+  }
+  // if (template.requiredCondition.length !== 0) {
+  //   return 'red.500'
+  // }
+  return 'initial'
+}
 const ListButton: FunctionComponent<Props> = ({
   template,
   onClick,
@@ -48,13 +96,11 @@ const ListButton: FunctionComponent<Props> = ({
   // const [arrowElement, setArrowElement] = useState<any>(null)
   const [error, setError] = useState<string | null>(null)
 
-  const renderColor = (template: Template) => {
-    if (template.requiredCondition.length !== 0) {
-      return 'red.500'
-    }
-    return 'initial'
-  }
   const renderButton = () => {
+    const lastDocDate = template.computedConditions?.lastDocDate
+    const date = lastDocDate
+      ? new Date(lastDocDate).toLocaleDateString('de-DE', { dateStyle: 'short' })
+      : ''
     if (!template.noFile) {
       return (
         <Popover>
@@ -104,7 +150,19 @@ const ListButton: FunctionComponent<Props> = ({
         rightIcon={rightIcon}
         color={renderColor(template)}
       >
-        <Text noOfLines={1}>{template.title}</Text>
+        <Stack
+          flex={1}
+          direction={'row'}
+          alignItems={'center'}
+          justifyContent={lastDocDate ? 'space-between' : 'flex-start'}
+        >
+          <Text noOfLines={1}>{template.title}</Text>
+          {lastDocDate && (
+            <Text noOfLines={1} fontSize={'xs'} title={`Versendet am ${date}`}>
+              {date}
+            </Text>
+          )}
+        </Stack>
       </Button>
     )
   }

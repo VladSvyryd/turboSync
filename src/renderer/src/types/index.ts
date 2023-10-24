@@ -44,6 +44,25 @@ export type ResponseFolder = {
   signType: SignType
   templates: Array<Template & { networkPath: string }>
 }
+export enum DocumentStatus {
+  INPROGRESS = 'INPROGRESS',
+  SIGNED = 'SIGNED',
+  SAVED = 'SAVED'
+}
+export enum ExpiredStatus {
+  EXPIRED = 'EXPIRED',
+  NOT_EXPIRED = 'NOT_EXPIRED'
+}
+export type ExtendedDocumentStatus = ExpiredStatus | DocumentStatus
+
+type ComputedConditions = {
+  lastDocStatus?: ExtendedDocumentStatus
+  lastDocDate?: Date | undefined
+  UNDER18?: boolean | 'NO_DATA'
+  MALE?: boolean | 'NO_DATA'
+  FEMALE?: boolean | 'NO_DATA'
+  RETIRED?: boolean | 'NO_DATA'
+}
 
 export type Template = {
   id: number
@@ -58,6 +77,7 @@ export type Template = {
   networkPath: string
   noFile: boolean
   expiredEveryMonths: number
+  computedConditions: ComputedConditions | null
 }
 export type EditableTemplate = {
   title: string

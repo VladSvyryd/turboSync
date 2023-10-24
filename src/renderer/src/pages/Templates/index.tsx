@@ -4,7 +4,7 @@ import useSWR from 'swr'
 import { fetcherUserBeforeQuery, handleDeleteTemplate } from '../../api'
 import DnD from '../../components/DnD'
 import DocFolders from '../../components/Doc/DocFolders'
-import { ResponseFolder } from '../../types'
+import { Patient, ResponseFolder } from '../../types'
 import AddTemplateFlow from '../../container/Template/AddTemplateFlow'
 import { useUploadStore } from '../../store/UploadStore'
 import ButtonContextMenu from '../../components/ListButton/ListButton/ButtonContextMenu'
@@ -13,6 +13,8 @@ import { fetchTemplatesUrl } from '../../types/variables'
 import LoadingOverlay from '../../components/Loading/LoadingOverlay'
 import { useTemplatesStore } from '../../store/TemplateStore'
 import DeleteSubmitModal from '../../container/Template/DeleteSubmitModal'
+import PatientLable from '../../components/Lables/PatientLable'
+import { usePatientStore } from '../../store/PatientStore'
 
 interface OwnProps {}
 
@@ -22,9 +24,16 @@ const index: FunctionComponent<Props> = () => {
   const toast = useToast()
   const { fillUploadTemplates, setSignTypeModal } = useUploadStore()
   const { previewLoading } = useTemplatesStore()
+  const { setPatient } = usePatientStore()
   const { data, isValidating, mutate } = useSWR<{
     folders: Array<ResponseFolder>
+    patient: Patient
   }>(fetchTemplatesUrl, fetcherUserBeforeQuery, {
+    focusThrottleInterval: 0,
+    onSuccess: (data) => {
+      console.log(data)
+      setPatient(data.patient)
+    },
     onError: (err) => {
       console.log(err)
       toast({
@@ -32,14 +41,6 @@ const index: FunctionComponent<Props> = () => {
       })
     }
   })
-  // const { data: activeUserData } = useSWR('activePatient', window.api.getActivePatient, {
-  //   onError: (err) => {
-  //     console.log(err)
-  //     toast({
-  //       description: `Fehler beim Abrufen der Daten. (${err.message})`
-  //     })
-  //   }
-  // })
 
   const startAddTemplateFlow = (uploadFiles: Array<File>) => {
     if (uploadFiles.length === 0) {
@@ -56,13 +57,13 @@ const index: FunctionComponent<Props> = () => {
       mutate()
     })
   }
-
   if (isValidating && !data) {
     return <Progress size="xs" isIndeterminate />
   }
 
   return (
     <>
+      <PatientLable patient={data?.patient} loading={isValidating} />
       <AddTemplateFlow
         onAddFlowDone={async () => {
           fillUploadTemplates(null)

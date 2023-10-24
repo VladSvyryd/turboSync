@@ -20,6 +20,24 @@ $ npm install
 $ npm run dev
 ```
 
+### Winax
+
+Package to use COM Objects, in Development needs python , Visiual Stuido, node-gype
+
+After installing Python and VS. Install Node-Gype globally
+
+````bash
+npm install node-gype -g
+```
+````
+
+### Build Node Modules to use your Node Version and Your Electron Version
+
+````bash
+npm rebuild
+```
+````
+
 ### Build
 
 ```bash

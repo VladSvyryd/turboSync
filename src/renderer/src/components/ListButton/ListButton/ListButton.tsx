@@ -78,9 +78,7 @@ const renderColor = (template: Template) => {
   ) {
     return getColorByExtendedDocStatus(lastDocStatus)
   }
-  // if (template.requiredCondition.length !== 0) {
-  //   return 'red.500'
-  // }
+
   return 'initial'
 }
 const ListButton: FunctionComponent<Props> = ({
@@ -96,11 +94,20 @@ const ListButton: FunctionComponent<Props> = ({
   // const [arrowElement, setArrowElement] = useState<any>(null)
   const [error, setError] = useState<string | null>(null)
 
+  const renderNoData = (template: Template) => {
+    if (template.computedConditions) {
+      if (Object.values(template.computedConditions).find((v) => v === 'NO_DATA') !== undefined) {
+        return 'No Data'
+      }
+    }
+    return undefined
+  }
   const renderButton = () => {
     const lastDocDate = template.computedConditions?.lastDocDate
     const date = lastDocDate
       ? new Date(lastDocDate).toLocaleDateString('de-DE', { dateStyle: 'short' })
       : ''
+    const noData = renderNoData(template)
     if (!template.noFile) {
       return (
         <Popover>
@@ -154,13 +161,22 @@ const ListButton: FunctionComponent<Props> = ({
           flex={1}
           direction={'row'}
           alignItems={'center'}
-          justifyContent={lastDocDate ? 'space-between' : 'flex-start'}
+          justifyContent={lastDocDate || noData ? 'space-between' : 'flex-start'}
         >
           <Text noOfLines={1}>{template.title}</Text>
-          {lastDocDate && (
-            <Text noOfLines={1} fontSize={'xs'} title={`Versendet am ${date}`}>
-              {date}
-            </Text>
+          {(lastDocDate || noData) && (
+            <Stack direction={'row'}>
+              {lastDocDate && (
+                <Text noOfLines={1} fontSize={'xs'} title={`Versendet am ${date}`}>
+                  {date}
+                </Text>
+              )}
+              {noData && (
+                <Text noOfLines={1} fontSize={'xs'}>
+                  {noData}
+                </Text>
+              )}
+            </Stack>
           )}
         </Stack>
       </Button>

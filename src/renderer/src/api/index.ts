@@ -9,7 +9,24 @@ export const ServerApi = axios.create({
     'Content-Type': 'application/json'
   }
 })
-export const fetcherUserBeforeQuery = async (url: string, options?: RequestInit) => {
+
+// const createUrlWithOption = async (url: string) => {
+//   const { data } = await window.api.getActivePatient()
+//   const patient = data
+//   const linkWithPatient = new URL(url)
+//   linkWithPatient.searchParams.append('id', patient.id)
+//   linkWithPatient.searchParams.append('firstName', patient.firstName)
+//   linkWithPatient.searchParams.append('secondName', patient.secondName)
+//   linkWithPatient.searchParams.append('street', patient.street)
+//   linkWithPatient.searchParams.append('zip', patient.zip)
+//   linkWithPatient.searchParams.append('birthday', patient.birthday)
+//   linkWithPatient.searchParams.append('city', patient.city)
+//   linkWithPatient.searchParams.append('gender', patient.gender)
+//   linkWithPatient.searchParams.append('houseNumber', patient.houseNumber)
+//   return linkWithPatient
+// }
+
+export const fetcherUserBeforeQuery = async (url: string, options?: RequestInit): Promise<any> => {
   const { data } = await window.api.getActivePatient()
   const createQueryParams = new URL(url)
   createQueryParams.searchParams.append('id', data.id)
@@ -35,8 +52,10 @@ export const fetcherUserBeforeQuery = async (url: string, options?: RequestInit)
     error.status = res.status
     throw error
   }
-
-  return res.json()
+  const result = await res.json()
+  return new Promise((resolve) => {
+    resolve({ ...result, patient: data })
+  })
 }
 
 export const handleMoveTemplate = async (

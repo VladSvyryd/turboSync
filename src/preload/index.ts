@@ -29,6 +29,9 @@ const api = {
   },
   printPDF: (path: string) => {
     electronAPI.ipcRenderer.send('printPDF', path)
+  },
+  openTemplatesWindow: () => {
+    electronAPI.ipcRenderer.send('openTemplatesWindow')
   }
 }
 

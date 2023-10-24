@@ -2,13 +2,15 @@ import { FunctionComponent, useState } from 'react'
 import { List, ListItem, ScaleFade, Spinner, Stack, Text, useToast } from '@chakra-ui/react'
 import ListButton from '../../components/ListButton/ListButton/ListButton'
 import ErrorModal from './ErrorModal'
-import { ServerApi } from '../../api'
+import { fetcherUserBeforeQuery, ServerApi } from '../../api'
 import { AxiosError } from 'axios'
 
 import { SignType, Template } from '../../types'
 import SignTypePicker from '../../components/Modals/SignTypePicker'
 import { BsPrinterFill, BsQrCodeScan } from 'react-icons/bs'
 import { LiaSignatureSolid } from 'react-icons/lia'
+import { mutate } from 'swr'
+import { usePatientStore } from '../../store/PatientStore'
 
 interface OwnProps {
   listId: SignType
@@ -92,7 +94,8 @@ const getSelectionButtons = (signType: SignType) => {
 
 const DocList: FunctionComponent<Props> = ({ files, listId, loading }) => {
   const toast = useToast()
-  const [loadingProcessTemplate, setLoadingProcessTemplate] = useState<null | string>(null)
+  const { patient } = usePatientStore()
+  const [loadingProcessTemplate, setLoadingProcessTemplate] = useState<Array<string>>([])
   const [error, setError] = useState<string | null>(null)
   const [activeSignTypePicker, setActiveSignTypePicker] = useState<Template | null>(null)
   const selectionButtons = getSelectionButtons(listId)
@@ -103,17 +106,27 @@ const DocList: FunctionComponent<Props> = ({ files, listId, loading }) => {
     }
     setActiveSignTypePicker(docFile)
   }
+  const toggleProcessToLoadingArray = (uuid: string) => {
+    console.log(uuid)
 
+    setLoadingProcessTemplate((prev) => {
+      const a = new Set(prev)
+      if (a.has(uuid)) {
+        return prev.filter((p) => p !== uuid)
+      } else {
+        return [...prev, uuid]
+      }
+    })
+  }
   const handleStartProcessTemplate = async (docFile: Template) => {
     try {
-      setLoadingProcessTemplate(docFile.uuid)
-      const activePatient = await window.api.getActivePatient()
-      if (!Boolean(activePatient?.data?.id)) {
-        setError(activePatient?.error)
+      toggleProcessToLoadingArray(docFile.uuid)
+      const activePatient = patient
+      if (!Boolean(activePatient?.id)) {
         return
       }
       const processTemplate = await ServerApi.post(`/api/processTemplate`, {
-        ...activePatient.data,
+        ...activePatient,
         uuid: docFile.uuid
       })
       console.log('processTemplate', processTemplate)
@@ -123,7 +136,8 @@ const DocList: FunctionComponent<Props> = ({ files, listId, loading }) => {
         description: err.response?.data?.message ?? 'Fehler beim Verarbeiten der Vorlage.'
       })
     } finally {
-      setLoadingProcessTemplate(null)
+      toggleProcessToLoadingArray(docFile.uuid)
+      if (loadingProcessTemplate.length === 1) await mutate(fetcherUserBeforeQuery)
     }
   }
 
@@ -167,7 +181,7 @@ const DocList: FunctionComponent<Props> = ({ files, listId, loading }) => {
             <ListButton
               template={file}
               onClick={handleDocClick}
-              loading={loadingProcessTemplate === file.uuid}
+              loading={new Set(loadingProcessTemplate).has(file.uuid)}
             />
           </ListItem>
         ))}

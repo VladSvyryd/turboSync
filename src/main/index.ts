@@ -87,40 +87,22 @@ ipcMain.on('openNewWindow', (_, path) => {
   }
   let newWindowHeight = 800
   let newWindowWidth = 600
-  const { x, y, width, height } = mainWindow.getBounds()
-  let newWindowX = x - newWindowWidth
-  let newWindowY = y
-  const isWithinBoundsX = isWithinDisplayBoundsX({ x: newWindowX })
-  const isWithinBoundsY = isWithinDisplayBoundsY({ y: newWindowY + newWindowHeight })
-  if (!isWithinBoundsX) newWindowX = x + width
-  if (!isWithinBoundsY) newWindowY = y - height
+  const { x, y } = getNewWindowPosition(mainWindow, newWindowWidth, newWindowHeight)
   popWindow = new BrowserWindow({
     parent: mainWindow,
     height: newWindowHeight,
     width: newWindowWidth,
     show: true,
-    x: newWindowX,
-    y: newWindowY,
+    x: x,
+    y: y,
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       plugins: true,
       sandbox: false
     }
   })
-  // popWindow.setPosition()
   popWindow.removeMenu()
-  if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
-    popWindow.loadURL(`http://localhost:5173/${path}`)
-  } else {
-    const loadUrl = format({
-      pathname: join(__dirname, `../renderer/index.html`),
-      hash: `/${path}`,
-      protocol: 'file:',
-      slashes: true
-    })
-    popWindow.loadURL(loadUrl)
-  }
-  console.log(path)
+  openUrlDependingFromMode(popWindow, path)
 })
 
 ipcMain.on('openPDFPreviewWindow', async (_, path) => {
@@ -145,17 +127,7 @@ ipcMain.on('openPDFPreviewWindow', async (_, path) => {
     }
   })
   pdfWindow.removeMenu()
-  if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
-    pdfWindow.loadURL(`http://localhost:5173/pdf?path=${path}`)
-  } else {
-    const loadUrl = format({
-      pathname: join(__dirname, `../renderer/index.html`),
-      hash: `/pdf?path=${path}`,
-      protocol: 'file:',
-      slashes: true
-    })
-    pdfWindow.loadURL(loadUrl)
-  }
+  openUrlDependingFromMode(pdfWindow, `pdf?path=${path}`)
   pdfWindow.maximize()
   pdfWindow.show()
   pdfWindow.on('close', async () => {
@@ -198,30 +170,6 @@ ipcMain.on('print', async () => {
   })
 })
 
-// ipcMain.on('ping', (_, path) => {
-//   ;['path'].forEach(function (host) {
-//     ping.promise.probe(host).then(function (res) {
-//       console.log(res)
-//     })
-//   })
-// })
-
-// In this file you can include the rest of your app"s specific main process
-// code. You can also put them in separate blackList and require them here.
-
-// function isWithinDisplayBounds(pos: { x: number; y: number }) {
-//   const displays = screen.getAllDisplays()
-//   return displays.reduce((result, display) => {
-//     const area = display.workArea
-//     return (
-//       result ||
-//       (pos.x >= area.x &&
-//         pos.y >= area.y &&
-//         pos.x < area.x + area.width &&
-//         pos.y < area.y + area.height)
-//     )
-//   }, false)
-// }
 function isWithinDisplayBoundsX(pos: { x: number }) {
   const displays = screen.getAllDisplays()
   return displays.reduce((result, display) => {
@@ -235,4 +183,33 @@ function isWithinDisplayBoundsY(pos: { y: number }) {
     const area = display.workArea
     return result || (pos.y >= area.y && pos.y < area.y + area.height)
   }, false)
+}
+
+const openUrlDependingFromMode = (currentBrowserWindow: BrowserWindow, path: string) => {
+  if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
+    currentBrowserWindow.loadURL(`http://localhost:5173/${path}`)
+  } else {
+    const loadUrl = format({
+      pathname: join(__dirname, `../renderer/index.html`),
+      hash: `/${path}`,
+      protocol: 'file:',
+      slashes: true
+    })
+    currentBrowserWindow.loadURL(loadUrl)
+  }
+}
+const getNewWindowPosition = (
+  parentWindow: BrowserWindow,
+  windowWidth: number,
+  windowHeight: number
+) => {
+  const { x, y, width, height } = parentWindow.getBounds()
+  let newWindowX = x - windowWidth
+  let newWindowY = y
+  const isWithinBoundsX = isWithinDisplayBoundsX({ x: newWindowX })
+  const isWithinBoundsY = isWithinDisplayBoundsY({ y: newWindowY + windowHeight })
+  if (!isWithinBoundsX) newWindowX = x + width
+  if (!isWithinBoundsY) newWindowY = y - height
+
+  return { x: newWindowX, y: newWindowY }
 }

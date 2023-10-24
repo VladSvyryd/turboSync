@@ -1,5 +1,5 @@
 import { PowerShell } from 'node-powershell'
-
+import * as winax from 'winax'
 const executeOn = async (powershellCommand: string) => {
   const ps = new PowerShell()
   try {
@@ -58,6 +58,41 @@ export async function getActivePatient() {
 
             `
   return await executeOn(cmd)
+}
+
+export const getTurbomed = () => {
+  try {
+    const app = new winax.Object('TMMain.Application', { activate: true })
+    console.log(app)
+    const oPatient = app.AktiverPatient()
+    const nummer = oPatient.Nummer()
+    const namensdaten = oPatient.Namensdaten()
+    const geburtsdaten = oPatient.Geburtsdaten()
+    const vorname = namensdaten.Vorname()
+    const nachname = namensdaten.Nachname()
+    const adressdaten = oPatient.Adressdaten().Postanschrift('Privat', 1)
+    const ort = adressdaten.Ort()
+    const plz = adressdaten.Postleitzahl()
+    const strasse = adressdaten.Strasse()
+    const hausnummer = adressdaten.Hausnummer()
+    const geburtstag = geburtsdaten.datum()
+    const geschlecht = geburtsdaten.geschlecht()
+    const patient = {
+      id: nummer,
+      firstName: vorname,
+      secondName: nachname,
+      city: ort,
+      zip: plz,
+      street: strasse,
+      houseNumber: hausnummer,
+      birthday: geburtstag,
+      gender: geschlecht
+    }
+    return patient
+  } catch (e) {
+    return undefined
+    console.log(e)
+  }
 }
 
 export async function getTurbomedIsOn() {

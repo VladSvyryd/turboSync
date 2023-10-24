@@ -16,6 +16,7 @@ declare global {
       onReceivePrinters: (callback:(event: Electron.IpcMainEvent, ...args: any[])=>void) => void
       print: (path:string) => void
       printPDF: (path:string) => void
+      openTemplatesWindow: () => void
     }
   }
 }

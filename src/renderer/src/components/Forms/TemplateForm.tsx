@@ -154,6 +154,12 @@ const TemplateForm: FunctionComponent<Props> = ({
                 id={key}
                 onChange={() => {
                   let conditions = new Set(currentConditions)
+                  if (key === ConditionOption.FEMALE && conditions.has(ConditionOption.MALE)) {
+                    conditions.delete(ConditionOption.MALE as ConditionOption)
+                  }
+                  if (key === ConditionOption.MALE && conditions.has(ConditionOption.FEMALE)) {
+                    conditions.delete(ConditionOption.FEMALE as ConditionOption)
+                  }
                   if (currentConditions.has(key as ConditionOption)) {
                     conditions.delete(key as ConditionOption)
                   } else {

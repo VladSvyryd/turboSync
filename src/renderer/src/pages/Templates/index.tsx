@@ -1,7 +1,7 @@
 import { FunctionComponent } from 'react'
 import { Progress, useToast } from '@chakra-ui/react'
 import useSWR from 'swr'
-import { fetcherWithQuery, handleDeleteTemplate } from '../../api'
+import { fetcherUserBeforeQuery, handleDeleteTemplate } from '../../api'
 import DnD from '../../components/DnD'
 import DocFolders from '../../components/Doc/DocFolders'
 import { ResponseFolder } from '../../types'
@@ -24,7 +24,7 @@ const index: FunctionComponent<Props> = () => {
   const { previewLoading } = useTemplatesStore()
   const { data, isValidating, mutate } = useSWR<{
     folders: Array<ResponseFolder>
-  }>(fetchTemplatesUrl, fetcherWithQuery, {
+  }>(fetchTemplatesUrl, fetcherUserBeforeQuery, {
     onError: (err) => {
       console.log(err)
       toast({

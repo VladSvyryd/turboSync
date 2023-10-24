@@ -9,8 +9,18 @@ export const ServerApi = axios.create({
     'Content-Type': 'application/json'
   }
 })
-export const fetcherWithQuery = async (url: string, options?: RequestInit) => {
-  const res = await fetch(url, options)
+export const fetcherUserBeforeQuery = async (url: string, options?: RequestInit) => {
+  const { data } = await window.api.getActivePatient()
+  const createQueryParams = new URL(url)
+  createQueryParams.searchParams.append('firstName', data.firstName)
+  createQueryParams.searchParams.append('secondName', data.secondName)
+  createQueryParams.searchParams.append('street', data.street)
+  createQueryParams.searchParams.append('zip', data.zip)
+  createQueryParams.searchParams.append('birthday', data.birthday)
+  createQueryParams.searchParams.append('city', data.city)
+  createQueryParams.searchParams.append('gender', data.gender)
+  createQueryParams.searchParams.append('houseNumber', data.houseNumber)
+  const res = await fetch(createQueryParams, options)
 
   // If the status code is not in the range 200-299,
   // we still try to parse and throw it.

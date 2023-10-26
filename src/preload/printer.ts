@@ -2,19 +2,14 @@ import * as winax from 'winax'
 
 export const wait = async (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
-export const print = async (path: string) => {
-  const app = new winax.Object('Word.Application', { activate: true })
-  console.log(app)
-  app.visible = false
+let app = new winax.Object('Word.Application', { activate: true })
+
+export const sendPrintOrder = (path: string, printer: string) => {
+  app = new winax.Object('Word.Application', { activate: true })
+  app.Visible = false
+  app.ActivePrinter = printer
   app.Documents.Open(path)
-  app.ActivePrinter = 'Xerox Drucker (Name)'
-  app.PrintOut()
-  // console.log(methods)
-}
-
-export const scan = async () => {
-  const app = new winax.Object('twain', { activate: true })
-  console.log(app)
-
-  // console.log(methods)
+  app?.PrintOut(true)
+  app?.Quit()
+  winax.release(app)
 }

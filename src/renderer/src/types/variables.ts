@@ -6,3 +6,4 @@ export const ModalOverlayStyle = {
 }
 
 export const fetchTemplatesUrl = `${ServerApi.getUri()}/api/templates`
+export const fetchPrintTextPath = `${ServerApi.getUri()}/api/printTest`

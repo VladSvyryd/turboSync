@@ -14,9 +14,11 @@ declare global {
       onPDFWindowClose: (callback:()=>void) => void
       getPrinters: () => void
       onReceivePrinters: (callback:(event: Electron.IpcMainEvent, ...args: any[])=>void) => void
-      print: (path:string) => void
+      printFile: (options:{path:string,defaultPrinter:string}) => void
       printPDF: (path:string) => void
       openTemplatesWindow: () => void
+      onPrintFileResult: (callback:(event: Electron.IpcMainEvent,res: { printFile:boolean })=>void) => void
+
     }
   }
 }

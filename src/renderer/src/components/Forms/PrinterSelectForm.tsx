@@ -45,6 +45,7 @@ const PrinterSelectForm: FunctionComponent<Props> = ({
     <>
       <Menu isLazy placement={'bottom-start'}>
         <MenuButton
+          size={'sm'}
           as={IconButton}
           icon={
             <Stack pos={'relative'}>
@@ -69,6 +70,7 @@ const PrinterSelectForm: FunctionComponent<Props> = ({
           >
             {list.map((printer) => (
               <MenuItemOption
+                key={printer.name}
                 value={printer.name}
                 bg={printer.name == defaultPrinter?.name ? 'teal.50' : 'initial'}
                 minH="48px"

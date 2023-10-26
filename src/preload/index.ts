@@ -24,8 +24,11 @@ const api = {
   onReceivePrinters: (c) => {
     electronAPI.ipcRenderer.on('receivePrinters', c)
   },
-  print: (path: string) => {
-    electronAPI.ipcRenderer.send('print', path)
+  printFile: (options) => {
+    electronAPI.ipcRenderer.send('printFile', options)
+  },
+  onPrintFileResult: (c) => {
+    electronAPI.ipcRenderer.on('onPrintFileResult', c)
   },
   printPDF: (path: string) => {
     electronAPI.ipcRenderer.send('printPDF', path)

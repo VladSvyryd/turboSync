@@ -3,6 +3,7 @@ import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import { format } from 'url'
+import { sendPrintOrder } from '../preload/printer'
 
 const minWidth = 100
 const minHeight = 150
@@ -139,35 +140,15 @@ ipcMain.on('getPrinters', async (event) => {
   let list = await popWindow.webContents.getPrintersAsync()
   event.sender.send('receivePrinters', list)
 })
-ipcMain.on('print', async () => {
-  const printWindow = new BrowserWindow({
-    width: 800,
-    height: 600,
-    show: true,
-    webPreferences: {
-      preload: join(__dirname, '../preload/index.js'),
-      plugins: true,
-      sandbox: false,
-      webviewTag: true
-    }
-  })
-  const path = 'file:\\\\192.168.185.59\\DigiSignStorage\\clipboard\\TESTDOK.pdf'
-
-  // const printJob = await print(path, {
-  //   silent: true,
-  //   printer: 'Xerox Drucker (Name)'
-  // })
-  // console.log(url)
-  printWindow.loadURL(`http://localhost:5173/printer?path=${path}`)
-  printWindow.webContents.on('did-finish-load', async () => {
-    printWindow.webContents.print({
-      silent: false,
-      printBackground: false,
-      deviceName: 'PDFCreator'
-      // deviceName: 'Xerox Drucker (Name)'
-    })
-    // printWindow.destroy()
-  })
+ipcMain.on('printFile', async (event, { path, defaultPrinter }) => {
+  console.log(path)
+  try {
+    sendPrintOrder(path, defaultPrinter)
+    event.sender.send('onPrintFileResult', { printFile: true })
+  } catch (e) {
+    console.log('LKANDKLANWDKLNAWKLD', e)
+    event.sender.send('onPrintFileResult', { printFile: false })
+  }
 })
 
 function isWithinDisplayBoundsX(pos: { x: number }) {

@@ -1,7 +1,7 @@
 import { FunctionComponent } from 'react'
 import { Progress, useToast } from '@chakra-ui/react'
 import useSWR from 'swr'
-import { fetcherUserBeforeQuery, handleDeleteTemplate } from '../../api'
+import { fetcherTemplateQuery, handleDeleteTemplate } from '../../api'
 import DnD from '../../components/DnD'
 import DocFolders from '../../components/Doc/DocFolders'
 import { Patient, ResponseFolder } from '../../types'
@@ -19,22 +19,31 @@ import { usePatientStore } from '../../store/PatientStore'
 interface OwnProps {}
 
 type Props = OwnProps
+const fetchActivePatient = async () => {
+  return window.api.getActivePatient()
+}
 
 const index: FunctionComponent<Props> = () => {
   const toast = useToast()
   const { fillUploadTemplates, setSignTypeModal } = useUploadStore()
-  const { previewLoading } = useTemplatesStore()
-  const { setPatient } = usePatientStore()
-  const { data, isValidating, mutate } = useSWR<{
+  const { folders, setFolders, previewLoading } = useTemplatesStore()
+  const { patient, setPatient } = usePatientStore()
+  const { isValidating: patientIsValidating } = useSWR<{
+    data: Patient
+  }>('getActivePatient', fetchActivePatient, {
+    focusThrottleInterval: 1000,
+    onSuccess: (data) => {
+      setPatient(data.data)
+    }
+  })
+  const { isValidating, mutate } = useSWR<{
     folders: Array<ResponseFolder>
-  }>(fetchTemplatesUrl, fetcherUserBeforeQuery, {
-    focusThrottleInterval: 0,
-    // onSuccess: (data) => {
-    //   console.log(data)
-    //   setPatient(data.patient)
-    // },
+  }>({ url: fetchTemplatesUrl, args: patient }, fetcherTemplateQuery, {
+    focusThrottleInterval: 1000,
+    onSuccess: (data) => {
+      setFolders(data?.folders)
+    },
     onError: (err) => {
-      console.log(err)
       toast({
         description: `Fehler beim Abrufen der Daten. (${err.message})`
       })
@@ -49,20 +58,20 @@ const index: FunctionComponent<Props> = () => {
     fillUploadTemplates(uploadFiles)
   }
 
-  const allFiles = data?.folders.flatMap((folder) => folder.templates).map((f) => f.title) ?? []
+  const allFiles = folders.flatMap((folder) => folder.templates).map((f) => f.title) ?? []
 
   const handleDelete = async (uuid: string) => {
     await handleDeleteTemplate(uuid, () => {
       mutate()
     })
   }
-  if (isValidating && !data) {
+  if (isValidating && !folders) {
     return <Progress size="xs" isIndeterminate />
   }
 
   return (
     <>
-      {/*<PatientLable patient={data?.patient} loading={isValidating} />*/}
+      <PatientLable patient={patient} loading={patientIsValidating} />
       <AddTemplateFlow
         onAddFlowDone={async () => {
           fillUploadTemplates(null)
@@ -70,7 +79,7 @@ const index: FunctionComponent<Props> = () => {
         }}
       />
       <DnD blackList={allFiles} onDropFiles={startAddTemplateFlow}>
-        <DocFolders folders={data?.folders ?? []} loading={isValidating && !data} />
+        <DocFolders folders={folders ?? []} loading={isValidating && !folders} />
       </DnD>
       {previewLoading && <LoadingOverlay title={'PDF wird erzeugt..'} />}
       <DeleteSubmitModal onDelete={handleDelete} />

@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { devtools } from 'zustand/middleware'
 import { VirtualElement } from '@popperjs/core'
-import { Template } from '../types'
+import { ResponseFolder, Template } from '../types'
 import { MouseEvent } from 'react'
 
 interface TemplatesState {
@@ -16,6 +16,8 @@ interface TemplatesState {
   setPreviewLoading: (loading: boolean) => void
   deleteTemplateUUID: string | null
   setDeleteTemplateUUID: (uuid: string | null) => void
+  folders: Array<ResponseFolder>
+  setFolders: (folders: Array<ResponseFolder>) => void
 }
 export const useTemplatesStore = create<TemplatesState>()(
   devtools((set) => ({
@@ -57,6 +59,12 @@ export const useTemplatesStore = create<TemplatesState>()(
     setDeleteTemplateUUID: (uuid: string | null) => {
       set({
         deleteTemplateUUID: uuid
+      })
+    },
+    folders: [],
+    setFolders: (folders: Array<ResponseFolder>) => {
+      set({
+        folders: folders
       })
     }
   }))

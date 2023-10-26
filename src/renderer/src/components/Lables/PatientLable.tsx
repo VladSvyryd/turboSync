@@ -13,6 +13,7 @@ const PatientLable: FunctionComponent<Props> = ({ patient, loading }) => {
   return (
     <Stack alignItems={'flex-start'} px={4}>
       <Stack
+        height={8}
         direction={'row'}
         bg={'teal'}
         px={2}

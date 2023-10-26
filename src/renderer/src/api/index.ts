@@ -10,24 +10,30 @@ export const ServerApi = axios.create({
   }
 })
 
-// const createUrlWithOption = async (url: string) => {
-//   const { data } = await window.api.getActivePatient()
-//   const patient = data
-//   const linkWithPatient = new URL(url)
-//   linkWithPatient.searchParams.append('id', patient.id)
-//   linkWithPatient.searchParams.append('firstName', patient.firstName)
-//   linkWithPatient.searchParams.append('secondName', patient.secondName)
-//   linkWithPatient.searchParams.append('street', patient.street)
-//   linkWithPatient.searchParams.append('zip', patient.zip)
-//   linkWithPatient.searchParams.append('birthday', patient.birthday)
-//   linkWithPatient.searchParams.append('city', patient.city)
-//   linkWithPatient.searchParams.append('gender', patient.gender)
-//   linkWithPatient.searchParams.append('houseNumber', patient.houseNumber)
-//   return linkWithPatient
-// }
+const createUrlWithOption = (url: string, patient?: Patient) => {
+  if (!patient) return url
+  const linkWithPatient = new URL(url)
+  linkWithPatient.searchParams.append('id', patient.id)
+  linkWithPatient.searchParams.append('firstName', patient.firstName)
+  linkWithPatient.searchParams.append('secondName', patient.secondName)
+  linkWithPatient.searchParams.append('street', patient.street)
+  linkWithPatient.searchParams.append('zip', patient.zip)
+  linkWithPatient.searchParams.append('birthday', patient.birthday)
+  linkWithPatient.searchParams.append('city', patient.city)
+  linkWithPatient.searchParams.append('gender', patient.gender)
+  linkWithPatient.searchParams.append('houseNumber', patient.houseNumber)
+  return linkWithPatient
+}
 
-export const fetcherUserBeforeQuery = async (url: string, options?: RequestInit): Promise<any> => {
-  const res = await fetch(url, options)
+export const fetcherTemplateQuery = async ({
+  url,
+  args
+}: {
+  url: string
+  args?: Patient
+}): Promise<any> => {
+  console.log('fetcherTemplateQuery', url, args)
+  const res = await fetch(createUrlWithOption(url, args))
 
   // If the status code is not in the range 200-299,
   // we still try to parse and throw it.

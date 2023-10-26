@@ -66,7 +66,7 @@ const renderColor = (template: Template) => {
     return getColorByExtendedDocStatus(lastDocStatus)
   }
 
-  if (lastDocStatus) {
+  if (template.computedConditions) {
     if (
       (Object.hasOwn(template.computedConditions, ConditionOption.FEMALE) &&
         template.computedConditions.FEMALE) ||

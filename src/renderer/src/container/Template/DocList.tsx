@@ -2,7 +2,7 @@ import { FunctionComponent, useState } from 'react'
 import { List, ListItem, ScaleFade, Spinner, Stack, Text, useToast } from '@chakra-ui/react'
 import ListButton from '../../components/ListButton/ListButton/ListButton'
 import ErrorModal from './ErrorModal'
-import { fetcherUserBeforeQuery, ServerApi } from '../../api'
+import { ServerApi } from '../../api'
 import { AxiosError } from 'axios'
 
 import { SignType, Template } from '../../types'
@@ -11,6 +11,7 @@ import { BsPrinterFill, BsQrCodeScan } from 'react-icons/bs'
 import { LiaSignatureSolid } from 'react-icons/lia'
 import { mutate } from 'swr'
 import { usePatientStore } from '../../store/PatientStore'
+import { fetchTemplatesUrl } from '../../types/variables'
 
 interface OwnProps {
   listId: SignType
@@ -137,7 +138,8 @@ const DocList: FunctionComponent<Props> = ({ files, listId, loading }) => {
       })
     } finally {
       toggleProcessToLoadingArray(docFile.uuid)
-      if (loadingProcessTemplate.length === 1) await mutate(fetcherUserBeforeQuery)
+      if (loadingProcessTemplate.length === 1)
+        await mutate({ url: fetchTemplatesUrl, args: patient })
     }
   }
 

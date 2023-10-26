@@ -14,6 +14,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { useTemplatesStore } from '../../../store/TemplateStore'
 import { mutate } from 'swr'
 import { fetchTemplatesUrl } from '../../../types/variables'
+import { usePatientStore } from '../../../store/PatientStore'
 
 interface OwnProps {}
 
@@ -28,7 +29,7 @@ const ButtonContextMenu: FunctionComponent<Props> = ({}) => {
     setEditTemplate,
     setPreviewLoading
   } = useTemplatesStore()
-
+  const { patient } = usePatientStore()
   const { titles } = useListStore()
   const [popperElement, setPopperElement] = useState<any>(null)
 
@@ -93,7 +94,7 @@ const ButtonContextMenu: FunctionComponent<Props> = ({}) => {
             title: titles[title],
             onClick: async () => {
               await handleMoveTemplate(template.uuid, title as SignType, async () => {
-                await mutate(fetchTemplatesUrl)
+                await mutate({ url: fetchTemplatesUrl, args: patient })
               })
               handleMenuClose()
             },

@@ -5,7 +5,7 @@ import theme from './theme'
 const defaultToastOptions: UseToastOptions = {
   status: 'error',
   title: 'Ups! Server Problem.',
-  position: 'top',
+  position: 'bottom',
   duration: 5000,
   isClosable: true
 }

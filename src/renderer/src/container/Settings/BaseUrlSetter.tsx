@@ -10,6 +10,7 @@ import {
 import { useSettingsStore } from '../../store'
 import { CheckIcon } from '@chakra-ui/icons'
 import axios from 'axios'
+import { ServerApi } from '../../api'
 
 interface OwnProps {}
 
@@ -43,7 +44,7 @@ const index: FunctionComponent<Props> = () => {
         const hasConnection = await checkConnection(value as string)
         if (hasConnection) {
           setApiBaseUrl(value as string)
-          axios.defaults.baseURL = `http://${value}`
+          ServerApi.defaults.baseURL = `http://${value}`
           return toast({
             title: 'Verbindung hergestellt',
             status: 'success'

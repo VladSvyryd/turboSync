@@ -1,8 +1,8 @@
 import { FunctionComponent, useState } from 'react'
-import { List, ListItem, ScaleFade, Spinner, Stack, Text, useToast } from '@chakra-ui/react'
+import { List, ListItem, ScaleFade, Spinner, Stack, useToast } from '@chakra-ui/react'
 import ListButton from '../../components/ListButton/ListButton/ListButton'
 import ErrorModal from './ErrorModal'
-import { ServerApi } from '../../api'
+import { getTemplateWordPreview, ServerApi } from '../../api'
 import { AxiosError } from 'axios'
 
 import { SignType, Template } from '../../types'
@@ -12,6 +12,7 @@ import { LiaSignatureSolid } from 'react-icons/lia'
 import { mutate } from 'swr'
 import { usePatientStore } from '../../store/PatientStore'
 import { fetchTemplatesUrl } from '../../types/variables'
+import { useSettingsStore } from '../../store'
 
 interface OwnProps {
   listId: SignType
@@ -21,6 +22,37 @@ interface OwnProps {
 
 type Props = OwnProps
 
+const LINK_BUTTONS = [
+  {
+    id: SignType.SIGNPAD,
+    title: 'QR-Code',
+    header: (
+      <Stack direction={'row'} justifyContent={'center'} gap={5}>
+        <BsQrCodeScan size={60} />
+      </Stack>
+    ),
+    disabled: true
+  },
+  {
+    id: SignType.PRINT,
+    title: 'SignPad',
+    header: (
+      <Stack direction={'row'} justifyContent={'center'} gap={5}>
+        <LiaSignatureSolid size={64} />
+      </Stack>
+    ),
+    disabled: true
+  },
+  {
+    id: SignType.LINK,
+    title: 'Drucken',
+    header: (
+      <Stack direction={'row'} justifyContent={'center'} gap={5}>
+        <BsPrinterFill size={60} />
+      </Stack>
+    )
+  }
+]
 const PRINT_BUTTONS = [
   {
     id: SignType.SIGNPAD,
@@ -72,10 +104,10 @@ const SIGNPAD_BUTTONS = [
   },
   {
     id: SignType.LINK,
-    title: null,
+    title: 'Drucken',
     header: (
       <Stack direction={'row'} justifyContent={'center'} gap={5}>
-        <Text>Sie haben folgende Optionen</Text>
+        <BsPrinterFill size={60} />
       </Stack>
     )
   }
@@ -84,6 +116,9 @@ const getSelectionButtons = (signType: SignType) => {
   switch (signType) {
     case SignType.SIGNPAD: {
       return SIGNPAD_BUTTONS
+    }
+    case SignType.LINK: {
+      return LINK_BUTTONS
     }
     case SignType.PRINT: {
       return PRINT_BUTTONS
@@ -96,15 +131,12 @@ const getSelectionButtons = (signType: SignType) => {
 const DocList: FunctionComponent<Props> = ({ files, listId, loading }) => {
   const toast = useToast()
   const { patient } = usePatientStore()
+  const { defaultPrinter } = useSettingsStore()
   const [loadingProcessTemplate, setLoadingProcessTemplate] = useState<Array<string>>([])
   const [error, setError] = useState<string | null>(null)
   const [activeSignTypePicker, setActiveSignTypePicker] = useState<Template | null>(null)
   const selectionButtons = getSelectionButtons(listId)
   const handleDocClick = async (docFile: Template) => {
-    if (listId === SignType.LINK) {
-      await handleStartProcessTemplate(docFile)
-      return
-    }
     setActiveSignTypePicker(docFile)
   }
   const toggleProcessToLoadingArray = (uuid: string) => {
@@ -113,15 +145,18 @@ const DocList: FunctionComponent<Props> = ({ files, listId, loading }) => {
     setLoadingProcessTemplate((prev) => {
       const a = new Set(prev)
       if (a.has(uuid)) {
+        console.log('IF')
         return prev.filter((p) => p !== uuid)
       } else {
+        console.log('ELSE', [...prev, uuid])
         return [...prev, uuid]
       }
     })
   }
   const handleStartProcessTemplate = async (docFile: Template) => {
+    toggleProcessToLoadingArray(docFile.uuid)
     try {
-      toggleProcessToLoadingArray(docFile.uuid)
+      console.log({ loadingProcessTemplate })
       const activePatient = patient
       if (!Boolean(activePatient?.id)) {
         return
@@ -137,18 +172,41 @@ const DocList: FunctionComponent<Props> = ({ files, listId, loading }) => {
         description: err.response?.data?.message ?? 'Fehler beim Verarbeiten der Vorlage.'
       })
     } finally {
-      toggleProcessToLoadingArray(docFile.uuid)
-      if (loadingProcessTemplate.length === 1)
-        await mutate({ url: fetchTemplatesUrl, args: patient })
+      console.log('finally', loadingProcessTemplate)
+      await mutate({ url: fetchTemplatesUrl, args: patient })
     }
+    toggleProcessToLoadingArray(docFile.uuid)
   }
 
+  const handleStartPrintDocument = async (docFile: Template) => {
+    toggleProcessToLoadingArray(docFile.uuid)
+    try {
+      if (!Boolean(patient?.id)) {
+        return
+      }
+      const networkPath = await getTemplateWordPreview(docFile.uuid, patient)
+      console.log('networkPath', networkPath)
+      if (networkPath && defaultPrinter)
+        window.api.printFile({ path: networkPath, defaultPrinter: defaultPrinter.name })
+    } catch (e) {
+      console.log(e)
+      toast({
+        description: 'Fehler beim Verarbeiten der Vorlage.'
+      })
+    } finally {
+      console.log('finally', loadingProcessTemplate)
+    }
+    toggleProcessToLoadingArray(docFile.uuid)
+  }
   const handlePickSignType = async (signType: SignType) => {
     if (!activeSignTypePicker) return
 
     switch (signType) {
       case SignType.LINK: {
         return await handleStartProcessTemplate(activeSignTypePicker)
+      }
+      case SignType.PRINT: {
+        return await handleStartPrintDocument(activeSignTypePicker)
       }
       default:
         toast({

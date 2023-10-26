@@ -32,7 +32,6 @@ export const fetcherTemplateQuery = async ({
   url: string
   args?: Patient
 }): Promise<any> => {
-  console.log('fetcherTemplateQuery', url, args)
   const res = await fetch(createUrlWithOption(url, args))
 
   // If the status code is not in the range 200-299,
@@ -114,6 +113,24 @@ export const getTemplatePdfPreview = async (
     if (finallyCb) finallyCb()
   }
 }
+export const getTemplateWordPreview = async (
+  uuid: Template['uuid'],
+  data?: Patient,
+  finallyCb?: () => void
+) => {
+  try {
+    const res = await ServerApi.post<{ networkPath: string }>(`/api/createPreviewWord`, {
+      uuid,
+      ...data
+    })
+    return res.data.networkPath
+  } catch (e) {
+    handleAxiosError(e)
+    return null
+  } finally {
+    if (finallyCb) finallyCb()
+  }
+}
 export const deleteTemplatePdfPreview = async (path: Template['uuid']) => {
   try {
     const res = await ServerApi.delete(`/api/deletePreviewPdf`, {
@@ -131,6 +148,16 @@ export const updateTemplate = async (template: Template, finallyCb?: () => void)
     await ServerApi.put(`/api/updateTemplate`, template)
   } catch (e) {
     handleAxiosError(e)
+  } finally {
+    if (finallyCb) finallyCb()
+  }
+}
+export const getTestPrintFile = async (finallyCb?: () => void) => {
+  try {
+    return (await ServerApi.get<{ path: string }>(`/api/printTest`)).data
+  } catch (e) {
+    handleAxiosError(e)
+    return null
   } finally {
     if (finallyCb) finallyCb()
   }

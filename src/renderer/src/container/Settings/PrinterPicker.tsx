@@ -2,9 +2,7 @@ import { FunctionComponent, useEffect, useState } from 'react'
 import PrinterSelectForm from '../../components/Forms/PrinterSelectForm'
 import { Button, Divider, Heading, Stack, Text, useToast } from '@chakra-ui/react'
 import { useSettingsStore } from '../../store'
-import useSWR from 'swr'
-import { fetchPrintTextPath } from '../../types/variables'
-import { fetcherQuery } from '../../api'
+import { getTestPrintFile } from '../../api'
 
 interface OwnProps {}
 
@@ -17,21 +15,23 @@ const PrinterPicker: FunctionComponent<Props> = ({}) => {
   // const { data } = useSWR<Array<string>>('getPrinters', a, {})
   // console.log(data)
   const [printers, setPrinters] = useState<Array<Electron.PrinterInfo>>([])
-  const { defaultPrinter, setDefaultPrinter } = useSettingsStore()
-  const { data } = useSWR<{
-    path: string
-  }>(fetchPrintTextPath, fetcherQuery, {
-    focusThrottleInterval: 0,
-    onError: (err) => {
-      console.log(err)
-      toast({
-        description: `Fehler beim Abrufen der Daten. (${err.message})`
-      })
-    }
-  })
+  const { defaultPrinter, setDefaultPrinter, apiBaseUrl } = useSettingsStore()
+  console.log(Boolean(apiBaseUrl))
+
   const retrievePrinters = () => {
     setLoading(true)
     window.api.getPrinters()
+  }
+
+  const handlePrintTestFile = async () => {
+    const printFile = await getTestPrintFile()
+    console.log({ printFile })
+    if (printFile?.path && defaultPrinter)
+      window.api.printFile({
+        path: printFile?.path,
+        defaultPrinter: defaultPrinter.name
+      })
+    setPrintLoading(true)
   }
 
   useEffect(() => {
@@ -73,20 +73,11 @@ const PrinterPicker: FunctionComponent<Props> = ({}) => {
             {defaultPrinter ? defaultPrinter.displayName : 'Nicht ausgewählt'}
           </Text>
           <Button
-            disabled={printLoading || !defaultPrinter}
-            isDisabled={printLoading}
+            isDisabled={printLoading || !defaultPrinter}
             isLoading={printLoading}
             size={'sm'}
             loadingText={'Druckt...'}
-            onClick={() => {
-              console.log({ data })
-              if (data?.path && defaultPrinter)
-                window.api.printFile({
-                  path: data?.path,
-                  defaultPrinter: defaultPrinter.name
-                })
-              setPrintLoading(true)
-            }}
+            onClick={handlePrintTestFile}
           >
             Test Print
           </Button>

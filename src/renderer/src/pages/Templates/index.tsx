@@ -1,4 +1,4 @@
-import { FunctionComponent } from 'react'
+import { FunctionComponent, useEffect } from 'react'
 import { Progress, useToast } from '@chakra-ui/react'
 import useSWR from 'swr'
 import { fetcherTemplateQuery, handleDeleteTemplate } from '../../api'
@@ -68,7 +68,22 @@ const index: FunctionComponent<Props> = () => {
   if (isValidating && !folders) {
     return <Progress size="xs" isIndeterminate />
   }
-
+  useEffect(() => {
+    window.api.onPrintFileResult((_, result) => {
+      console.log('onPrintFileResult')
+      if (result.printFile) {
+        toast({
+          status: 'success',
+          title: 'Drucker',
+          description: 'Druckauftrag wurde erfolgreich gestartet.'
+        })
+      } else {
+        toast({
+          description: 'Fehler beim Drucken.'
+        })
+      }
+    })
+  }, [])
   return (
     <>
       <PatientLable patient={patient} loading={patientIsValidating} />

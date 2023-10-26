@@ -102,7 +102,12 @@ const SignTypePicker: FunctionComponent<Props> = ({ isOpen, signTypeButtons, onC
                   as={motion.button}
                   whileHover={
                     disabled
-                      ? { cursor: 'auto' }
+                      ? {
+                          cursor: 'auto',
+                          backgroundColor: disabled
+                            ? 'gray.400'
+                            : backgroundButton[index].backgroundColor
+                        }
                       : { backgroundColor: backgroundButton[index].hoverBackgroundColor }
                   }
                   whileTap={
@@ -117,7 +122,7 @@ const SignTypePicker: FunctionComponent<Props> = ({ isOpen, signTypeButtons, onC
                   width={'50%'}
                   height={'50%'}
                   transformOrigin={'0% 100%'}
-                  bg={backgroundButton[index].backgroundColor}
+                  bg={disabled ? 'gray.400' : backgroundButton[index].backgroundColor}
                   style={{
                     transform: backgroundButton[index].transform
                   }}

@@ -15,6 +15,7 @@ import { updateTemplate } from '../../api'
 import { useTemplatesStore } from '../../store/TemplateStore'
 import { mutate } from 'swr'
 import { fetchTemplatesUrl } from '../../types/variables'
+import { usePatientStore } from '../../store/PatientStore'
 interface OwnProps {}
 
 type Props = OwnProps
@@ -22,6 +23,7 @@ type Props = OwnProps
 const EditTemplate: FunctionComponent<Props> = ({}) => {
   const initialRef = useRef(null)
   const { editTemplate, setEditTemplate } = useTemplatesStore()
+  const { patient } = usePatientStore()
 
   const handleCloseModal = () => {
     setEditTemplate(null)
@@ -40,7 +42,7 @@ const EditTemplate: FunctionComponent<Props> = ({}) => {
         handleCloseModal()
       }
     )
-    await mutate(fetchTemplatesUrl)
+    await mutate({ url: fetchTemplatesUrl, args: patient })
   }
 
   const overlayColors = getBlurColorBySignType(editTemplate?.signType)

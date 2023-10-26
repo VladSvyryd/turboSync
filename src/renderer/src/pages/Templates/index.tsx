@@ -27,13 +27,12 @@ const index: FunctionComponent<Props> = () => {
   const { setPatient } = usePatientStore()
   const { data, isValidating, mutate } = useSWR<{
     folders: Array<ResponseFolder>
-    patient: Patient
   }>(fetchTemplatesUrl, fetcherUserBeforeQuery, {
     focusThrottleInterval: 0,
-    onSuccess: (data) => {
-      console.log(data)
-      setPatient(data.patient)
-    },
+    // onSuccess: (data) => {
+    //   console.log(data)
+    //   setPatient(data.patient)
+    // },
     onError: (err) => {
       console.log(err)
       toast({
@@ -63,7 +62,7 @@ const index: FunctionComponent<Props> = () => {
 
   return (
     <>
-      <PatientLable patient={data?.patient} loading={isValidating} />
+      {/*<PatientLable patient={data?.patient} loading={isValidating} />*/}
       <AddTemplateFlow
         onAddFlowDone={async () => {
           fillUploadTemplates(null)

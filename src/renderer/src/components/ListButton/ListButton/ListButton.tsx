@@ -61,22 +61,24 @@ const renderColor = (template: Template) => {
   if (template.computedConditions === null) {
     return 'initial'
   }
-  const lastDocStatus = template.computedConditions.lastDocStatus
+  const lastDocStatus = template.computedConditions?.lastDocStatus
   if (lastDocStatus) {
     return getColorByExtendedDocStatus(lastDocStatus)
   }
 
-  if (
-    (Object.hasOwn(template.computedConditions, ConditionOption.FEMALE) &&
-      template.computedConditions.FEMALE) ||
-    (Object.hasOwn(template.computedConditions, ConditionOption.MALE) &&
-      template.computedConditions.MALE) ||
-    (Object.hasOwn(template.computedConditions, ConditionOption.UNDER18) &&
-      template.computedConditions.UNDER18) ||
-    (Object.hasOwn(template.computedConditions, ConditionOption.RETIRED) &&
-      template.computedConditions.RETIRED)
-  ) {
-    return getColorByExtendedDocStatus(lastDocStatus)
+  if (lastDocStatus) {
+    if (
+      (Object.hasOwn(template.computedConditions, ConditionOption.FEMALE) &&
+        template.computedConditions.FEMALE) ||
+      (Object.hasOwn(template.computedConditions, ConditionOption.MALE) &&
+        template.computedConditions.MALE) ||
+      (Object.hasOwn(template.computedConditions, ConditionOption.UNDER18) &&
+        template.computedConditions.UNDER18) ||
+      (Object.hasOwn(template.computedConditions, ConditionOption.RETIRED) &&
+        template.computedConditions.RETIRED)
+    ) {
+      return getColorByExtendedDocStatus(lastDocStatus)
+    }
   }
 
   return 'initial'

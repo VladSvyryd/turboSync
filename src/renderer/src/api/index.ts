@@ -27,18 +27,7 @@ export const ServerApi = axios.create({
 // }
 
 export const fetcherUserBeforeQuery = async (url: string, options?: RequestInit): Promise<any> => {
-  const { data } = await window.api.getActivePatient()
-  const createQueryParams = new URL(url)
-  createQueryParams.searchParams.append('id', data.id)
-  createQueryParams.searchParams.append('firstName', data.firstName)
-  createQueryParams.searchParams.append('secondName', data.secondName)
-  createQueryParams.searchParams.append('street', data.street)
-  createQueryParams.searchParams.append('zip', data.zip)
-  createQueryParams.searchParams.append('birthday', data.birthday)
-  createQueryParams.searchParams.append('city', data.city)
-  createQueryParams.searchParams.append('gender', data.gender)
-  createQueryParams.searchParams.append('houseNumber', data.houseNumber)
-  const res = await fetch(createQueryParams, options)
+  const res = await fetch(url, options)
 
   // If the status code is not in the range 200-299,
   // we still try to parse and throw it.
@@ -52,10 +41,7 @@ export const fetcherUserBeforeQuery = async (url: string, options?: RequestInit)
     error.status = res.status
     throw error
   }
-  const result = await res.json()
-  return new Promise((resolve) => {
-    resolve({ ...result, patient: data })
-  })
+  return res.json()
 }
 export const fetcherQuery = async (url: string, options?: RequestInit): Promise<any> => {
   const res = await fetch(url, options)

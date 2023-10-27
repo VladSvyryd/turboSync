@@ -1,33 +1,37 @@
-import { app, shell, BrowserWindow, ipcMain, screen } from 'electron'
+import { app, shell, BrowserWindow, ipcMain, screen, nativeTheme } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import { format } from 'url'
 import { sendPrintOrder } from '../preload/printer'
-
-const minWidth = 100
-const minHeight = 150
+import contextMenu from 'electron-context-menu'
+const minWidth = 50
+const minHeight = 50
 
 let mainWindow: BrowserWindow
 let popWindow: BrowserWindow
 let pdfWindow: BrowserWindow
+
 function createWindow(): void {
   // Create the browser window.
   mainWindow = new BrowserWindow({
-    width: 200,
-    height: 300,
+    width: 150,
+    height: 150,
+    maxWidth: 500,
+    maxHeight: 500,
     minWidth,
     minHeight,
     show: false,
     autoHideMenuBar: true,
     frame: false,
     alwaysOnTop: true,
+    // focusable: false,
     transparent: true, // this breaks resize feature
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       sandbox: false,
-      devTools: true,
+      // devTools: true,
       plugins: true
     }
   })
@@ -40,7 +44,31 @@ function createWindow(): void {
     shell.openExternal(details.url)
     return { action: 'deny' }
   })
+  contextMenu({
+    window: mainWindow,
+    showSelectAll: false,
+    append: (defaultActions, params, browserWindow) => [
+      {
+        icon: nativeTheme.shouldUseDarkColors
+          ? join(__dirname, '../../resources/settings-white.png')
+          : join(__dirname, '../../resources/settings-black.png'),
+        label: 'Einstellungen',
+        role: 'quit'
+      },
 
+      {
+        icon: nativeTheme.shouldUseDarkColors
+          ? join(__dirname, '../../resources/close-white.png')
+          : join(__dirname, '../../resources/close-black.png'),
+        label: 'Fenster schließen',
+        role: 'quit'
+      }
+    ]
+  })
+  creaeteWindowDragControl(mainWindow)
+  mainWindow.setAspectRatio(0.78)
+  // const m = new Menu()
+  // m.append({checked: true, label: 'test', type: 'checkbox'})
   // HMR for renderer base on electron-vite cli.
   // Load the remote URL for development or the local html file for production.
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
@@ -151,19 +179,17 @@ ipcMain.on('printFile', async (event, { path, defaultPrinter }) => {
   }
 })
 
-function isWithinDisplayBoundsX(pos: { x: number }) {
-  const displays = screen.getAllDisplays()
-  return displays.reduce((result, display) => {
-    const area = display.workArea
-    return result || (pos.x >= area.x && pos.x < area.x + area.width)
-  }, false)
+function isWithinDisplayBoundsX(pos: { x: number; display: BrowserWindow }) {
+  const winBounds = pos.display.getBounds()
+  const activeScreen = screen.getDisplayNearestPoint({ x: winBounds.x, y: winBounds.y })
+  const area = activeScreen.workArea
+  return pos.x >= area.x && pos.x < area.x + area.width
 }
-function isWithinDisplayBoundsY(pos: { y: number }) {
-  const displays = screen.getAllDisplays()
-  return displays.reduce((result, display) => {
-    const area = display.workArea
-    return result || (pos.y >= area.y && pos.y < area.y + area.height)
-  }, false)
+function isWithinDisplayBoundsY(pos: { y: number; display: BrowserWindow }) {
+  const winBounds = pos.display.getBounds()
+  const activeScreen = screen.getDisplayNearestPoint({ x: winBounds.x, y: winBounds.y })
+  const area = activeScreen.workArea
+  return pos.y >= area.y && pos.y < area.y + area.height
 }
 
 const openUrlDependingFromMode = (currentBrowserWindow: BrowserWindow, path: string) => {
@@ -187,10 +213,55 @@ const getNewWindowPosition = (
   const { x, y, width, height } = parentWindow.getBounds()
   let newWindowX = x - windowWidth
   let newWindowY = y
-  const isWithinBoundsX = isWithinDisplayBoundsX({ x: newWindowX })
-  const isWithinBoundsY = isWithinDisplayBoundsY({ y: newWindowY + windowHeight })
+  const isWithinBoundsX = isWithinDisplayBoundsX({ x: newWindowX, display: parentWindow })
+  const isWithinBoundsY = isWithinDisplayBoundsY({
+    y: newWindowY + windowHeight,
+    display: parentWindow
+  })
   if (!isWithinBoundsX) newWindowX = x + width
-  if (!isWithinBoundsY) newWindowY = y - height
+  if (!isWithinBoundsY) newWindowY = y - windowHeight + height
 
   return { x: newWindowX, y: newWindowY }
+}
+
+const creaeteWindowDragControl = (currentWindow: BrowserWindow) => {
+  const WM_MOUSEMOVE = 0x0200 // https://learn.microsoft.com/en-us/windows/win32/inputdev/wm-mousemove
+  const WM_LBUTTONUP = 0x0202 // https://learn.microsoft.com/en-us/windows/win32/inputdev/wm-lbuttonup
+
+  const MK_LBUTTON = 0x0001
+  let isDragging = false
+  let initialPos = {
+    x: 0,
+    y: 0
+  }
+
+  currentWindow.hookWindowMessage(WM_LBUTTONUP, () => {
+    isDragging = false
+
+    currentWindow.webContents.send('onWindowIsDragged', { isDragged: isDragging })
+  })
+  currentWindow.hookWindowMessage(WM_MOUSEMOVE, (wParam, lParam) => {
+    if (!currentWindow) {
+      return
+    }
+    const wParamNumber: number = wParam.readInt16LE(0)
+    if (!(wParamNumber & MK_LBUTTON)) {
+      // <-- checking if left mouse button is pressed
+      return
+    }
+
+    const x = lParam.readInt16LE(0)
+    const y = lParam.readInt16LE(2)
+    if (!isDragging) {
+      isDragging = true
+      initialPos.x = x
+      initialPos.y = y
+      return
+    }
+    currentWindow.setBounds({
+      x: x + currentWindow.getPosition()[0] - initialPos.x,
+      y: y + currentWindow.getPosition()[1] - initialPos.y
+    })
+    currentWindow.webContents.send('onWindowIsDragged', { isDragged: isDragging })
+  })
 }

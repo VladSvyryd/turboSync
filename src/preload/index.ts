@@ -35,6 +35,9 @@ const api = {
   },
   openTemplatesWindow: () => {
     electronAPI.ipcRenderer.send('openTemplatesWindow')
+  },
+  onWindowIsDragged: (c) => {
+    electronAPI.ipcRenderer.on('onWindowIsDragged', c)
   }
 }
 

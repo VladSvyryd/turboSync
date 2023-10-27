@@ -18,7 +18,7 @@ declare global {
       printPDF: (path:string) => void
       openTemplatesWindow: () => void
       onPrintFileResult: (callback:(event: Electron.IpcMainEvent,res: { printFile:boolean })=>void) => void
-
+      onWindowIsDragged: (callback:(event: Electron.IpcMainEvent,res: { isDragged:boolean })=>void) => void
     }
   }
 }

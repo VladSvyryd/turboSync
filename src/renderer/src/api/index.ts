@@ -1,6 +1,6 @@
 import axios, { AxiosError } from 'axios'
 import { useSettingsStore } from '../store'
-import { Patient, Template } from '../types'
+import { Patient, Template, TemplateEvaluationStatus } from '../types'
 import { execToast } from '../App'
 
 export const ServerApi = axios.create({
@@ -155,6 +155,17 @@ export const updateTemplate = async (template: Template, finallyCb?: () => void)
 export const getTestPrintFile = async (finallyCb?: () => void) => {
   try {
     return (await ServerApi.get<{ path: string }>(`/api/printTest`)).data
+  } catch (e) {
+    handleAxiosError(e)
+    return null
+  } finally {
+    if (finallyCb) finallyCb()
+  }
+}
+
+export const getCheckDocStatus = async (finallyCb?: () => void) => {
+  try {
+    return (await ServerApi.get<{ status: TemplateEvaluationStatus }>(`/api/checkDocStatus`)).data
   } catch (e) {
     handleAxiosError(e)
     return null

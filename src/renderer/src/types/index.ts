@@ -102,3 +102,9 @@ export const InternalErrors = {
   code: InternalErrorNumber.FILE_NOT_FOUND,
   title: 'Not Found'
 }
+
+export enum TemplateEvaluationStatus {
+  SUCCESS = 'SUCCESS',
+  WARNING = 'WARNING',
+  ERROR = 'ERROR'
+}

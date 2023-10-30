@@ -54,12 +54,12 @@ const getColorByExtendedDocStatus = (status?: ExtendedDocumentStatus) => {
     case DocumentStatus.INPROGRESS:
       return 'orange.500'
     default:
-      return 'green.500'
+      return 'green.600'
   }
 }
 const renderColor = (template: Template) => {
   if (template.computedConditions === null) {
-    return 'green'
+    return 'green.600'
   }
   const lastDocStatus = template.computedConditions?.lastDocStatus
   if (lastDocStatus) {
@@ -81,7 +81,7 @@ const renderColor = (template: Template) => {
     }
   }
 
-  return 'green'
+  return 'green.600'
 }
 const ListButton: FunctionComponent<Props> = ({
   template,

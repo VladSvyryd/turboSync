@@ -21,6 +21,7 @@ interface OwnProps {}
 type Props = OwnProps
 const fetchActivePatient = async () => {
   return window.api.getActivePatient()
+  // return window.api.getStoreValue({ key: 'patient' })
 }
 
 const index: FunctionComponent<Props> = () => {
@@ -28,14 +29,19 @@ const index: FunctionComponent<Props> = () => {
   const { fillUploadTemplates, setSignTypeModal } = useUploadStore()
   const { folders, setFolders, previewLoading } = useTemplatesStore()
   const { patient, setPatient } = usePatientStore()
-  const { isValidating: patientIsValidating } = useSWR<{
-    data: Patient
-  }>('getActivePatient', fetchActivePatient, {
-    focusThrottleInterval: 1000,
-    onSuccess: (data) => {
-      // setPatient(data.data)
+  const { isValidating: patientIsValidating } = useSWR<{ data: Patient }>(
+    'getActivePatient',
+    fetchActivePatient,
+    {
+      focusThrottleInterval: 1000,
+      refreshInterval: 1000,
+      onSuccess: (data) => {
+        console.log(data)
+        setPatient(data.data)
+      }
     }
-  })
+  )
+
   const { isValidating, mutate } = useSWR<{
     folders: Array<ResponseFolder>
   }>({ url: fetchTemplatesUrl, args: patient }, fetcherTemplateQuery, {
@@ -82,6 +88,10 @@ const index: FunctionComponent<Props> = () => {
           description: 'Fehler beim Drucken.'
         })
       }
+    })
+    window.api.onUpdatePatient((_, { patient }) => {
+      console.log({ patient })
+      setPatient(patient)
     })
   }, [])
   return (

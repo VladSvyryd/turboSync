@@ -4,8 +4,9 @@ import { join } from 'path'
 import { BrowserWindow, screen, net } from 'electron'
 import { mainWindow } from './index'
 import * as winax from 'winax'
+import { store } from './store'
 
-const Turbomed = new winax.Object('TMMain.Application', { activate: true })
+const Turbomed = new winax.Object('TMMain.Application', { activate: true, encoding: 'utf8' })
 
 export function isWithinDisplayBoundsX(pos: { x: number; display: BrowserWindow }) {
   const winBounds = pos.display.getBounds()
@@ -187,10 +188,9 @@ export const getTurbomed = async () => {
       zip: plz,
       street: strasse,
       houseNumber: hausnummer,
-      birthday: geburtstag,
+      birthday: geburtstag ? String(geburtstag) : geburtstag,
       gender: geschlecht
     }
-    await fetchDocStatus(patient)
     return { data: patient }
   } catch (e) {
     console.log(e)

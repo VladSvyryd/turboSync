@@ -1,13 +1,14 @@
+import './helpers'
+import './store'
+import './subscriptions'
 import { app, shell, BrowserWindow, nativeTheme } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import contextMenu from 'electron-context-menu'
-import { creaeteWindowDragControl, openNewWindow, startPollingStatus } from './helpers'
+import { creaeteWindowDragControl, openNewWindow } from './helpers'
 const minWidth = 50
 const minHeight = 50
-import './subscriptions'
-import './helpers'
 export let mainWindow: BrowserWindow
 
 function createWindow(): void {
@@ -76,7 +77,6 @@ function createWindow(): void {
   } else {
     mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
   }
-  // startPollingStatus()
 }
 
 // This method will be called when Electron has finished

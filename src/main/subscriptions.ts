@@ -2,6 +2,7 @@ import { join } from 'path'
 import { openNewWindow, openUrlDependingFromMode, popWindow } from './helpers'
 import { sendPrintOrder } from '../preload/printer'
 import { BrowserWindow, ipcMain } from 'electron'
+import { store } from './store'
 
 export let pdfWindow: BrowserWindow
 
@@ -50,5 +51,21 @@ ipcMain.on('printFile', async (event, { path, defaultPrinter }) => {
   } catch (e) {
     console.log('LKANDKLANWDKLNAWKLD', e)
     event.sender.send('onPrintFileResult', { printFile: false })
+  }
+})
+ipcMain.handle('getStoreValue', async (_, { key }) => {
+  try {
+    return store.get(key)
+  } catch (e) {
+    console.log('getStoreValue', e)
+    return null
+  }
+})
+ipcMain.handle('setStoreValue', async (_, { key, value }) => {
+  try {
+    return store.set(key, value)
+  } catch (e) {
+    console.log('getStoreValue', e)
+    return null
   }
 })

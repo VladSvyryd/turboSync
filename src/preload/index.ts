@@ -38,6 +38,15 @@ const api = {
   },
   onWindowIsDragged: (c) => {
     electronAPI.ipcRenderer.on('onWindowIsDragged', c)
+  },
+  onUpdatePatient: (c) => {
+    electronAPI.ipcRenderer.on('onUpdatePatient', c)
+  },
+  getStoreValue: (args) => {
+    return electronAPI.ipcRenderer.invoke('getStoreValue', args)
+  },
+  setStoreValue: (args) => {
+    return electronAPI.ipcRenderer.invoke('setStoreValue', args)
   }
 }
 

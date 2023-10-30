@@ -1,69 +1,31 @@
-import { PowerShell } from 'node-powershell'
 import * as winax from 'winax'
-const executeOn = async (powershellCommand: string) => {
-  const ps = new PowerShell()
-  try {
-    const res = await ps.invoke(powershellCommand)
-    return { data: JSON.parse(res.raw.replaceAll("'", '"')) }
-  } catch (error) {
-    const err = error as any
-    return { error: err?.message ?? error }
-  } finally {
-    await ps.dispose()
-  }
-}
+
+const Turbomed = new winax.Object('TMMain.Application', { activate: true })
+
 export async function getActivePatient() {
   const isOnlineAndWithActivePatient = await getTurbomedIsOn()
-  if (isOnlineAndWithActivePatient?.data?.error)
+  if (isOnlineAndWithActivePatient?.error)
     return {
-      error: `(Turbomed aus/Aktiver Patient da?)\n${isOnlineAndWithActivePatient?.data?.error}`
+      error: `(Turbomed aus/Aktiver Patient da?)\n${isOnlineAndWithActivePatient?.error}`
     }
 
-  const cmd = PowerShell.command`
-                [console]::OutputEncoding = New-Object System.Text.UTF8Encoding
-                $progId = 'TMMain.Application';
-                try {
-                  $app            = [System.Runtime.InteropServices.Marshal]::GetActiveObject($progId)
-                  $oPatient       = $app.AktiverPatient()
-                  $nummer         = $oPatient.Nummer()
-                  $namensdaten    = $oPatient.Namensdaten()
-                  $geburtsdaten   = $oPatient.Geburtsdaten()
-                  $vorname        = $namensdaten.Vorname()
-                  $nachname       = $namensdaten.Nachname()
-                  $adressdaten    = $oPatient.Adressdaten().Postanschrift("Privat", 1)
-                  $ort            = $adressdaten.Ort()
-                  $plz            = $adressdaten.Postleitzahl()
-                  $strasse        = $adressdaten.Strasse()
-                  $hausnummer     = $adressdaten.Hausnummer()
-                  $geburtstag     = $geburtsdaten.datum()
-                  $geschlecht     = $geburtsdaten.geschlecht()
-                  $json          +=
-                  "{'id': '$nummer',
-                    'firstName': '$vorname',
-                    'secondName': '$nachname',
-                    'city': '$ort',
-                    'zip': '$plz',
-                    'street': '$strasse',
-                    'houseNumber': '$hausnummer',
-                    'birthday': '$geburtstag',
-                    'gender': '$geschlecht'
-                  }"
-                  echo $json;
-                  [System.GC]::Collect()
-                }
-                catch [System.Runtime.InteropServices.COMException] {
-                  echo "{'error':'$_.Exception.Message'}";
-                  [System.GC]::Collect()
-                }
-
-            `
-  return await executeOn(cmd)
+  return getCurrentPatient()
 }
 
-export const getTurbomed = () => {
+export async function getTurbomedIsOn() {
+  const app = Turbomed
   try {
-    const app = new winax.Object('TMMain.Application', { activate: true })
-    console.log(app)
+    const oPatient = app.AktiverPatient()
+    const nummer = oPatient.Nummer()
+    return { id: nummer }
+  } catch (e: any) {
+    return { error: e?.message ?? 'Turbomed Error' }
+  }
+}
+
+export const getCurrentPatient = async () => {
+  try {
+    const app = Turbomed
     const oPatient = app.AktiverPatient()
     const nummer = oPatient.Nummer()
     const namensdaten = oPatient.Namensdaten()
@@ -78,7 +40,7 @@ export const getTurbomed = () => {
     const geburtstag = geburtsdaten.datum()
     const geschlecht = geburtsdaten.geschlecht()
     const patient = {
-      id: nummer,
+      id: String(nummer),
       firstName: vorname,
       secondName: nachname,
       city: ort,
@@ -88,27 +50,10 @@ export const getTurbomed = () => {
       birthday: geburtstag,
       gender: geschlecht
     }
-    return patient
+    return { data: patient }
   } catch (e) {
-    return undefined
     console.log(e)
+    // winax.release(Turbomed)
+    return { error: 'ERROR' }
   }
-}
-
-export async function getTurbomedIsOn() {
-  const cmd = PowerShell.command`
-   $progId = 'TMMain.Application';
-    try {
-       $app = [System.Runtime.InteropServices.Marshal]::GetActiveObject($progId);
-       $p = $app.AktiverPatient()
-       $nummer = $p.Nummer()
-       echo "{'id':$nummer}";
-       [System.GC]::Collect()
-    }
-    catch [System.Runtime.InteropServices.COMException] {
-      echo "{'error':'$_.Exception.Message'}";
-      [System.GC]::Collect()
-    }
-`
-  return await executeOn(cmd)
 }

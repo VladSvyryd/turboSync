@@ -1,19 +1,43 @@
 import { FunctionComponent, useEffect, useState } from 'react'
 
-import { IconButton, Stack, useToken } from '@chakra-ui/react'
+import { IconButton, Stack, Text, useToken } from '@chakra-ui/react'
 import { LiaFileSignatureSolid } from 'react-icons/lia'
 import { useSettingsStore } from '../../store'
 import { motion } from 'framer-motion'
+import useSWR from 'swr'
+import { Patient } from '../../types'
+import { usePatientStore } from '../../store/PatientStore'
+import { fetcherTemplateQuery } from '../../api'
+import { fetchTemplatesUrl } from '../../types/variables'
+import { useTemplatesStore } from '../../store/TemplateStore'
 interface OwnProps {}
 
 type Props = OwnProps
+const fetchActivePatient = async () => {
+  return window.api.getActivePatient()
+}
 
 const index: FunctionComponent<Props> = () => {
   const red = useToken('colors', 'red.400')
   const orange = useToken('colors', 'orange.400')
   const { apiBaseUrl } = useSettingsStore()
-  const [blockClicks, setBlockClicks] = useState(false)
+  const { patient, setPatient } = usePatientStore()
+  const { setFolders } = useTemplatesStore()
 
+  const [blockClicks, setBlockClicks] = useState(false)
+  const { isValidating } = useSWR<{
+    data: Patient
+  }>('getActivePatient', fetchActivePatient, {
+    focusThrottleInterval: 1000,
+    refreshInterval: 500,
+    onSuccess: async (data) => {
+      console.log(data)
+      setPatient(data.data)
+      const foldersData = await fetcherTemplateQuery({ url: fetchTemplatesUrl, args: data.data })
+      console.log({ foldersData })
+      setFolders(foldersData?.folders)
+    }
+  })
   useEffect(() => {
     if (apiBaseUrl === '') {
       window.api.openNewWindow('settings')
@@ -34,12 +58,15 @@ const index: FunctionComponent<Props> = () => {
       }}
     >
       <Stack>
+        <Text mb={'-40px'} mr={'-40px'}>
+          {'awdawd' + String(patient?.id)}
+        </Text>
         <IconButton
           as={motion.button}
-          whileHover={{ filter: `drop-shadow(2px 4px 6px ${red})`, background: 'initial' }}
+          whileHover={{ filter: `drop-shadow(2px 4px 6px ${red})`, background: 'transparent' }}
           whileTap={{
             filter: `drop-shadow(2px 4px 6px ${orange})`,
-            background: 'initial',
+            background: 'transparent',
             scale: 0.95,
             cursor: !blockClicks ? 'pointer' : 'grabbing'
           }}

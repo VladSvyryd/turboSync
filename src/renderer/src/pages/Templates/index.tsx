@@ -33,7 +33,7 @@ const index: FunctionComponent<Props> = () => {
   }>('getActivePatient', fetchActivePatient, {
     focusThrottleInterval: 1000,
     onSuccess: (data) => {
-      setPatient(data.data)
+      // setPatient(data.data)
     }
   })
   const { isValidating, mutate } = useSWR<{

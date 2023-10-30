@@ -185,9 +185,23 @@ const DocList: FunctionComponent<Props> = ({ files, listId, loading }) => {
         return
       }
       const networkPath = await getTemplateWordPreview(docFile.uuid, patient)
-      console.log('networkPath', networkPath)
-      if (networkPath && defaultPrinter)
-        window.api.printFile({ path: networkPath, defaultPrinter: defaultPrinter.name })
+      if (networkPath && defaultPrinter) {
+        const result = await window.api.printFileByPath({
+          path: networkPath,
+          defaultPrinter: defaultPrinter.name
+        })
+        if (result.printFile) {
+          toast({
+            status: 'success',
+            title: 'Drucker',
+            description: 'Druckauftrag wurde erfolgreich gestartet.'
+          })
+        } else {
+          toast({
+            description: 'Fehler beim Drucken.'
+          })
+        }
+      }
     } catch (e) {
       console.log(e)
       toast({

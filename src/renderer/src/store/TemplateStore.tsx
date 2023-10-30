@@ -16,7 +16,7 @@ interface TemplatesState {
   setPreviewLoading: (loading: boolean) => void
   deleteTemplateUUID: string | null
   setDeleteTemplateUUID: (uuid: string | null) => void
-  folders: Array<ResponseFolder>
+  folders: Array<ResponseFolder> | null
   setFolders: (folders: Array<ResponseFolder>) => void
 }
 export const useTemplatesStore = create<TemplatesState>()(
@@ -61,7 +61,7 @@ export const useTemplatesStore = create<TemplatesState>()(
         deleteTemplateUUID: uuid
       })
     },
-    folders: [],
+    folders: null,
     setFolders: (folders: Array<ResponseFolder>) => {
       set({
         folders: folders

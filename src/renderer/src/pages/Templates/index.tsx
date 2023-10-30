@@ -1,4 +1,4 @@
-import { FunctionComponent, useEffect } from 'react'
+import { FunctionComponent } from 'react'
 import { Progress, useToast } from '@chakra-ui/react'
 import useSWR from 'swr'
 import { fetcherTemplateQuery, handleDeleteTemplate } from '../../api'
@@ -64,36 +64,18 @@ const index: FunctionComponent<Props> = () => {
     fillUploadTemplates(uploadFiles)
   }
 
-  const allFiles = folders.flatMap((folder) => folder.templates).map((f) => f.title) ?? []
+  const allFiles = folders?.flatMap((folder) => folder.templates).map((f) => f.title) ?? []
 
   const handleDelete = async (uuid: string) => {
     await handleDeleteTemplate(uuid, () => {
       mutate()
     })
   }
+
   if (isValidating && !folders) {
     return <Progress size="xs" isIndeterminate />
   }
-  useEffect(() => {
-    window.api.onPrintFileResult((_, result) => {
-      console.log('onPrintFileResult')
-      if (result.printFile) {
-        toast({
-          status: 'success',
-          title: 'Drucker',
-          description: 'Druckauftrag wurde erfolgreich gestartet.'
-        })
-      } else {
-        toast({
-          description: 'Fehler beim Drucken.'
-        })
-      }
-    })
-    window.api.onUpdatePatient((_, { patient }) => {
-      console.log({ patient })
-      setPatient(patient)
-    })
-  }, [])
+
   return (
     <>
       <PatientLable patient={patient} loading={patientIsValidating} />

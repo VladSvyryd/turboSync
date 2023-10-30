@@ -1,6 +1,6 @@
 import { join } from 'path'
 import { openNewWindow, openUrlDependingFromMode, popWindow } from './helpers'
-import { sendPrintOrder } from '../preload/printer'
+import { createPrintOrder } from '../preload/printer'
 import { BrowserWindow, ipcMain } from 'electron'
 import { store } from './store'
 
@@ -39,20 +39,18 @@ ipcMain.on('openPDFPreviewWindow', async (_, path) => {
   })
 })
 
-ipcMain.on('getPrinters', async (event) => {
-  let list = await popWindow.webContents.getPrintersAsync()
-  event.sender.send('receivePrinters', list)
+ipcMain.handle('getPrinters', async () => {
+  return popWindow.webContents.getPrintersAsync()
 })
-ipcMain.on('printFile', async (event, { path, defaultPrinter }) => {
-  console.log(path)
+ipcMain.handle('printFileByPath', async (_, { path, defaultPrinter }) => {
   try {
-    sendPrintOrder(path, defaultPrinter)
-    event.sender.send('onPrintFileResult', { printFile: true })
+    createPrintOrder(path, defaultPrinter)
+    return { printFile: true }
   } catch (e) {
-    console.log('LKANDKLANWDKLNAWKLD', e)
-    event.sender.send('onPrintFileResult', { printFile: false })
+    return { printFile: true }
   }
 })
+
 ipcMain.handle('getStoreValue', async (_, { key }) => {
   try {
     return store.get(key)

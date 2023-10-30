@@ -43,7 +43,7 @@ const PrinterSelectForm: FunctionComponent<Props> = ({
 
   return (
     <>
-      <Menu isLazy placement={'bottom-start'}>
+      <Menu isLazy placement={'bottom-end'}>
         <MenuButton
           size={'sm'}
           as={IconButton}

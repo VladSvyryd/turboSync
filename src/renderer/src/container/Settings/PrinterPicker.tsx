@@ -18,44 +18,60 @@ const PrinterPicker: FunctionComponent<Props> = ({}) => {
   const { defaultPrinter, setDefaultPrinter, apiBaseUrl } = useSettingsStore()
   console.log(Boolean(apiBaseUrl))
 
-  const retrievePrinters = () => {
+  const retrievePrinters = async () => {
     setLoading(true)
-    window.api.getPrinters()
-  }
-
-  const handlePrintTestFile = async () => {
-    const printFile = await getTestPrintFile()
-    console.log({ printFile })
-    if (printFile?.path && defaultPrinter)
-      window.api.printFile({
-        path: printFile?.path,
-        defaultPrinter: defaultPrinter.name
-      })
-    setPrintLoading(true)
-  }
-
-  useEffect(() => {
-    const wait = setTimeout(() => {
-      setLoading(false)
+    try {
+      const p = await window.api.getPrinters()
+      setPrinters(p)
+    } catch (e) {
       toast({
         title: 'Drucker',
         description: 'Drucker wurden nicht erfolgreich abgerufen.'
       })
-    }, 6000)
-    window.api.onReceivePrinters((_, list) => {
-      setPrinters(list)
+    } finally {
       setLoading(false)
-      clearTimeout(wait)
-    })
-    window.api.onPrintFileResult((_, res) => {
-      console.log({ res })
-      if (!res?.printFile) {
+    }
+  }
+
+  const handlePrintTestFile = async () => {
+    setPrintLoading(true)
+
+    const printFile = await getTestPrintFile()
+    console.log({ printFile })
+    if (!printFile?.path || !defaultPrinter) {
+      toast({
+        title: 'Drucker',
+        description: 'Drucker wurden nicht erfolgreich abgerufen.'
+      })
+      return
+    }
+    try {
+      const printResult = await window.api.printFileByPath({
+        path: printFile?.path,
+        defaultPrinter: defaultPrinter.name
+      })
+      if (!printResult?.printFile) {
         toast({
           description: `Fehler beim Drucken.`
         })
+        return
       }
+      toast({
+        status: 'success',
+        title: 'Drucker',
+        description: 'Druckauftrag wurde erfolgreich gestartet.'
+      })
+    } catch (e) {
+      console.log(e)
+      toast({
+        description: `Fehler beim Drucken.`
+      })
+    } finally {
       setPrintLoading(false)
-    })
+    }
+  }
+
+  useEffect(() => {
     retrievePrinters()
   }, [])
   return (

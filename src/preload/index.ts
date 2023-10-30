@@ -18,18 +18,10 @@ const api = {
   onPDFWindowClose: (callback: () => void) => {
     electronAPI.ipcRenderer.on('onPDFWindowClose', callback)
   },
-  getPrinters: () => {
-    electronAPI.ipcRenderer.send('getPrinters')
+  getPrinters: (args) => {
+    return electronAPI.ipcRenderer.invoke('getPrinters', args)
   },
-  onReceivePrinters: (c) => {
-    electronAPI.ipcRenderer.on('receivePrinters', c)
-  },
-  printFile: (options) => {
-    electronAPI.ipcRenderer.send('printFile', options)
-  },
-  onPrintFileResult: (c) => {
-    electronAPI.ipcRenderer.on('onPrintFileResult', c)
-  },
+
   printPDF: (path: string) => {
     electronAPI.ipcRenderer.send('printPDF', path)
   },
@@ -47,6 +39,9 @@ const api = {
   },
   setStoreValue: (args) => {
     return electronAPI.ipcRenderer.invoke('setStoreValue', args)
+  },
+  printFileByPath: (args) => {
+    return electronAPI.ipcRenderer.invoke('printFileByPath', args)
   }
 }
 

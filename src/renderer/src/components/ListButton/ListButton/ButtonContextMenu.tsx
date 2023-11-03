@@ -5,9 +5,10 @@ import { FaChevronRight, FaFileWord, FaTrash } from 'react-icons/fa'
 import { usePopper } from 'react-popper'
 import { ContextMenuKey, SignType } from '../../../types'
 import { AiFillEdit } from 'react-icons/ai'
-import { getTemplatePdfPreview, handleMoveTemplate } from '../../../api'
+import { getTemplatePdfPreview, handleCancelDocuments, handleMoveTemplate } from '../../../api'
 import { FaArrowRightArrowLeft, FaFilePdf } from 'react-icons/fa6'
-import { MdDocumentScanner } from 'react-icons/md'
+import { MdDocumentScanner, MdOutlineCancelScheduleSend } from 'react-icons/md'
+import { GoListOrdered, GoTasklist } from 'react-icons/go'
 import { TbArrowsTransferDown } from 'react-icons/tb'
 import { useListStore } from '../../../store/ListStore'
 import { AnimatePresence, motion } from 'framer-motion'
@@ -40,8 +41,33 @@ const ButtonContextMenu: FunctionComponent<Props> = ({}) => {
   const handleMenuClose = () => {
     closeContextMenu()
   }
+
   const renderContextMenu = useMemo(() => {
-    if (!template) return []
+    if (!template || !patient) return []
+
+    const discardButtons = [
+      {
+        title: 'Alle',
+        onClick: async () => {
+          await handleCancelDocuments(template.uuid, patient, undefined, async () => {
+            await mutate({ url: fetchTemplatesUrl, args: patient })
+          })
+          handleMenuClose()
+        },
+        leftIcon: <GoListOrdered />
+      },
+      {
+        title: 'Letztes Dokument',
+        onClick: async () => {
+          await handleCancelDocuments(template.uuid, patient, 1, async () => {
+            await mutate({ url: fetchTemplatesUrl, args: patient })
+          })
+          handleMenuClose()
+        },
+        leftIcon: <GoTasklist />
+      }
+    ]
+
     const menuPoints = [
       {
         id: ContextMenuKey.OPEN,
@@ -67,9 +93,7 @@ const ButtonContextMenu: FunctionComponent<Props> = ({}) => {
         onClick: async () => {
           setPreviewLoading(true)
           handleMenuClose()
-          const activePatient = await window.api.getActivePatient()
-          const networkPath = await getTemplatePdfPreview(template.uuid, activePatient.data)
-          console.log('networkPath', networkPath)
+          const networkPath = await getTemplatePdfPreview(template.uuid, patient)
           window.api.openPDFPreviewWindow(networkPath ?? 'error')
           setPreviewLoading(false)
         },
@@ -101,6 +125,7 @@ const ButtonContextMenu: FunctionComponent<Props> = ({}) => {
             leftIcon: <FaArrowRightArrowLeft />
           }))
       },
+
       {
         id: ContextMenuKey.DELETE,
         title: 'Löschen',
@@ -109,13 +134,21 @@ const ButtonContextMenu: FunctionComponent<Props> = ({}) => {
           setDeleteTemplateUUID(template.uuid)
         },
         leftIcon: <FaTrash />
+      },
+      {
+        id: ContextMenuKey.DISCARD,
+        title: 'Widerrufen',
+        onClick: async () => {},
+        leftIcon: <MdOutlineCancelScheduleSend />,
+        rightIcon: <FaChevronRight size={10} />,
+        contextMenuLinks: discardButtons
       }
     ]
     if (!template.noFile) {
       return menuPoints.filter((m) => m.id === ContextMenuKey.DELETE)
     }
     return menuPoints
-  }, [template?.noFile])
+  }, [template?.noFile, patient])
   if (!template) return null
 
   return (

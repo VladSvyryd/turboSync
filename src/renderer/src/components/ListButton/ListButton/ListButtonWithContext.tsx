@@ -60,6 +60,7 @@ const ListButton: FunctionComponent<Props> = ({
           isActive={Boolean(contextMenu === title)}
           rightIcon={rightIcon}
           colorScheme={'teal'}
+          w={'100%'}
         >
           <Text noOfLines={1}>{title}</Text>
         </Button>

@@ -92,7 +92,8 @@ export enum ContextMenuKey {
   DELETE = 'DELETE',
   MOVE = 'MOVE',
   UPLOAD = 'UPLOAD',
-  PREVIEW = 'PREVIEW'
+  PREVIEW = 'PREVIEW',
+  DISCARD = 'DISCARD'
 }
 
 export const InternalErrorNumber = {

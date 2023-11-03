@@ -156,7 +156,6 @@ const DocList: FunctionComponent<Props> = ({ files, listId, loading }) => {
   const handleStartProcessTemplate = async (docFile: Template) => {
     toggleProcessToLoadingArray(docFile.uuid)
     try {
-      console.log({ loadingProcessTemplate })
       const activePatient = patient
       if (!Boolean(activePatient?.id)) {
         return
@@ -172,7 +171,6 @@ const DocList: FunctionComponent<Props> = ({ files, listId, loading }) => {
         description: err.response?.data?.message ?? 'Fehler beim Verarbeiten der Vorlage.'
       })
     } finally {
-      console.log('finally', loadingProcessTemplate)
       await mutate({ url: fetchTemplatesUrl, args: patient })
     }
     toggleProcessToLoadingArray(docFile.uuid)

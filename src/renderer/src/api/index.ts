@@ -174,6 +174,25 @@ export const getCheckDocStatus = async (finallyCb?: () => void) => {
   }
 }
 
+export const handleCancelDocuments = async (
+  uuid: Template['uuid'],
+  data?: Patient,
+  size?: number,
+  finallyCb?: () => void
+) => {
+  try {
+    await ServerApi.post(`/api/cancelDocuments`, {
+      uuid,
+      ...data,
+      size
+    })
+  } catch (e) {
+    handleAxiosError(e)
+  } finally {
+    if (finallyCb) finallyCb()
+  }
+}
+
 const handleAxiosError = (e: any) => {
   if (e instanceof AxiosError) {
     execToast({

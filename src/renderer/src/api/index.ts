@@ -195,10 +195,13 @@ export const handleCancelDocuments = async (
 
 const handleAxiosError = (e: any) => {
   if (e instanceof AxiosError) {
+    console.log(e)
     execToast({
-      description: e?.response?.statusText ?? 'Fehler beim Verschieben der Vorlage.'
+      description:
+        e?.response?.data?.error ??
+        e?.response?.statusText ??
+        'Unterbrochene Verbindung mit dem Server'
     })
-    console.log(e?.response?.data?.error ?? 'No Error from BE')
   }
   console.log('Unknown Error', e)
 }

@@ -3,6 +3,7 @@ import { Stack } from '@chakra-ui/react'
 import BaseUrlSetter from '../../container/Settings/BaseUrlSetter'
 import PingServer from '../../container/Settings/PingServer'
 import PrinterPicker from '../../container/Settings/PrinterPicker'
+import ScannerPicker from '../../container/Settings/ScannerPicker'
 
 interface OwnProps {}
 
@@ -13,6 +14,7 @@ const index: FunctionComponent<Props> = () => {
       <BaseUrlSetter />
       <PingServer />
       <PrinterPicker />
+      <ScannerPicker />
     </Stack>
   )
 }

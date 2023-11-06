@@ -107,7 +107,10 @@ const ListButton: FunctionComponent<Props> = ({
   const renderButton = () => {
     const lastDocDate = template.computedConditions?.lastDocDate
     const date = lastDocDate
-      ? new Date(lastDocDate).toLocaleDateString('de-DE', { dateStyle: 'short' })
+      ? new Date(lastDocDate).toLocaleString('de-DE', {
+          dateStyle: 'short',
+          timeStyle: 'short'
+        })
       : ''
     const noData = renderNoData(template)
     if (!template.noFile) {

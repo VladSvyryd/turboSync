@@ -147,6 +147,9 @@ const ButtonContextMenu: FunctionComponent<Props> = ({}) => {
     if (!template.noFile) {
       return menuPoints.filter((m) => m.id === ContextMenuKey.DELETE)
     }
+    if (template.computedConditions?.lastDocStatus === undefined) {
+      return menuPoints.filter((m) => m.id !== ContextMenuKey.DISCARD)
+    }
     return menuPoints
   }, [template?.noFile, patient])
   if (!template) return null

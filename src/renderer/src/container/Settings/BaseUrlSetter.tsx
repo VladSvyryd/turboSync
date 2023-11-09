@@ -45,6 +45,7 @@ const index: FunctionComponent<Props> = () => {
         if (hasConnection) {
           setApiBaseUrl(value as string)
           ServerApi.defaults.baseURL = `http://${value}`
+          window.api.setStoreValue({ key: 'apiBaseUrl', value: value })
           return toast({
             title: 'Verbindung hergestellt',
             status: 'success'

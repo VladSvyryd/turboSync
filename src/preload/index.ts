@@ -42,6 +42,9 @@ const api = {
   },
   printFileByPath: (args) => {
     return electronAPI.ipcRenderer.invoke('printFileByPath', args)
+  },
+  onSocketConnection: (c) => {
+    electronAPI.ipcRenderer.on('onSocketConnection', c)
   }
 }
 

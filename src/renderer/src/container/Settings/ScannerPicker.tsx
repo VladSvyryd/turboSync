@@ -47,8 +47,8 @@ const ScannerPicker: FunctionComponent<Props> = ({}) => {
     }
     try {
       const printResult = await window.api.printFileByPath({
-        path: printFile?.path,
-        defaultPrinter: defaultScanner
+        path: printFile?.path ?? '',
+        defaultPrinter: defaultScanner ?? ''
       })
       if (!printResult?.printFile) {
         toast({

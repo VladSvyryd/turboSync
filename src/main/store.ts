@@ -14,6 +14,7 @@ export type Patient = {
 interface StoreSchema {
   patient: Patient
   apiBaseUrl: string
+  socketConnected: boolean
 }
 const storeSchema: Schema<StoreSchema> = {
   patient: {
@@ -33,9 +34,15 @@ const storeSchema: Schema<StoreSchema> = {
   apiBaseUrl: {
     type: 'string',
     default: ''
+  },
+  socketConnected: {
+    type: 'boolean',
+    default: false
   }
 }
 export const store = new Store<StoreSchema>({
-  schema: storeSchema,
-  watch: true
+  schema: storeSchema
 })
+
+// console.log(store.clear())
+console.log(store.store)

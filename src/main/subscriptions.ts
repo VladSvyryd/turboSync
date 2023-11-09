@@ -3,14 +3,17 @@ import { openNewWindow, openUrlDependingFromMode, popWindow } from './helpers'
 import { createPrintOrder } from '../preload/printer'
 import { BrowserWindow, ipcMain } from 'electron'
 import { store } from './store'
+import icon from '../../resources/icon.png?asset'
 
 export let pdfWindow: BrowserWindow
 
-ipcMain.on('openNewWindow', (_, path) => {
-  openNewWindow(path)
+ipcMain.on('openNewWindow', async (_, path) => {
+  await openNewWindow(path)
 })
 
-ipcMain.on('openPDFPreviewWindow', async (_, path) => {
+export const openPDFPreviewWindow = (path: string) => {
+  console.log(path)
+
   if (pdfWindow) {
     pdfWindow.destroy()
   }
@@ -22,6 +25,7 @@ ipcMain.on('openPDFPreviewWindow', async (_, path) => {
     height: newWindowHeight,
     width: newWindowWidth,
     show: false,
+    icon,
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       plugins: true,
@@ -37,6 +41,9 @@ ipcMain.on('openPDFPreviewWindow', async (_, path) => {
   pdfWindow.on('close', async () => {
     pdfWindow.webContents.send('onPDFWindowClose')
   })
+}
+ipcMain.on('openPDFPreviewWindow', async (_, path) => {
+  openPDFPreviewWindow(path)
 })
 
 ipcMain.handle('getPrinters', async () => {
@@ -61,6 +68,7 @@ ipcMain.handle('getStoreValue', async (_, { key }) => {
 })
 ipcMain.handle('setStoreValue', async (_, { key, value }) => {
   try {
+    store.delete(key)
     return store.set(key, value)
   } catch (e) {
     console.log('getStoreValue', e)

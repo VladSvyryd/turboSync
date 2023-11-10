@@ -1,5 +1,5 @@
+import '../preload/store'
 import './helpers'
-import './store'
 import './subscriptions'
 import './socket'
 import { app, shell, BrowserWindow, nativeTheme } from 'electron'

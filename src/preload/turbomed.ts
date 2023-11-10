@@ -1,7 +1,7 @@
 import * as winax from 'winax'
 import { PowerShell } from 'node-powershell'
-// const Turbomed = new winax.Object('TMMain.Application', { activate: false })
 const ps = new PowerShell({
+  debug: true,
   executableOptions: {
     '-ExecutionPolicy': 'Bypass',
     '-NoProfile': true
@@ -21,8 +21,7 @@ export async function canWorkWithPatient() {
   try {
     const c = PowerShell.command`
        $app  = [System.Runtime.InteropServices.Marshal]::GetActiveObject("TMMain.Application")
-       $oPatient = $app.AktiverPatient()
-       echo "true"
+       $oPatient = $app.AktiverPatient().Nummer()
        [System.GC]::Collect()
     `
     await ps.invoke(c)
@@ -75,7 +74,6 @@ export const getCurrentPatient = async () => {
     return { data: patient }
   } catch (e) {
     console.log(e)
-    // winax.release(Turbomed)
     return { error: '(Aktiver Patient da?)' }
   } finally {
     winax.release(Turbomed)

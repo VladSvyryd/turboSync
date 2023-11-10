@@ -49,6 +49,7 @@ const api = {
   onSocketConnection: (c) => {
     electronAPI.ipcRenderer.on('onSocketConnection', c)
   },
+  // not used
   onTurbomedConnection: (c) => {
     electronAPI.ipcRenderer.on('onTurbomedConnection', c)
   }

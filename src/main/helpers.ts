@@ -4,7 +4,7 @@ import { join } from 'path'
 import { BrowserWindow, screen } from 'electron'
 import { mainWindow } from './index'
 import icon from '../../resources/icon.png?asset'
-import { store } from './store'
+import { store } from '../preload/store'
 
 export function isWithinDisplayBoundsX(pos: { x: number; display: BrowserWindow }) {
   const winBounds = pos.display.getBounds()
@@ -123,9 +123,9 @@ export const openNewWindow = async (path: string) => {
 
   popWindow.removeMenu()
   store.onDidChange('socketConnected', (v) => {
-    console.log('socketConnected: ', { v })
     popWindow.webContents.send('onSocketConnection', v)
   })
+
   openUrlDependingFromMode(popWindow, path)
   popWindow.show()
 }

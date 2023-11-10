@@ -21,6 +21,7 @@ declare global {
       setStoreValue:(args:{key: string,value:any}) => Promise<any>
       printFileByPath:(args:{path: string,defaultPrinter:string}) => Promise<{ printFile:boolean }>
       onSocketConnection: (args:(event: Electron.IpcMainEvent,connection:boolean)=> void) => void
+      onTurbomedConnection: (args:(event: Electron.IpcMainEvent,connection:boolean)=> void) => void
     }
   }
 }

@@ -2,7 +2,7 @@ import { join } from 'path'
 import { openNewWindow, openUrlDependingFromMode, popWindow } from './helpers'
 import { createPrintOrder } from '../preload/printer'
 import { BrowserWindow, ipcMain } from 'electron'
-import { store } from './store'
+import { store } from '../preload/store'
 import icon from '../../resources/icon.png?asset'
 import { getAllScanners } from '../preload/scan/scan'
 
@@ -74,7 +74,6 @@ ipcMain.handle('getStoreValue', async (_, { key }) => {
 })
 ipcMain.handle('setStoreValue', async (_, { key, value }) => {
   try {
-    store.delete(key)
     return store.set(key, value)
   } catch (e) {
     console.log('getStoreValue', e)

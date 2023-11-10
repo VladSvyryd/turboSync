@@ -27,7 +27,7 @@ const index: FunctionComponent<Props> = () => {
     onSuccess: async (data) => {
       if (data.error) {
         console.log('error', data.error)
-        alert(data.error)
+        // alert(data.error)
       }
       if (!data.data) {
         setPatient(data.data)

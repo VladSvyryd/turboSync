@@ -15,6 +15,7 @@ interface StoreSchema {
   patient: Patient
   apiBaseUrl: string
   socketConnected: boolean
+  turbomedConnected: boolean
 }
 const storeSchema: Schema<StoreSchema> = {
   patient: {
@@ -36,6 +37,10 @@ const storeSchema: Schema<StoreSchema> = {
     default: ''
   },
   socketConnected: {
+    type: 'boolean',
+    default: false
+  },
+  turbomedConnected: {
     type: 'boolean',
     default: false
   }

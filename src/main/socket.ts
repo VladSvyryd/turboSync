@@ -1,6 +1,6 @@
 import io, { Socket } from 'socket.io-client'
 import { showNotification } from './notifications'
-import { store } from './store'
+import { store } from '../preload/store'
 
 export enum ServerEmitterEvents {
   notify = 'notify'

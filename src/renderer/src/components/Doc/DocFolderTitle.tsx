@@ -1,5 +1,6 @@
 import { FunctionComponent } from 'react'
 import {
+  Box,
   Heading,
   IconButton,
   Input,
@@ -10,11 +11,13 @@ import {
   PopoverContent,
   PopoverHeader,
   PopoverTrigger,
-  Stack
+  Stack,
+  Text
 } from '@chakra-ui/react'
 import { FaInfo } from 'react-icons/fa'
-import { SignType } from '../../types'
+import { DocumentStatus, SignType } from '../../types'
 import { useListStore } from '../../store/ListStore'
+import { getColorByExtendedDocStatus } from '../ListButton/ListButton/ListButton'
 
 interface OwnProps {
   title: SignType
@@ -35,6 +38,29 @@ const explanations: { [key in SignType]: string } = {
     ' Beschränkungsstufe.'
 }
 
+const explanationTexts = [
+  {
+    color: getColorByExtendedDocStatus(),
+    text: 'Fehlt'
+  },
+  {
+    color: getColorByExtendedDocStatus(DocumentStatus.INPROGRESS),
+    text: 'In Progress'
+  },
+  {
+    color: getColorByExtendedDocStatus(DocumentStatus.SAVED),
+    text: 'In Turbomed gespeichert'
+  },
+  {
+    color: getColorByExtendedDocStatus(DocumentStatus.SIGNED),
+    text: 'Wird in Turbomed übertragen'
+  },
+  {
+    color: 'blackAlpha.900',
+    text: 'Einfache Vorlage'
+  }
+]
+
 const DocFolderTitle: FunctionComponent<Props> = ({ title }) => {
   const { titles, setActiveTitle, activeTitle, changeTitle } = useListStore()
   const handleChangeName = (v: string) => {
@@ -42,6 +68,7 @@ const DocFolderTitle: FunctionComponent<Props> = ({ title }) => {
     changeTitle(title, castV)
     setActiveTitle(null)
   }
+
   return (
     <Stack flexDir={'row'} alignItems={'center'} justifyContent={'space-between'} px={4}>
       {title !== activeTitle ? (
@@ -74,7 +101,17 @@ const DocFolderTitle: FunctionComponent<Props> = ({ title }) => {
           <PopoverArrow bg={'teal.500'} />
           <PopoverCloseButton />
           <PopoverHeader>Hilfe</PopoverHeader>
-          <PopoverBody>{explanations[title as SignType]}</PopoverBody>
+          <PopoverBody>
+            <Text marginBottom={3}>{explanations[title as SignType]}</Text>
+            <Stack>
+              {explanationTexts.map((e) => (
+                <Stack spacing={4} direction={'row'} alignItems={'center'}>
+                  <Box h={3} w={4} bg={e.color} borderRadius={4} />
+                  <Text display={'inline'}>{e.text}</Text>
+                </Stack>
+              ))}
+            </Stack>
+          </PopoverBody>
         </PopoverContent>
       </Popover>
     </Stack>

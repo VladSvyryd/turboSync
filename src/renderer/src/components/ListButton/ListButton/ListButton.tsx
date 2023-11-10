@@ -43,23 +43,23 @@ interface OwnProps {
 
 type Props = OwnProps
 
-const getColorByExtendedDocStatus = (status?: ExtendedDocumentStatus) => {
+export const getColorByExtendedDocStatus = (status?: ExtendedDocumentStatus) => {
   switch (status) {
     case ExpiredStatus.EXPIRED:
-      return 'red.500'
-    case undefined:
       return 'red.500'
     case DocumentStatus.SIGNED:
       return 'blue.500'
     case DocumentStatus.INPROGRESS:
       return 'orange.500'
-    default:
+    case DocumentStatus.SAVED:
       return 'green.600'
+    default:
+      return 'red.500'
   }
 }
 const renderColor = (template: Template) => {
   if (template.computedConditions === null) {
-    return 'green.600'
+    return 'blackAlpha.900'
   }
   const lastDocStatus = template.computedConditions?.lastDocStatus
   if (lastDocStatus) {

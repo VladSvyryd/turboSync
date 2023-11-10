@@ -2,12 +2,12 @@ import { contextBridge } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
 import { pingAddress } from './ping'
 import { openDoc } from './documnet'
-import { getCurrentPatient } from './turbomed'
+import { getActivePatient } from './turbomed'
 
 // Custom APIs for renderer
 const api = {
   ping: pingAddress,
-  getActivePatient: getCurrentPatient,
+  getActivePatient: getActivePatient,
   openNewWindow: (path: string) => {
     electronAPI.ipcRenderer.send('openNewWindow', path)
   },
@@ -20,6 +20,9 @@ const api = {
   },
   getPrinters: (args) => {
     return electronAPI.ipcRenderer.invoke('getPrinters', args)
+  },
+  getScanners: (args) => {
+    return electronAPI.ipcRenderer.invoke('getScanners', args)
   },
 
   printPDF: (path: string) => {
@@ -45,6 +48,9 @@ const api = {
   },
   onSocketConnection: (c) => {
     electronAPI.ipcRenderer.on('onSocketConnection', c)
+  },
+  onTurbomedConnection: (c) => {
+    electronAPI.ipcRenderer.on('onTurbomedConnection', c)
   }
 }
 

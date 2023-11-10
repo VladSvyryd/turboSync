@@ -20,11 +20,18 @@ const index: FunctionComponent<Props> = () => {
   const { patient, setPatient, status, setStatus } = usePatientStore()
   const [isDragged, setIsDragged] = useState(false)
   const { isValidating: userLoading } = useSWR<{
-    data: Patient
+    data?: Patient
+    error?: string
   }>('getActivePatient', fetchActivePatient, {
     refreshInterval: 1000,
     onSuccess: async (data) => {
-      setPatient(data.data)
+      if (data.error) {
+        console.log('error', data.error)
+        alert(data.error)
+      }
+      if (!data.data) {
+        setPatient(data.data)
+      }
     }
   })
   const { isValidating: statusLoading } = useSWR<{

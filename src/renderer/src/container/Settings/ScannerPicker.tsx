@@ -13,15 +13,16 @@ const ScannerPicker: FunctionComponent<Props> = ({}) => {
   const [printLoading, setPrintLoading] = useState(false)
   // const { data } = useSWR<Array<string>>('getPrinters', a, {})
   // console.log(data)
-  const [printers, setPrinters] = useState<Array<Electron.PrinterInfo>>([])
+  const [scanners, setScanners] = useState<Array<{ name: string; deviceId: string }>>([])
   const { defaultScanner, setDefaultScanner, apiBaseUrl } = useSettingsStore()
   console.log(Boolean(apiBaseUrl))
 
   const retrievePrinters = async () => {
     setLoading(true)
     try {
-      const p = await window.api.getPrinters()
-      setPrinters(p)
+      const p = await window.api.getScanners()
+      console.log({ p })
+      setScanners(p)
     } catch (e) {
       toast({
         title: 'Drucker',
@@ -103,7 +104,7 @@ const ScannerPicker: FunctionComponent<Props> = ({}) => {
         </Stack>
         <ScannerSelectForm
           defaultValue={defaultScanner}
-          list={[...printers.map((p) => p.name), 'Kein Scanner']}
+          list={scanners.map((s) => s.name)}
           onChange={(printer) => {
             setDefaultScanner(printer)
           }}

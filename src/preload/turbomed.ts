@@ -1,21 +1,41 @@
 import * as winax from 'winax'
-
-const Turbomed = new winax.Object('TMMain.Application', { activate: true })
-
+import { PowerShell } from 'node-powershell'
+// const Turbomed = new winax.Object('TMMain.Application', { activate: false })
+const ps = new PowerShell({
+  executableOptions: {
+    '-ExecutionPolicy': 'Bypass',
+    '-NoProfile': true
+  }
+})
 export async function getActivePatient() {
-  const isOnlineAndWithActivePatient = await getTurbomedIsOn()
-  if (isOnlineAndWithActivePatient?.error)
+  const active = await canWorkWithPatient()
+  if (!active)
     return {
-      error: `(Turbomed aus/Aktiver Patient da?)\n${isOnlineAndWithActivePatient?.error}`
+      error: `(Turbomed aus/Aktiver Patient da?)`
     }
 
   return getCurrentPatient()
 }
 
-export async function getTurbomedIsOn() {
-  const app = Turbomed
+export async function canWorkWithPatient() {
   try {
-    const oPatient = app.AktiverPatient()
+    const c = PowerShell.command`
+       $app  = [System.Runtime.InteropServices.Marshal]::GetActiveObject("TMMain.Application")
+       $oPatient = $app.AktiverPatient()
+       echo "true"
+       [System.GC]::Collect()
+    `
+    await ps.invoke(c)
+    return true
+  } catch {
+    return false
+  }
+}
+export async function getTurbomedIsOn() {
+  const Turbomed = new winax.Object('TMMain.Application', { activate: true })
+
+  try {
+    const oPatient = Turbomed.AktiverPatient()
     const nummer = oPatient.Nummer()
     return { id: nummer }
   } catch (e: any) {
@@ -24,6 +44,8 @@ export async function getTurbomedIsOn() {
 }
 
 export const getCurrentPatient = async () => {
+  const Turbomed = new winax.Object('TMMain.Application', { activate: true })
+
   try {
     const app = Turbomed
     const oPatient = app.AktiverPatient()
@@ -54,6 +76,8 @@ export const getCurrentPatient = async () => {
   } catch (e) {
     console.log(e)
     // winax.release(Turbomed)
-    return { error: 'ERROR' }
+    return { error: '(Aktiver Patient da?)' }
+  } finally {
+    winax.release(Turbomed)
   }
 }

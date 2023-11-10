@@ -12,6 +12,7 @@ declare global {
       openDoc: (docTitle:string) => void
       onPDFWindowClose: (callback:()=>void) => void
       getPrinters: () => Promise<Electron.PrinterInfo[]>
+      getScanners: () => Promise<{ name:string,deviceId:string }[]>
       printPDF: (path:string) => void
       openTemplatesWindow: () => void
       onWindowIsDragged: (callback:(event: Electron.IpcMainEvent,res: { isDragged:boolean })=>void) => void

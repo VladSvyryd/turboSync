@@ -49,7 +49,7 @@ const ScannerSelectForm: FunctionComponent<Props> = ({ list, defaultValue, loadi
               const active = list.find((l) => l === v)
               if (active) onChange(active)
             }}
-            title="Kein Drucker"
+            title="Kein Scanner"
             type="radio"
           >
             {list.map((listItem) => (

@@ -4,6 +4,7 @@ import { createPrintOrder } from '../preload/printer'
 import { BrowserWindow, ipcMain } from 'electron'
 import { store } from './store'
 import icon from '../../resources/icon.png?asset'
+import { getAllScanners } from '../preload/scan/scan'
 
 export let pdfWindow: BrowserWindow
 
@@ -48,6 +49,11 @@ ipcMain.on('openPDFPreviewWindow', async (_, path) => {
 
 ipcMain.handle('getPrinters', async () => {
   return popWindow.webContents.getPrintersAsync()
+})
+ipcMain.handle('getScanners', async () => {
+  const scanners = getAllScanners()
+  console.log('getScanners', scanners)
+  return scanners
 })
 ipcMain.handle('printFileByPath', async (_, { path, defaultPrinter }) => {
   try {

@@ -36,7 +36,6 @@ const index: FunctionComponent<Props> = () => {
   }>(patient ? { url: fetchStatusUrl, args: patient } : null, fetcherTemplateQuery, {
     refreshInterval: 1000,
     onSuccess: (data) => {
-      console.log('data', data)
       setStatus(data.status)
     }
   })

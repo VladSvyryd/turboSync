@@ -1,9 +1,9 @@
 import { FunctionComponent, useMemo, useRef, useState } from 'react'
 import { Box, Button, List, ListItem } from '@chakra-ui/react'
 import ListButtonWithContext from './ListButtonWithContext'
-import { FaChevronRight, FaFileWord, FaTrash } from 'react-icons/fa'
+import { FaChevronRight, FaFileSignature, FaFileWord, FaTrash } from 'react-icons/fa'
 import { usePopper } from 'react-popper'
-import { ContextMenuKey, SignType } from '../../../types'
+import { ContextMenuKey, DocumentStatus, SignType } from '../../../types'
 import { AiFillEdit } from 'react-icons/ai'
 import { getTemplatePdfPreview, handleCancelDocuments, handleMoveTemplate } from '../../../api'
 import { FaArrowRightArrowLeft, FaFilePdf } from 'react-icons/fa6'
@@ -41,10 +41,8 @@ const ButtonContextMenu: FunctionComponent<Props> = ({}) => {
   const handleMenuClose = () => {
     closeContextMenu()
   }
-
   const renderContextMenu = useMemo(() => {
     if (!template || !patient) return []
-
     const discardButtons = [
       {
         title: 'Alle',
@@ -70,8 +68,21 @@ const ButtonContextMenu: FunctionComponent<Props> = ({}) => {
 
     const menuPoints = [
       {
+        id: ContextMenuKey.LAST_SHOW,
+        title: 'Dokument',
+        onClick: () => {
+          setPreviewLoading(true)
+          handleMenuClose()
+          const signPath = template?.document ? template?.document[0]?.signedPath : undefined
+
+          if (signPath) window.api.openPDFPreviewWindow(signPath)
+          setPreviewLoading(false)
+        },
+        leftIcon: <FaFileSignature />
+      },
+      {
         id: ContextMenuKey.OPEN,
-        title: 'Öffnen',
+        title: 'Bearbeiten',
         onClick: () => {
           window.api.openDoc(template.networkPath)
           handleMenuClose()
@@ -89,7 +100,7 @@ const ButtonContextMenu: FunctionComponent<Props> = ({}) => {
       },
       {
         id: ContextMenuKey.PREVIEW,
-        title: 'Vorschau',
+        title: 'PDF Vorschau',
         onClick: async () => {
           setPreviewLoading(true)
           handleMenuClose()
@@ -147,8 +158,11 @@ const ButtonContextMenu: FunctionComponent<Props> = ({}) => {
     if (!template.noFile) {
       return menuPoints.filter((m) => m.id === ContextMenuKey.DELETE)
     }
-    if (template.computedConditions?.lastDocStatus === undefined) {
+    if (template.computedConditions?.lastDocStatus !== DocumentStatus.INPROGRESS) {
       return menuPoints.filter((m) => m.id !== ContextMenuKey.DISCARD)
+    }
+    if (template.computedConditions?.lastDocStatus === DocumentStatus.INPROGRESS) {
+      return menuPoints.filter((m) => m.id !== ContextMenuKey.LAST_SHOW)
     }
     return menuPoints
   }, [template?.noFile, patient])

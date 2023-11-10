@@ -47,7 +47,8 @@ export type ResponseFolder = {
 export enum DocumentStatus {
   INPROGRESS = 'INPROGRESS',
   SIGNED = 'SIGNED',
-  SAVED = 'SAVED'
+  SAVED = 'SAVED',
+  CANCELED = 'CANCELED'
 }
 export enum ExpiredStatus {
   EXPIRED = 'EXPIRED',
@@ -78,6 +79,7 @@ export type Template = {
   noFile: boolean
   expiredEveryMonths: number
   computedConditions: ComputedConditions | null
+  document?: Array<{ signedPath?: string }>
 }
 export type EditableTemplate = {
   title: string
@@ -93,7 +95,8 @@ export enum ContextMenuKey {
   MOVE = 'MOVE',
   UPLOAD = 'UPLOAD',
   PREVIEW = 'PREVIEW',
-  DISCARD = 'DISCARD'
+  DISCARD = 'DISCARD',
+  LAST_SHOW = 'LAST_SHOW'
 }
 
 export const InternalErrorNumber = {

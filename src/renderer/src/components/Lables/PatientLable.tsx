@@ -1,6 +1,7 @@
 import { FunctionComponent } from 'react'
-import { Spinner, Stack, Text } from '@chakra-ui/react'
+import { Stack, Text, useToken } from '@chakra-ui/react'
 import { Patient } from '../../types'
+import StatusLamp from '../Loading/StatusLamp'
 
 interface OwnProps {
   patient?: Patient
@@ -10,12 +11,14 @@ interface OwnProps {
 type Props = OwnProps
 
 const PatientLable: FunctionComponent<Props> = ({ patient, loading }) => {
+  const teal = useToken('colors', 'teal')
+  const white = useToken('colors', 'whiteAlpha.300')
   return (
     <Stack alignItems={'flex-start'} px={4}>
       <Stack
         height={8}
         direction={'row'}
-        bg={patient ? 'teal' : 'red'}
+        bg={!patient && !loading ? 'red' : 'teal'}
         px={2}
         py={1}
         alignItems={'center'}
@@ -23,15 +26,16 @@ const PatientLable: FunctionComponent<Props> = ({ patient, loading }) => {
         borderBottomRightRadius={5}
         pr={6}
       >
-        <Spinner visibility={loading ? 'visible' : 'hidden'} size={'xs'} color={'white'} />)
-        {patient ? (
+        <StatusLamp on={!loading} size={3} onColor={teal} offColor={white} />
+        {/*<Spinner visibility={loading ? 'visible' : 'hidden'} size={'xs'} color={'white'} />)*/}
+        {!loading && !patient ? (
+          <Text color={'white'}>Kein Patient</Text>
+        ) : (
           <>
             <Text color={'white'}>{patient?.id}</Text>
             <Text color={'white'}>{patient?.firstName}</Text>
             <Text color={'white'}>{patient?.secondName}</Text>
           </>
-        ) : (
-          <Text color={'white'}>Kein Patient</Text>
         )}
       </Stack>
     </Stack>

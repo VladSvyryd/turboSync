@@ -1,7 +1,6 @@
 import * as winax from 'winax'
 import { PowerShell } from 'node-powershell'
 const ps = new PowerShell({
-  debug: true,
   executableOptions: {
     '-ExecutionPolicy': 'Bypass',
     '-NoProfile': true

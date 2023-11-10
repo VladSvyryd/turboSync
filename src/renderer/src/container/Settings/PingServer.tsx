@@ -1,30 +1,11 @@
 import { FunctionComponent, useEffect, useState } from 'react'
-import { Box, Divider, Heading, Stack, Text } from '@chakra-ui/react'
-import { motion } from 'framer-motion'
+import { Divider, Heading, Stack, Text } from '@chakra-ui/react'
+import StatusLamp from '../../components/Loading/StatusLamp'
 
 interface OwnProps {}
 
 type Props = OwnProps
-const greenColor = 'rgba(0,255,0,.8)'
-const redColor = 'rgba(255,0,0,.6)'
 
-const sx = {
-  position: 'relative',
-  width: 4,
-  height: 4,
-  borderRadius: '50%',
-  backgroundColor: 'currentColor',
-  '@keyframes ripple': {
-    '0%': {
-      transform: 'scale(.8)',
-      opacity: 1
-    },
-    '100%': {
-      transform: 'scale(2)',
-      opacity: 0
-    }
-  }
-}
 const PingServer: FunctionComponent<Props> = () => {
   const [connected, setConnected] = useState<boolean>(false)
   // const [turbomed, setTurbomed] = useState<boolean>(false)
@@ -47,20 +28,7 @@ const PingServer: FunctionComponent<Props> = () => {
       <Heading size={'sm'}>Verbindung</Heading>
       <Stack direction={'row'} justifyContent={'space-between'}>
         <Text>Server:</Text>
-        <Box p={2}>
-          <Box as={motion.div} sx={sx} animate={{ color: connected ? greenColor : redColor }}>
-            <Box
-              pos={'absolute'}
-              top={0}
-              left={0}
-              width={4}
-              height={4}
-              borderRadius={'50%'}
-              animation={'ripple 1.2s infinite ease-in-out'}
-              border={'1px solid currentColor'}
-            />
-          </Box>
-        </Box>
+        <StatusLamp on={connected} p={2} />
       </Stack>
 
       <Divider />

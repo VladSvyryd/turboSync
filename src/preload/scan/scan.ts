@@ -1,6 +1,12 @@
 import * as fs from 'fs'
 import { WiaDeviceType, ImageIntent, WIAErrorCodes } from './constants'
-import { FileFormat, ScannerProperties, ScannerOptions, WIAPropertyConstant } from './types'
+import {
+  FileFormat,
+  ScannerProperties,
+  ScannerOptions,
+  WIAPropertyConstant,
+  Scanner
+} from './types'
 import { WIAErrorCodeToString } from './errorCodeToString'
 import { DeviceManager } from './deviceManager'
 
@@ -30,10 +36,11 @@ export const scanAll = (options: ScannerOptions) => {
       doScan(Device, options.format)
     }
   } catch (e) {
-    if (e.code === WIAErrorCodes.WIA_ERROR_PAPER_EMPTY) {
+    const error = e as unknown as { code: number }
+    if (error.code === WIAErrorCodes.WIA_ERROR_PAPER_EMPTY) {
       console.log('Ignore this except if its the first time')
     }
-    console.log(WIAErrorCodeToString(e.code))
+    console.log(WIAErrorCodeToString(error.code))
   }
 }
 
@@ -53,7 +60,7 @@ export const scanSingle = (options: ScannerOptions) => {
 
 export const getAllScanners = (): Array<{ name: string; deviceId: string }> => {
   console.log(DeviceManager.DeviceInfos.Count)
-  let Scanners = []
+  let Scanners: Array<Scanner> = []
   for (let i = 1; i <= DeviceManager.DeviceInfos.Count; i++) {
     if (DeviceManager.DeviceInfos(i).Type != WiaDeviceType.ScannerDeviceType) {
       continue
@@ -67,7 +74,7 @@ export const getAllScanners = (): Array<{ name: string; deviceId: string }> => {
 }
 
 // https://learn.microsoft.com/en-us/previous-versions/windows/desktop/wiaaut/-wiaaut-consts-formatid
-const doScan = (Device: any, FormatId: FileFormat) => {
+const doScan = (Device: any, FormatId?: FileFormat) => {
   let FileExt
   switch (FormatId) {
     case FileFormat.BMP:
@@ -87,11 +94,11 @@ const doScan = (Device: any, FormatId: FileFormat) => {
       break
     default:
       // Use BMP as default
-      FileExt = '.bmp'
+      FileExt = '.png'
       break
   }
-
-  const img = Device.Items(1).Transfer(FormatId)
+  const _FormatId = FormatId ?? FileFormat.PNG
+  const img = Device.Items(1).Transfer(_FormatId)
 
   let i = 0
   let targetFilename = SCAN_FOLDER + `img${('0000' + i).slice(-4)}${FileExt}`
@@ -137,18 +144,20 @@ const setProperties = (Device: any, props?: ScannerProperties) => {
 const setProperty = (Device: any, prop: WIAPropertyConstant, value: any) => {
   const propString = Object.entries(WIAPropertyConstant).find(([_, v]) => {
     return prop === v
-  })[0]
-
+  })
+  if (!propString) throw new Error('Property not found')
+  const key = propString[0]
   if (Device.Items(1).Properties.Exists(prop)) {
     try {
       Device.Items(1).Properties(prop).Value = value
     } catch (e) {
-      if (e.code === INVALID_PARAM) {
-        console.log('Invalid Parameter for: ' + propString)
+      const error = e as unknown as { code: number }
+      if (error.code === INVALID_PARAM) {
+        console.log('Invalid Parameter for: ' + key)
       }
-      console.log('Error setting WIA property "' + propString + '".')
+      console.log('Error setting WIA property "' + key + '".')
     }
   } else {
-    console.log('Error: WIA property "' + propString + '" does not exist on Object.')
+    console.log('Error: WIA property "' + key + '" does not exist on Object.')
   }
 }

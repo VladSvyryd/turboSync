@@ -15,7 +15,7 @@ const PatientLable: FunctionComponent<Props> = ({ patient, loading }) => {
       <Stack
         height={8}
         direction={'row'}
-        bg={'teal'}
+        bg={patient ? 'teal' : 'red'}
         px={2}
         py={1}
         alignItems={'center'}
@@ -24,9 +24,15 @@ const PatientLable: FunctionComponent<Props> = ({ patient, loading }) => {
         pr={6}
       >
         <Spinner visibility={loading ? 'visible' : 'hidden'} size={'xs'} color={'white'} />)
-        <Text color={'white'}>{patient?.id}</Text>
-        <Text color={'white'}>{patient?.firstName}</Text>
-        <Text color={'white'}>{patient?.secondName}</Text>
+        {patient ? (
+          <>
+            <Text color={'white'}>{patient?.id}</Text>
+            <Text color={'white'}>{patient?.firstName}</Text>
+            <Text color={'white'}>{patient?.secondName}</Text>
+          </>
+        ) : (
+          <Text color={'white'}>Kein Patient</Text>
+        )}
       </Stack>
     </Stack>
   )

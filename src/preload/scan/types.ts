@@ -32,3 +32,8 @@ export type ScannerOptions = {
   format?: FileFormat // default BMP
   props?: ScannerProperties
 }
+
+export type Scanner = {
+  name: string
+  deviceId: string
+}

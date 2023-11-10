@@ -29,7 +29,7 @@ const index: FunctionComponent<Props> = () => {
   const { fillUploadTemplates, setSignTypeModal } = useUploadStore()
   const { folders, setFolders, previewLoading } = useTemplatesStore()
   const { patient, setPatient } = usePatientStore()
-  const { isValidating: patientIsValidating } = useSWR<{ data: Patient }>(
+  const { isValidating: patientIsValidating } = useSWR<{ data?: Patient; error?: string }>(
     'getActivePatient',
     fetchActivePatient,
     {
@@ -37,6 +37,9 @@ const index: FunctionComponent<Props> = () => {
       refreshInterval: 1000,
       onSuccess: (data) => {
         console.log(data)
+        if (data.error) {
+          console.log('error', data.error)
+        }
         setPatient(data.data)
       }
     }

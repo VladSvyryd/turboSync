@@ -1,7 +1,10 @@
 import { PowerShell } from 'node-powershell'
 
-import { existsSync, mkdirSync, writeFileSync } from 'fs'
-import { app, ipcRenderer } from 'electron'
+import { accessSync, existsSync, mkdirSync, writeFileSync } from 'fs'
+import { app } from 'electron'
+import IpcMainEvent = Electron.IpcMainEvent
+import { writeFile, readFile } from 'fs/promises'
+import * as path from 'path'
 const ps = new PowerShell({
   executableOptions: {
     '-ExecutionPolicy': 'Bypass',
@@ -18,6 +21,16 @@ export type Patient = {
   houseNumber: string | undefined
   birthday: string //Date  | undefined
   gender: string //Date  | undefined
+  rows: Array<PatientRow>
+}
+export type PatientRow = {
+  art: string
+  id: string
+  gueltigkeitsZeitpunkt: string
+  eintrag: string
+  lastChange: string
+  created: string
+  autor: string
 }
 export async function getPatientById(id: string) {
   const active = await canWorkWithPatient()
@@ -82,8 +95,6 @@ export const getCurrentPatient = async (id: String) => {
     `
     const queryPatient = await ps.invoke(cmd)
     if (queryPatient.raw === 'null') return null
-    console.log(queryPatient.raw.replaceAll("'", '"'))
-
     return JSON.parse(queryPatient.raw.replaceAll("'", '"'))
   } catch (e) {
     console.log('HERE', e)
@@ -117,15 +128,15 @@ const getMaxPatientRows = async (id: string) => {
   }
 }
 
-export async function initPatientImport(id: string) {
+export async function initPatientImport(id: string, turboPath: string, render: IpcMainEvent) {
   try {
     const patient = await getCurrentPatient(id)
     const count = await getMaxPatientRows(id)
-    ipcRenderer.send('setProgress', count)
-
-    const queryRows = [...new Array(20)].map((_, index) => getPatientRow(id, index))
+    render.sender.send('setProgress', count - 1)
+    const queryRows = [...new Array(7)].map((_, index) =>
+      getPatientRow(id, index, turboPath, render)
+    )
     const rows = await Promise.all(queryRows)
-    console.log({ rows })
     const filePath = app.getAppPath() + '/temp/export' + '/' + id
     if (!existsSync(filePath)) {
       mkdirSync(filePath, { recursive: true })
@@ -139,7 +150,53 @@ export async function initPatientImport(id: string) {
   }
 }
 
-export const getPatientRow = async (id: String, index: number) => {
+export const getFileIfExists = async (id: string, index: number) => {
+  const cmd = PowerShell.command`
+   [console]::OutputEncoding = New-Object System.Text.UTF8Encoding
+   $progId = 'TMMain.Application';
+   $file = "false"
+    try {
+       $app = [System.Runtime.InteropServices.Marshal]::GetActiveObject($progId);
+       $oPatient = $app.Praxisgemeinschaft().PatientMitNummer(${id})
+       $datei = $oPatient.Karteikarte().Zeilen().Item(${index}).Eintrag().DateiLinkPfad()
+       $file = $datei
+       [System.GC]::Collect()
+    }
+    catch [System.Runtime.InteropServices.COMException] {
+      $file = $datei
+      [System.GC]::Collect()
+    }
+    echo $file;
+  `
+  try {
+    const query = await ps.invoke(cmd)
+    return query.raw
+  } catch (e) {
+    return null
+  }
+}
+
+const readWriteFile = async (inPath: string, id: string, index: number) => {
+  try {
+    const fileBuffer = await readFile(inPath)
+    const outputPath = app.getAppPath() + '/temp/export' + '/' + id + '/' + 'files'
+    if (!existsSync(outputPath)) {
+      mkdirSync(outputPath, { recursive: true })
+    }
+    await writeFile(outputPath + '/' + path.parse(inPath).base, fileBuffer)
+    return '/' + path.parse(inPath).base
+  } catch (e) {
+    console.log('readWriteFile error', inPath, index)
+    return null
+  }
+}
+
+export const getPatientRow = async (
+  id: string,
+  index: number,
+  turboPath: string,
+  render: IpcMainEvent
+) => {
   const cmd = PowerShell.command`
    [console]::OutputEncoding = New-Object System.Text.UTF8Encoding
    $progId = 'TMMain.Application';
@@ -152,22 +209,85 @@ export const getPatientRow = async (id: String, index: number) => {
        $created    = $oPatient.Karteikarte().Zeilen().Item(${index}).Properties().Item("erstellungsZeitpunkt")
        $eintrag    = $oPatient.Karteikarte().Zeilen().Item(${index}).Eintrag().AsString()
        $autor      = $oPatient.Karteikarte().Zeilen().Item(${index}).Properties().Item("markierung")
-       echo "{'art': '$art', 'id': '$id', 'eintrag': '$eintrag', 'lastChange': '$lastChange', 'created': '$created', 'autor': '$autor' }";
+       $gueltigkeitsZeitpunkt      = $oPatient.Karteikarte().Zeilen().Item(${index}).Properties().Item("gueltigkeitsZeitpunkt")
+       echo "{'art': '$art', 'id': '$id','gueltigkeitsZeitpunkt': '$gueltigkeitsZeitpunkt', 'eintrag': '$eintrag', 'lastChange': '$lastChange', 'created': '$created', 'autor': '$autor' }";
        [System.GC]::Collect()
     }
     catch [System.Runtime.InteropServices.COMException] {
-      echo "null";
+      echo null;
+      [System.GC]::Collect()
+    }
+  `
+  try {
+    let newPath: null | string | undefined = undefined
+    let filePath = await getFileIfExists(id, index)
+    newPath = filePath
+    if (filePath) {
+      if (filePath.startsWith('$')) {
+        filePath = filePath.replaceAll('$\\TurboMed', turboPath)
+      }
+      newPath = await readWriteFile(filePath, id, index)
+    } else {
+      newPath = null
+    }
+
+    const res = await ps.invoke(cmd)
+    render.sender.send('onProgressChanged', index)
+    console.log(res.raw.replaceAll("'", '"'))
+    if (res.raw === 'null') return null
+    const parsedRow = JSON.parse(res.raw.replaceAll("'", '"').replace(/(\r\n|\n|\r)/gm, ''))
+    render.sender.send('onLogs', `${parsedRow.id}: Fertig`)
+    return { ...parsedRow, filePath: newPath, originPath: filePath }
+  } catch (e) {
+    console.log(e)
+    return { error: '(Aktiver Patient da?)' }
+  }
+}
+
+export const setPatientRow = async (
+  id: String,
+  row: Patient['rows'][0],
+  index: number,
+  render: IpcMainEvent
+) => {
+  const { art, eintrag, lastChange, created, autor, gueltigkeitsZeitpunkt } = row
+  const cmd = PowerShell.command`
+   [console]::OutputEncoding = New-Object System.Text.UTF8Encoding
+   $progId = 'TMMain.Application';
+    try {
+       $app = [System.Runtime.InteropServices.Marshal]::GetActiveObject($progId);
+       $row = $app.Praxisgemeinschaft().PatientMitNummer(${id}).Karteikarte().NeuerTextEintrag(${autor},${eintrag})
+       $row.Properties().Item("iD") = ${art}
+       $row.EnthalteneZeile().Properties().Item("erstellungsZeitpunkt") = ${created}
+       $row.EnthalteneZeile().Properties().Item("letzteAenderungZeitpunkt") = ${lastChange}
+       $row.EnthalteneZeile().Properties().Item("gueltigkeitsZeitpunkt") = ${gueltigkeitsZeitpunkt}
+       echo $row.PublicId()
+       [System.GC]::Collect()
+    }
+    catch [System.Runtime.InteropServices.COMException] {
+      echo false
       [System.GC]::Collect()
     }
   `
 
   try {
     const res = await ps.invoke(cmd)
-    ipcRenderer.send('onProgressChanged', index)
+    render.sender.send('onProgressChanged', index)
     if (res.raw === 'null') return null
     return JSON.parse(res.raw.replaceAll("'", '"'))
   } catch (e) {
     console.log(e)
-    return { error: '(Aktiver Patient da?)' }
+    return null
+  }
+}
+export const importToTurbomedById = async (id: string, data: Patient, render: IpcMainEvent) => {
+  try {
+    const mutateRows = data.rows.map((row, index) => setPatientRow(id, row, index, render))
+    render.sender.send('setProgress', data.rows.length)
+
+    const res = await Promise.all(mutateRows)
+    console.log({ res })
+  } catch (e) {
+    console.log(e)
   }
 }

@@ -1,29 +1,90 @@
 {
   "id": "1001665",
+  "hausnummer": "5",
+  "geburtstag": "03/25/1890 00:00:00",
+  "strasse": "Gablonzerstr.",
+  "geschlecht": "m",
   "firstName": "Jonathan",
   "secondName": "Martin",
   "city": "Karlsruhe",
   "zip": "76185",
-  "street": "Gablonzerstr.",
-  "houseNumber": "5",
-  "birthday": "1890-03-25T00:00:00.000Z",
-  "gender": "m",
   "rows": [
     {
-      "art": "3",
-      "id": "1194678889941774528",
-      "lastChange": "2018-01-19T09:53:43.000Z",
-      "created": "2018-01-19T09:53:43.000Z",
-      "eintrag": "Das hier wurde im Durchlauf Nummer 3 geschrieben",
-      "autor": "jpm"
+      "art": "mal",
+      "id": "1283640973632377600",
+      "gueltigkeitsZeitpunkt": "05/25/2019 10:21:53",
+      "eintrag": "von Bußgeld Thüringen vom 04.05.2019  ** bereits von AM bezahlt **",
+      "lastChange": "07/07/2019 11:26:31",
+      "created": "05/25/2019 10:21:53",
+      "autor": "am",
+      "filePath": null,
+      "originPath": "C:\\TurboMed\\Dokumente\\Sonstiges\\201905\\Martin18900325-1001665-26C3AC8A-9FFB-4675-AB31-386FDC5FC608.pdf"
     },
     {
-      "art": "bild",
-      "id": "1391861255926614720",
-      "lastChange": "2023-11-14T16:50:18.000Z",
-      "created": "2018-01-22T13:19:10.000Z",
-      "eintrag": "Hier ist ein Bildeintrag",
-      "autor": "jpm"
+      "art": "mal",
+      "id": "1291440377159452288",
+      "gueltigkeitsZeitpunkt": "06/18/2019 11:25:59",
+      "eintrag": "von Bußgeld Kehl  vom 18.06.2019  ** bereits von AM bezahlt ** vom 07.07.2019",
+      "lastChange": "11/15/2023 11:57:52",
+      "created": "07/07/2019 11:25:59",
+      "autor": "am",
+      "filePath": null,
+      "originPath": "C:\\TurboMed\\Dokumente\\Sonstiges\\201907\\Martin18900325-1001665-977136D8-B728-43f3-BB92-489E977CC4FD.pdf"
+    },
+    {
+      "art": "mal",
+      "id": "1292393107926268096",
+      "gueltigkeitsZeitpunkt": "07/12/2019 17:37:36",
+      "eintrag": "von Bußgeld Kehl  vom 01.07.2019  ** bereits von AM bezahlt ** vom 12.07.2019",
+      "lastChange": "12/09/2019 14:26:14",
+      "created": "07/12/2019 17:37:36",
+      "autor": "am",
+      "filePath": null,
+      "originPath": "C:\\TurboMed\\Dokumente\\Sonstiges\\201907\\Martin18900325-1001665-5A90AB24-5EE4-44af-A16A-7EFD5BDF06B9.pdf"
+    },
+    {
+      "art": "mal",
+      "id": "1298335525637104640",
+      "gueltigkeitsZeitpunkt": "08/14/2019 12:43:42",
+      "eintrag": "von Bußgeld Kehl  vom 17.07.2019  ** bereits von AM bezahlt ** vom 28.05.2019",
+      "lastChange": "12/09/2019 14:26:48",
+      "created": "08/14/2019 12:43:42",
+      "autor": "am",
+      "filePath": "/Martin18900325-1001665-A730AEEB-5F0D-4736-9D9F-C7A59C478290.pdf",
+      "originPath": "C:\\TurboMed\\Dokumente\\Sonstiges\\201908\\Martin18900325-1001665-A730AEEB-5F0D-4736-9D9F-C7A59C478290.pdf"
+    },
+    {
+      "art": "mal",
+      "id": "1391862940931797440",
+      "gueltigkeitsZeitpunkt": "09/06/2019 09:19:31",
+      "eintrag": "von Bußgeld KA  vom  06.09.2019  ** bereits von AM bezahlt ** vom 28.05.2019",
+      "lastChange": "11/15/2023 12:14:04",
+      "created": "09/16/2019 09:19:31",
+      "autor": "am",
+      "filePath": null,
+      "originPath": ""
+    },
+    {
+      "art": "DigiSign",
+      "id": "1579036413143782848",
+      "gueltigkeitsZeitpunkt": "11/10/2023 15:53:55",
+      "eintrag": "119232d9-acbf-417c-a407-cdedf39e6ad4",
+      "lastChange": "11/15/2023 11:48:26",
+      "created": "11/10/2023 15:53:55",
+      "autor": "sig",
+      "filePath": null,
+      "originPath": "file:\\\\192.168.185.59\\DigiSignStorage\\templatesProcessed\\1001665\\signed\\03c9b77f-23d6-440a-1699628034202.pdf"
+    },
+    {
+      "art": "priv",
+      "id": "1579912606830053952",
+      "gueltigkeitsZeitpunkt": "11/15/2023 11:48:28",
+      "eintrag": "awdawdadawdawdadawd,",
+      "lastChange": "11/15/2023 11:49:00",
+      "created": "11/15/2023 11:48:28",
+      "autor": "sig",
+      "filePath": null,
+      "originPath": null
     }
   ]
 }

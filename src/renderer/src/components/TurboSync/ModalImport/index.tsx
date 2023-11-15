@@ -25,7 +25,16 @@ const ModalImport: FunctionComponent<Props> = ({}) => {
     setActiveImport(undefined)
   }
 
-  const handleOnSubmit = async () => {}
+  const handleOnSubmit = async () => {
+    let id = values.trim()
+    if (activeImport) {
+      id = activeImport.id
+    }
+    console.log({ id })
+    try {
+      window.api.importToTurbomedById(id)
+    } catch (e) {}
+  }
 
   return (
     <Modal
@@ -67,7 +76,12 @@ const ModalImport: FunctionComponent<Props> = ({}) => {
           )}
         </ModalBody>
         <ModalFooter>
-          <Button colorScheme="blue" mr={3} isDisabled={values === ''} onClick={handleOnSubmit}>
+          <Button
+            colorScheme="blue"
+            mr={3}
+            isDisabled={activeImport === null && values.trim() === ''}
+            onClick={handleOnSubmit}
+          >
             Importieren
           </Button>
           <Button onClick={handleCloseModal}>Cancel</Button>

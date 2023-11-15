@@ -1,16 +1,15 @@
 import { FunctionComponent } from 'react'
-import { Button, Stack, Tab, TabList, TabPanel, TabPanels, Tabs } from '@chakra-ui/react'
+import { Stack, Tab, TabList, TabPanel, TabPanels, Tabs } from '@chakra-ui/react'
 import PatientList from '../../components/TurboSync/PatientList'
 import PatientSelectForm from '../../components/Forms/PatientSelectForm'
-import PatientImportForm from '../../components/Forms/PatientImportForm'
+import PatientExportForm from '../../components/Forms/PatientExportForm'
 import ExportsList from '../../components/TurboSync/ExportsList'
-import { useListStore } from '../../store/ListStore'
+import PatientImportForm from '../../components/Forms/PatientImportForm'
 
 interface OwnProps {}
 
 type Props = OwnProps
 const TurboSync: FunctionComponent<Props> = () => {
-  const { activeExport, setActiveImport } = useListStore()
   return (
     <Tabs
       isLazy
@@ -31,31 +30,15 @@ const TurboSync: FunctionComponent<Props> = () => {
               <PatientList />
               <PatientSelectForm />
             </Stack>
-            <PatientImportForm />
+            <PatientExportForm />
           </Stack>
         </TabPanel>
         <TabPanel as={Stack} flex={1}>
           <Stack flex={1} direction={'row'}>
-            <Stack flex={1}>
+            <Stack>
               <ExportsList />
             </Stack>
-            <Stack justifyContent={'flex-start'}>
-              <Button
-                onClick={async () => {
-                  if (activeExport?.id) {
-                    const importPatient = await window.api.getPatientById(activeExport.id)
-                    setActiveImport(null)
-                    return
-                    if (importPatient.error) {
-                      return
-                    }
-                    setActiveImport(importPatient.data)
-                  }
-                }}
-              >
-                Import
-              </Button>
-            </Stack>
+            <PatientImportForm />
           </Stack>
         </TabPanel>
       </TabPanels>

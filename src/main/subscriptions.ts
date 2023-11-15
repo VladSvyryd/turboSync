@@ -3,7 +3,7 @@ import { openNewWindow, openUrlDependingFromMode, popWindow } from './helpers'
 import { app, BrowserWindow, ipcMain } from 'electron'
 import { store } from '../preload/store'
 import icon from '../../resources/icon.png?asset'
-import { initPatientImport } from './turbomedMain'
+import { importToTurbomedById, initPatientImport, Patient } from './turbomedMain'
 import { readdirSync, readFileSync } from 'fs'
 
 export let pdfWindow: BrowserWindow
@@ -63,10 +63,13 @@ ipcMain.handle('setStoreValue', async (_, { key, value }) => {
 ipcMain.on('setProgress', async (event, progress) => {
   event.reply('setProgress', progress)
 })
+ipcMain.on('onLogs', async (event, progress) => {
+  event.reply('onLogs', progress)
+})
 
-ipcMain.on('test', async (_, id) => {
-  console.log('test', app.getAppPath(), id)
-  initPatientImport(id)
+ipcMain.on('initPatientImport', async (event, { id, turbomedPath }) => {
+  console.log(id, turbomedPath)
+  initPatientImport(id, turbomedPath, event)
 })
 ipcMain.handle('getExportData', (_, id) => {
   const filePath = app.getAppPath() + `/temp/export/${id}`
@@ -87,4 +90,11 @@ ipcMain.handle('getListOfExportData', () => {
     })
   })
   return exports
+})
+ipcMain.on('importToTurbomedById', (event, id) => {
+  const filePath = app.getAppPath() + `/temp/export/` + id
+  const data = readFileSync(filePath + '/data.json', 'utf8')
+  if (!data) return
+  const patient = JSON.parse(data) as unknown as Patient
+  importToTurbomedById(id, patient, event)
 })

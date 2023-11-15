@@ -1,36 +1,17 @@
 import { FunctionComponent, useEffect, useState } from 'react'
-import { Button, Stack, Text } from '@chakra-ui/react'
+import { Button, Input, Stack, Text } from '@chakra-ui/react'
 import { useListStore } from '../../store/ListStore'
+import { useListPersistStore } from '../../store/ListPersistStore'
 
 interface OwnProps {}
 
 type Props = OwnProps
 
 const PatientImportForm: FunctionComponent<Props> = () => {
-  const { patients } = useListStore()
+  const { importTurbomedPath, setImportTurbomedPath } = useListPersistStore()
+  const { setActiveImport, activeExport } = useListStore()
   const [progressCount, setProgressCount] = useState(0)
   const [progress, setProgress] = useState(0)
-  const [loading, setLoading] = useState(false)
-  const handleImport = async () => {
-    try {
-      setLoading(true)
-      await window.api.initPatientImport(patients[0].id)
-    } catch (e) {
-    } finally {
-      setLoading(false)
-    }
-  }
-  console.log({ loading })
-  const handleExportData = () => {
-    setLoading(true)
-    try {
-      const data = window.api.getExportData(patients[0].id)
-      console.log({ data })
-    } catch (e) {
-    } finally {
-      setLoading(false)
-    }
-  }
 
   useEffect(() => {
     window.api.setProgress((_, progress) => {
@@ -48,12 +29,30 @@ const PatientImportForm: FunctionComponent<Props> = () => {
       <Stack>
         <Text>{progress}</Text> / <Text>{progressCount}</Text>
       </Stack>
-      <Stack alignSelf={'flex-end'}>
-        <Button onClick={handleExportData} isDisabled={patients.length === 0} isLoading={loading}>
-          Export Datei
-        </Button>
-        <Button onClick={handleImport} isDisabled={patients.length === 0} isLoading={loading}>
-          Export
+      <Stack direction={'row'} justifyContent={'space-between'}>
+        <Input
+          value={importTurbomedPath}
+          name={'path'}
+          autoFocus
+          placeholder="Turbomed Path"
+          onChange={(e) => {
+            setImportTurbomedPath(e.target.value)
+          }}
+        />
+        <Button
+          onClick={async () => {
+            if (activeExport?.id) {
+              const importPatient = await window.api.getPatientById(activeExport.id)
+
+              if (importPatient.error) {
+                setActiveImport(null)
+                return
+              }
+              setActiveImport(importPatient.data)
+            }
+          }}
+        >
+          Import
         </Button>
       </Stack>
     </Stack>

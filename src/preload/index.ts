@@ -1,28 +1,31 @@
-import { contextBridge, ipcRenderer } from 'electron'
+import { contextBridge } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
 import { pingAddress } from './ping'
 import { getPatientById } from './turbomed'
-import { initPatientImport } from '../main/turbomedMain'
 // Custom APIs for renderer
 const api = {
   ping: pingAddress,
   getPatientById: getPatientById,
-  initPatientImport: initPatientImport,
   onProgressChanged: (c) => {
     electronAPI.ipcRenderer.on('onProgressChanged', c)
   },
   setProgress: (c) => {
     electronAPI.ipcRenderer.on('setProgress', c)
   },
-  test: (c) => {
-    console.log('test')
-    ipcRenderer.send('test', c)
+  initPatientImport: (c) => {
+    electronAPI.ipcRenderer.send('initPatientImport', c)
+  },
+  importToTurbomedById: (c) => {
+    electronAPI.ipcRenderer.send('importToTurbomedById', c)
   },
   getExportData: (c) => {
-    return ipcRenderer.invoke('getExportData', c)
+    return electronAPI.ipcRenderer.invoke('getExportData', c)
   },
   getListOfExportData: (c) => {
-    return ipcRenderer.invoke('getListOfExportData', c)
+    return electronAPI.ipcRenderer.invoke('getListOfExportData', c)
+  },
+  onLogs: (c) => {
+    return electronAPI.ipcRenderer.on('onLogs', c)
   }
 }
 

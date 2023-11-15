@@ -1,57 +1,28 @@
-import { contextBridge } from 'electron'
+import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
 import { pingAddress } from './ping'
-import { openDoc } from './documnet'
-import { getActivePatient } from './turbomed'
-
+import { getPatientById } from './turbomed'
+import { initPatientImport } from '../main/turbomedMain'
 // Custom APIs for renderer
 const api = {
   ping: pingAddress,
-  getActivePatient: getActivePatient,
-  openNewWindow: (path: string) => {
-    electronAPI.ipcRenderer.send('openNewWindow', path)
+  getPatientById: getPatientById,
+  initPatientImport: initPatientImport,
+  onProgressChanged: (c) => {
+    electronAPI.ipcRenderer.on('onProgressChanged', c)
   },
-  openDoc,
-  openPDFPreviewWindow: (path: string) => {
-    electronAPI.ipcRenderer.send('openPDFPreviewWindow', path)
+  setProgress: (c) => {
+    electronAPI.ipcRenderer.on('setProgress', c)
   },
-  onPDFWindowClose: (callback: () => void) => {
-    electronAPI.ipcRenderer.on('onPDFWindowClose', callback)
+  test: (c) => {
+    console.log('test')
+    ipcRenderer.send('test', c)
   },
-  getPrinters: (args) => {
-    return electronAPI.ipcRenderer.invoke('getPrinters', args)
+  getExportData: (c) => {
+    return ipcRenderer.invoke('getExportData', c)
   },
-  getScanners: (args) => {
-    return electronAPI.ipcRenderer.invoke('getScanners', args)
-  },
-
-  printPDF: (path: string) => {
-    electronAPI.ipcRenderer.send('printPDF', path)
-  },
-  openTemplatesWindow: () => {
-    electronAPI.ipcRenderer.send('openTemplatesWindow')
-  },
-  onWindowIsDragged: (c) => {
-    electronAPI.ipcRenderer.on('onWindowIsDragged', c)
-  },
-  onUpdatePatient: (c) => {
-    electronAPI.ipcRenderer.on('onUpdatePatient', c)
-  },
-  getStoreValue: (args) => {
-    return electronAPI.ipcRenderer.invoke('getStoreValue', args)
-  },
-  setStoreValue: (args) => {
-    return electronAPI.ipcRenderer.invoke('setStoreValue', args)
-  },
-  printFileByPath: (args) => {
-    return electronAPI.ipcRenderer.invoke('printFileByPath', args)
-  },
-  onSocketConnection: (c) => {
-    electronAPI.ipcRenderer.on('onSocketConnection', c)
-  },
-  // not used
-  onTurbomedConnection: (c) => {
-    electronAPI.ipcRenderer.on('onTurbomedConnection', c)
+  getListOfExportData: (c) => {
+    return ipcRenderer.invoke('getListOfExportData', c)
   }
 }
 

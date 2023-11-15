@@ -1,0 +1,808 @@
+{
+  "id": "99999",
+  "hausnummer": "5",
+  "geschlecht": "m",
+  "geburtstag": "03/30/1943 00:00:00",
+  "strasse": "Gablonzerstr.",
+  "firstName": "Vornameä",
+  "secondName": "Nachnameü",
+  "city": "Ort Karlsruhe",
+  "zip": "PLZ 76133",
+  "rows": [
+    {
+      "art": "sv",
+      "id": "1374269895478906624",
+      "eintrag": "Servicevertrag (VA:Comfort) - TÄST ACCOUNT -",
+      "lastChange": "10/20/2017 14:59:17",
+      "created": "10/20/2017 14:59:17",
+      "autor": "am"
+    },
+    {
+      "art": "sv",
+      "id": "1374269895167280832",
+      "eintrag": "Servicevertrag (VA:Comfort) - TÄST ACCOUNT -",
+      "lastChange": "10/20/2017 15:11:33",
+      "created": "10/20/2017 15:11:10",
+      "autor": "am"
+    },
+    {
+      "art": "fk",
+      "id": "1374269894853049536",
+      "eintrag": "Fax von Rufnummer 00707138701 am 19.10.2017 um 13:35:04 Uhr erhalten.",
+      "lastChange": "10/20/2017 15:12:02",
+      "created": "10/20/2017 15:12:02",
+      "autor": "am"
+    },
+    {
+      "art": "fk",
+      "id": "1185485980021129600",
+      "eintrag": "Fax von Rufnummer 0072544247 am 19.10.2017 um 15:23:58 Uhr erhalten.",
+      "lastChange": "10/20/2017 15:12:03",
+      "created": "10/20/2017 15:12:03",
+      "autor": "am"
+    },
+    {
+      "art": "fk",
+      "id": "1374269894178066304",
+      "eintrag": "Fax von Rufnummer 007844918792 am 19.10.2017 um 20:28:52 Uhr erhalten.",
+      "lastChange": "10/20/2017 15:12:04",
+      "created": "10/20/2017 15:12:04",
+      "autor": "am"
+    },
+    {
+      "art": "cave",
+      "id": "1374269893871165248",
+      "eintrag": "118731_SV_Basic sdkfj slkdjf lksdjf ",
+      "lastChange": "10/20/2017 15:17:04",
+      "created": "10/20/2017 15:12:33",
+      "autor": "am"
+    },
+    {
+      "art": "mk",
+      "id": "1374269893559099712",
+      "eintrag": "Dr.Vetter Backup - TurboMed-F erfolgreich gesichert! (10240@dr-vetter.com, 22.09.2017 08:01)",
+      "lastChange": "11/29/2017 16:19:42",
+      "created": "10/20/2017 15:17:53",
+      "autor": "am"
+    },
+    {
+      "art": "sv",
+      "id": "1374269893252849728",
+      "eintrag": "Servicevertrag (VA:1) - TÄST ACCOUNT - ID: 49",
+      "lastChange": "10/20/2017 15:37:15",
+      "created": "10/20/2017 15:37:15",
+      "autor": "am"
+    },
+    {
+      "art": "sv",
+      "id": "1374269892952330112",
+      "eintrag": "Servicevertrag (VA:2) - TÄST ACCOUNT - ID: 50",
+      "lastChange": "10/20/2017 15:37:15",
+      "created": "10/20/2017 15:37:15",
+      "autor": "am"
+    },
+    {
+      "art": "sv",
+      "id": "1374269892639827904",
+      "eintrag": "Servicevertrag (VA:3) - TÄST ACCOUNT - ID: 51",
+      "lastChange": "10/20/2017 15:37:16",
+      "created": "10/20/2017 15:37:16",
+      "autor": "am"
+    },
+    {
+      "art": "sv",
+      "id": "1374269892315978176",
+      "eintrag": "Servicevertrag (VA:4) - TÄST ACCOUNT - ID: 52",
+      "lastChange": "10/20/2017 15:37:16",
+      "created": "10/20/2017 15:37:16",
+      "autor": "am"
+    },
+    {
+      "art": "sv",
+      "id": "1374269892016034880",
+      "eintrag": "Servicevertrag (VA:Basic) - TÄST ACCOUNT - ID: 53",
+      "lastChange": "06/24/2020 11:24:44",
+      "created": "10/20/2017 15:37:16",
+      "autor": "am"
+    },
+    {
+      "art": "sv",
+      "id": "1374269891710936256",
+      "eintrag": "Servicevertrag (VA:Business) - TÄST ACCOUNT - ID: 56",
+      "lastChange": "10/20/2017 15:37:55",
+      "created": "10/20/2017 15:37:16",
+      "autor": "am"
+    },
+    {
+      "art": "sv",
+      "id": "1374269891400026816",
+      "eintrag": "Servicevertrag (VA:Comfort) - TÄST ACCOUNT - ID: 47",
+      "lastChange": "10/20/2017 15:37:16",
+      "created": "10/20/2017 15:37:16",
+      "autor": "am"
+    },
+    {
+      "art": "sv",
+      "id": "1374269891078673280",
+      "eintrag": "Servicevertrag (VA:Comfort) - TÄST ACCOUNT - ID: 48",
+      "lastChange": "10/20/2017 15:37:16",
+      "created": "10/20/2017 15:37:16",
+      "autor": "am"
+    },
+    {
+      "art": "sv",
+      "id": "1374269890774862784",
+      "eintrag": "Servicevertrag (VA:Comfort) - TÄST ACCOUNT - ID: 55",
+      "lastChange": "10/20/2017 15:37:17",
+      "created": "10/20/2017 15:37:17",
+      "autor": "am"
+    },
+    {
+      "art": "sv",
+      "id": "1374269890248112000",
+      "eintrag": "Servicevertrag (VA:Standard) - TÄST ACCOUNT - ID: 54",
+      "lastChange": "10/20/2017 15:37:43",
+      "created": "10/20/2017 15:37:17",
+      "autor": "am"
+    },
+    {
+      "art": "sv",
+      "id": "1374269889945442752",
+      "eintrag": "Servicevertrag (VA:4) - TÄST ACCOUNT - ID: 52",
+      "lastChange": "10/20/2017 15:38:25",
+      "created": "10/20/2017 15:38:25",
+      "autor": "am"
+    },
+    {
+      "art": "sv",
+      "id": "1374269889636748480",
+      "eintrag": "Servicevertrag (VA:Comfort) - TÄST ACCOUNT - ID: 47",
+      "lastChange": "10/20/2017 15:38:25",
+      "created": "10/20/2017 15:38:25",
+      "autor": "am"
+    },
+    {
+      "art": "sv",
+      "id": "1374269889325663680",
+      "eintrag": "Servicevertrag (VA:Comfort) - TÄST ACCOUNT - ID: 48",
+      "lastChange": "10/20/2017 15:38:25",
+      "created": "10/20/2017 15:38:25",
+      "autor": "am"
+    },
+    {
+      "art": "TImg",
+      "id": "1374269889015338752",
+      "eintrag": "Dokumentation - Martin, Jonathan",
+      "lastChange": "12/01/2017 14:01:35",
+      "created": "12/01/2017 13:56:50",
+      "autor": "jpm"
+    },
+    {
+      "art": "BLAA",
+      "id": "1374269888715293632",
+      "eintrag": "",
+      "lastChange": "12/01/2017 14:21:28",
+      "created": "12/01/2017 14:21:28",
+      "autor": "jpm"
+    },
+    {
+      "art": "TImg",
+      "id": "1374269888414202304",
+      "eintrag": "Dokumentation - Martin, Jonathan",
+      "lastChange": "12/01/2017 14:38:15",
+      "created": "12/01/2017 14:37:53",
+      "autor": "jpm"
+    },
+    {
+      "art": "TImg",
+      "id": "1374269888101614784",
+      "eintrag": "Dokumentation - Martin, Jonathan",
+      "lastChange": "12/01/2017 14:38:44",
+      "created": "12/01/2017 14:38:38",
+      "autor": "jpm"
+    },
+    {
+      "art": "TImg",
+      "id": "1374269887570115456",
+      "eintrag": "Dokumentation - Martin, Jonathan",
+      "lastChange": "12/01/2017 14:39:31",
+      "created": "12/01/2017 14:39:27",
+      "autor": "jpm"
+    },
+    {
+      "art": "TImg",
+      "id": "1374269887257515136",
+      "eintrag": "Dokumentation - Martin, Andreas",
+      "lastChange": "01/09/2018 13:57:27",
+      "created": "12/01/2017 14:58:37",
+      "autor": "jpm"
+    },
+    {
+      "art": "TImg",
+      "id": "1374269886939377664",
+      "eintrag": "Dokumentation - Martin, Jonathan",
+      "lastChange": "12/01/2017 14:59:44",
+      "created": "12/01/2017 14:59:33",
+      "autor": "jpm"
+    },
+    {
+      "art": "TImg",
+      "id": "1374269886642853376",
+      "eintrag": "Dokumentation - Martin, Jonathan",
+      "lastChange": "01/15/2018 11:15:51",
+      "created": "12/01/2017 15:02:36",
+      "autor": "jpm"
+    },
+    {
+      "art": "TImg",
+      "id": "1374269886340979200",
+      "eintrag": "Dokumentation - Martin, Jonathan",
+      "lastChange": "12/01/2017 15:18:57",
+      "created": "12/01/2017 15:11:38",
+      "autor": "jpm"
+    },
+    {
+      "art": "TImg",
+      "id": "1374269886003823488",
+      "eintrag": "Dokumentation - Martin, Jonathan",
+      "lastChange": "12/01/2017 15:21:00",
+      "created": "12/01/2017 15:21:00",
+      "autor": "jpm"
+    },
+    {
+      "art": "TImg",
+      "id": "1374269885703708864",
+      "eintrag": "Dokumentation - Seemann, Markus",
+      "lastChange": "02/06/2018 13:21:45",
+      "created": "12/06/2017 19:35:37",
+      "autor": "jpm"
+    },
+    {
+      "art": "doku",
+      "id": "1374269885183010624",
+      "eintrag": "Information - Jonathan Martin - Berufsschule",
+      "lastChange": "02/23/2018 10:27:43",
+      "created": "01/11/2018 08:33:06",
+      "autor": "jpm"
+    },
+    {
+      "art": "doku",
+      "id": "1374269884872787776",
+      "eintrag": "Information - Jonathan Martin - Testbild",
+      "lastChange": "02/23/2018 10:27:54",
+      "created": "01/12/2018 11:44:38",
+      "autor": "jpm"
+    },
+    {
+      "art": "doku",
+      "id": "1374269884553958272",
+      "eintrag": "Dokumentation - Jonathan Martin - Testbild",
+      "lastChange": "02/23/2018 10:29:02",
+      "created": "01/15/2018 10:55:13",
+      "autor": "jpm"
+    },
+    {
+      "art": "doku",
+      "id": "1374269884229903552",
+      "eintrag": "Information - Jonathan Martin - Testbild",
+      "lastChange": "02/23/2018 10:28:04",
+      "created": "01/15/2018 11:00:15",
+      "autor": "jpm"
+    },
+    {
+      "art": "doku",
+      "id": "1374269883678257024",
+      "eintrag": "Information - Jonathan Martin - Testbild",
+      "lastChange": "02/23/2018 10:28:58",
+      "created": "01/15/2018 11:07:39",
+      "autor": "jpm"
+    },
+    {
+      "art": "doku",
+      "id": "1374269883369777728",
+      "eintrag": "Dokumentation - Sabrina Gang - Test",
+      "lastChange": "02/23/2018 10:28:53",
+      "created": "01/15/2018 11:27:36",
+      "autor": "jpm"
+    },
+    {
+      "art": "doku",
+      "id": "1374269883009532032",
+      "eintrag": "Dokumentation - Jonathan Martin - Code",
+      "lastChange": "02/23/2018 10:28:48",
+      "created": "01/15/2018 15:50:19",
+      "autor": "jpm"
+    },
+    {
+      "art": "doku",
+      "id": "1374269882700273216",
+      "eintrag": "Dokumentation - Jonathan Martin - Testbild",
+      "lastChange": "02/23/2018 10:28:43",
+      "created": "02/06/2018 13:18:32",
+      "autor": "jpm"
+    },
+    {
+      "art": "doku",
+      "id": "1374269882387112960",
+      "eintrag": "Dokumentation - Tasja Schlaszus - Hallo",
+      "lastChange": "02/23/2018 10:28:25",
+      "created": "02/06/2018 13:22:59",
+      "autor": "jpm"
+    },
+    {
+      "art": "mk",
+      "id": "1374269881837060096",
+      "eintrag": "[SPAM?] DEU - Manicure&pedicure Products -15%Discount! (Newsletter Vetro.ro - Oferte Speciale!, 06.02.2018 09:39)",
+      "lastChange": "02/06/2018 13:30:15",
+      "created": "02/06/2018 13:30:15",
+      "autor": "am"
+    },
+    {
+      "art": "mail",
+      "id": "1374269881530302400",
+      "eintrag": "TI-Passwörter Tabelle (Artur Linder (mcsys GmbH), 02.01.2018 12:19)",
+      "lastChange": "02/12/2018 14:12:08",
+      "created": "02/12/2018 14:12:08",
+      "autor": "sll"
+    },
+    {
+      "art": "dokument",
+      "id": "1374269881224101184",
+      "eintrag": "AG051457_Dr Herkommer",
+      "lastChange": "05/29/2018 10:11:32",
+      "created": "02/12/2018 14:13:51",
+      "autor": "sll"
+    },
+    {
+      "art": "priv",
+      "id": "1374269880904515904",
+      "eintrag": "",
+      "lastChange": "02/20/2023 17:10:41",
+      "created": "02/23/2018 10:27:32",
+      "autor": "sl"
+    },
+    {
+      "art": "Bild",
+      "id": "1374269880630750592",
+      "eintrag": "Dokumentation - Jonathan Martin - TestBild",
+      "lastChange": "04/20/2018 15:02:08",
+      "created": "04/20/2018 15:02:08",
+      "autor": "jpm"
+    },
+    {
+      "error": "(Aktiver Patient da?)"
+    },
+    {
+      "art": "SeVe",
+      "id": "1374269879991324224",
+      "eintrag": "",
+      "lastChange": "06/04/2018 11:21:49",
+      "created": "06/04/2018 11:21:09",
+      "autor": "jpm"
+    },
+    {
+      "art": "tn",
+      "id": "1374269879462152512",
+      "eintrag": "AG099999 - Tätigkeitsnachweis - Angebot nicht gefunden.",
+      "lastChange": "07/12/2018 15:53:16",
+      "created": "06/08/2018 16:57:49",
+      "autor": "jpm"
+    },
+    {
+      "art": "Bild",
+      "id": "1374269879137640576",
+      "eintrag": "Dokumentation - Jonathan Martin",
+      "lastChange": "07/12/2018 13:18:53",
+      "created": "07/12/2018 13:18:53",
+      "autor": "jpm"
+    },
+    {
+      "art": "tn",
+      "id": "1374269878799868864",
+      "eintrag": "AG011111 - Tätigkeitsnachweis - Angebot nicht gefunden.",
+      "lastChange": "07/13/2018 10:13:08",
+      "created": "07/13/2018 08:57:04",
+      "autor": "jpm"
+    },
+    {
+      "art": "tn",
+      "id": "1374269878481735552",
+      "eintrag": "AG011111 - Tätigkeitsnachweis - Angebot nicht gefunden.",
+      "lastChange": "07/13/2018 10:13:03",
+      "created": "07/13/2018 08:58:03",
+      "autor": "jpm"
+    },
+    {
+      "art": "tn",
+      "id": "1374269878163561728",
+      "eintrag": "AG012334 - Tätigkeitsnachweis - Angebot nicht gefunden.",
+      "lastChange": "07/20/2018 11:08:03",
+      "created": "07/13/2018 09:10:57",
+      "autor": "jpm"
+    },
+    {
+      "art": "tn",
+      "id": "1374269877829508992",
+      "eintrag": "AG088888 - Tätigkeitsnachweis - Angebot nicht gefunden.",
+      "lastChange": "07/20/2018 11:53:05",
+      "created": "07/19/2018 11:38:34",
+      "autor": "jpm"
+    },
+    {
+      "art": "tn",
+      "id": "1374269877272400448",
+      "eintrag": "AG0342 - Tätigkeitsnachweis - Angebot nicht gefunden.",
+      "lastChange": "07/30/2018 17:57:00",
+      "created": "07/26/2018 13:05:11",
+      "autor": "jpm"
+    },
+    {
+      "art": "tn",
+      "id": "1374269876950088960",
+      "eintrag": "AG012334 - Tätigkeitsnachweis - Angebot nicht gefunden.",
+      "lastChange": "08/24/2018 10:37:11",
+      "created": "08/23/2018 16:11:57",
+      "autor": "jpm"
+    },
+    {
+      "art": "tn",
+      "id": "1374269876613245312",
+      "eintrag": "AG012334 - Tätigkeitsnachweis - Angebot nicht gefunden.",
+      "lastChange": "08/24/2018 10:37:16",
+      "created": "08/23/2018 16:39:12",
+      "autor": "jpm"
+    },
+    {
+      "art": "EWE",
+      "id": "1235257556838114816",
+      "eintrag": "Einwilligungserklärung / ** signed **",
+      "lastChange": "08/31/2018 09:45:02",
+      "created": "08/31/2018 09:45:02",
+      "autor": "jpm"
+    },
+    {
+      "art": "tn",
+      "id": "1374269876013078400",
+      "eintrag": "AG088888 - Tätigkeitsnachweis - Angebotnicht gefunden.",
+      "lastChange": "09/18/2018 11:12:58",
+      "created": "09/18/2018 07:17:44",
+      "autor": "jpm"
+    },
+    {
+      "art": "tn",
+      "id": "1374269875700033984",
+      "eintrag": "AG088888 - Tätigkeitsnachweis - Angebot nicht gefunden.",
+      "lastChange": "09/18/2018 11:13:02",
+      "created": "09/18/2018 07:30:02",
+      "autor": "jpm"
+    },
+    {
+      "art": "tn",
+      "id": "1374269875078817088",
+      "eintrag": "AG0gfhgf - Tätigkeitsnachweis - Angebot nicht gefunden.",
+      "lastChange": "09/20/2018 12:36:00",
+      "created": "09/20/2018 09:10:34",
+      "autor": "jpm"
+    },
+    {
+      "art": "tn",
+      "id": "1374269874528589952",
+      "eintrag": "AG0gfhgf - Tätigkeitsnachweis - Angebot nicht gefunden.",
+      "lastChange": "09/20/2018 12:36:04",
+      "created": "09/20/2018 09:16:26",
+      "autor": "jpm"
+    },
+    {
+      "art": "tn",
+      "id": "1374269874215314368",
+      "eintrag": "AG0gfhgf - Tätigkeitsnachweis - Angebot nicht gefunden.",
+      "lastChange": "09/20/2018 12:36:08",
+      "created": "09/20/2018 09:18:30",
+      "autor": "jpm"
+    },
+    {
+      "art": "tn",
+      "id": "1374269873891602368",
+      "eintrag": "AG0gfhgf - Tätigkeitsnachweis - Angebot nicht gefunden.",
+      "lastChange": "09/20/2018 12:36:13",
+      "created": "09/20/2018 09:18:46",
+      "autor": "jpm"
+    },
+    {
+      "art": "tn",
+      "id": "1374269873572133504",
+      "eintrag": "AG0gfhgf - Tätigkeitsnachweis - Angebot nicht gefunden.",
+      "lastChange": "09/20/2018 12:36:21",
+      "created": "09/20/2018 09:20:16",
+      "autor": "jpm"
+    },
+    {
+      "art": "",
+      "id": "1374269873250813888",
+      "eintrag": "hallo",
+      "lastChange": "10/16/2018 13:41:21",
+      "created": "10/16/2018 13:41:11",
+      "autor": "jpm"
+    },
+    {
+      "art": "",
+      "id": "1374269872942201088",
+      "eintrag": "hallo",
+      "lastChange": "10/16/2018 13:43:16",
+      "created": "10/16/2018 13:43:16",
+      "autor": "jpm"
+    },
+    {
+      "art": "",
+      "id": "1374269872630817216",
+      "eintrag": "hallo",
+      "lastChange": "10/16/2018 13:44:20",
+      "created": "10/16/2018 13:44:20",
+      "autor": "jpm"
+    },
+    {
+      "art": "EWE",
+      "id": "1243624701855384448",
+      "eintrag": "hallo",
+      "lastChange": "10/16/2018 14:01:08",
+      "created": "10/16/2018 14:01:08",
+      "autor": "jpm"
+    },
+    {
+      "art": "EWE",
+      "id": "1243625053334015872",
+      "eintrag": "hallo",
+      "lastChange": "10/16/2018 14:03:56",
+      "created": "10/16/2018 14:03:56",
+      "autor": "jpm"
+    },
+    {
+      "art": "EWE",
+      "id": "1243627279605102016",
+      "eintrag": "hallo",
+      "lastChange": "10/16/2018 14:21:37",
+      "created": "10/16/2018 14:21:37",
+      "autor": "jpm"
+    },
+    {
+      "art": "EWE",
+      "id": "1243627412058779392",
+      "eintrag": "hallo",
+      "lastChange": "10/16/2018 14:22:40",
+      "created": "10/16/2018 14:22:40",
+      "autor": "jpm"
+    },
+    {
+      "art": "EWE",
+      "id": "1243628635824643072",
+      "eintrag": "hallo",
+      "lastChange": "10/16/2018 14:32:24",
+      "created": "10/16/2018 14:32:24",
+      "autor": "jpm"
+    },
+    {
+      "art": "EWE",
+      "id": "1243769834129626624",
+      "eintrag": "1243628635824643072",
+      "lastChange": "10/17/2018 09:14:33",
+      "created": "10/17/2018 09:14:33",
+      "autor": "jpm"
+    },
+    {
+      "art": "EWE",
+      "id": "1243771027897527680",
+      "eintrag": "1243628635824643072",
+      "lastChange": "10/18/2018 13:23:12",
+      "created": "10/17/2018 09:24:02",
+      "autor": "jpm"
+    },
+    {
+      "art": "tn",
+      "id": "1374269869664596352",
+      "eintrag": "AG088888 - Tätigkeitsnachweis - Angebot nicht gefunden.",
+      "lastChange": "10/25/2018 13:19:16",
+      "created": "10/24/2018 10:05:30",
+      "autor": "jpm"
+    },
+    {
+      "art": "tn",
+      "id": "1374269869349393600",
+      "eintrag": "AG088888 - Tätigkeitsnachweis - Angebot nicht gefunden.",
+      "lastChange": "10/25/2018 13:19:20",
+      "created": "10/24/2018 10:11:54",
+      "autor": "jpm"
+    },
+    {
+      "art": "tn",
+      "id": "1374269869023071232",
+      "eintrag": "AG088888 - Tätigkeitsnachweis - Angebot nicht gefunden.",
+      "lastChange": "10/25/2018 13:19:24",
+      "created": "10/24/2018 10:12:08",
+      "autor": "jpm"
+    },
+    {
+      "art": "tn",
+      "id": "1374269868473608000",
+      "eintrag": "AG088888 - Tätigkeitsnachweis - Angebot nicht gefunden.",
+      "lastChange": "10/25/2018 13:19:28",
+      "created": "10/24/2018 10:12:22",
+      "autor": "jpm"
+    },
+    {
+      "art": "tn",
+      "id": "1374269868133740864",
+      "eintrag": "AG088888 - Tätigkeitsnachweis - Angebot nicht gefunden.",
+      "lastChange": "10/25/2018 13:19:33",
+      "created": "10/24/2018 14:52:39",
+      "autor": "jpm"
+    },
+    {
+      "art": "tn",
+      "id": "1374269867799967296",
+      "eintrag": "AG088888 - Tätigkeitsnachweis - Angebot nicht gefunden.",
+      "lastChange": "10/25/2018 13:19:37",
+      "created": "10/24/2018 14:58:22",
+      "autor": "jpm"
+    },
+    {
+      "art": "tn",
+      "id": "1374269867468015936",
+      "eintrag": "AG088888 - Tätigkeitsnachweis - Angebot nicht gefunden.",
+      "lastChange": "10/25/2018 13:19:42",
+      "created": "10/24/2018 15:00:26",
+      "autor": "jpm"
+    },
+    {
+      "art": "tn",
+      "id": "1374269867146351936",
+      "eintrag": "AG088888 - Tätigkeitsnachweis - Angebot nicht gefunden.",
+      "lastChange": "10/25/2018 13:19:47",
+      "created": "10/24/2018 15:02:27",
+      "autor": "jpm"
+    },
+    {
+      "art": "tn",
+      "id": "1374269866820014336",
+      "eintrag": "AG088888 - Tätigkeitsnachweis - Angebot nicht gefunden.",
+      "lastChange": "10/25/2018 13:20:01",
+      "created": "10/24/2018 15:02:36",
+      "autor": "jpm"
+    },
+    {
+      "art": "tn",
+      "id": "1374269866481494080",
+      "eintrag": "AG099999 - Tätigkeitsnachweis - Angebot nicht gefunden.",
+      "lastChange": "10/25/2018 13:19:54",
+      "created": "10/24/2018 16:15:47",
+      "autor": "jpm"
+    },
+    {
+      "art": "tn",
+      "id": "1374269866176994176",
+      "eintrag": "AG099999 - Tätigkeitsnachweis - Angebot nicht gefunden.",
+      "lastChange": "10/25/2018 13:20:06",
+      "created": "10/25/2018 09:27:36",
+      "autor": "jpm"
+    },
+    {
+      "art": "tn",
+      "id": "1374269865856844224",
+      "eintrag": "AG088888 - Tätigkeitsnachweis - Angebot nicht gefunden.",
+      "lastChange": "10/25/2018 13:20:10",
+      "created": "10/25/2018 09:28:05",
+      "autor": "jpm"
+    },
+    {
+      "art": "tn",
+      "id": "1374269865525454912",
+      "eintrag": "AG088888 - Tätigkeitsnachweis - Angebot nicht gefunden.",
+      "lastChange": "10/25/2018 13:20:14",
+      "created": "10/25/2018 09:31:13",
+      "autor": "jpm"
+    },
+    {
+      "art": "tn",
+      "id": "1374269865224873792",
+      "eintrag": "AG088888 - Tätigkeitsnachweis - Angebot nicht gefunden.",
+      "lastChange": "10/25/2018 13:20:18",
+      "created": "10/25/2018 09:32:24",
+      "autor": "jpm"
+    },
+    {
+      "art": "tn",
+      "id": "1374269864935326336",
+      "eintrag": "AG088888 - Tätigkeitsnachweis - Angebot nicht gefunden.",
+      "lastChange": "10/25/2018 13:20:23",
+      "created": "10/25/2018 09:32:46",
+      "autor": "jpm"
+    },
+    {
+      "art": "tn",
+      "id": "1374269864618911296",
+      "eintrag": "AG088888 - Tätigkeitsnachweis - Angebot nicht gefunden.",
+      "lastChange": "10/25/2018 13:20:26",
+      "created": "10/25/2018 09:33:34",
+      "autor": "jpm"
+    },
+    {
+      "art": "tn",
+      "id": "1374269864307223936",
+      "eintrag": "AG088888 - Tätigkeitsnachweis - Angebot nicht gefunden.",
+      "lastChange": "10/25/2018 13:20:30",
+      "created": "10/25/2018 09:36:29",
+      "autor": "jpm"
+    },
+    {
+      "art": "tn",
+      "id": "1374269864005958272",
+      "eintrag": "AG088888 - Tätigkeitsnachweis - Angebot nicht gefunden.",
+      "lastChange": "10/25/2018 13:20:35",
+      "created": "10/25/2018 09:37:30",
+      "autor": "jpm"
+    },
+    {
+      "art": "tn",
+      "id": "1374269863688796800",
+      "eintrag": "AG088888 - Tätigkeitsnachweis - Angebot nicht gefunden.",
+      "lastChange": "10/25/2018 13:20:40",
+      "created": "10/25/2018 09:38:55",
+      "autor": "jpm"
+    },
+    {
+      "art": "tn",
+      "id": "1374269863363842624",
+      "eintrag": "AG0342 - Tätigkeitsnachweis - Angebot nicht gefunden.",
+      "lastChange": "10/29/2018 16:30:33",
+      "created": "10/25/2018 16:53:18",
+      "autor": "jpm"
+    },
+    {
+      "art": "tn",
+      "id": "1374269862827664512",
+      "eintrag": "AG021312 - Tätigkeitsnachweis - Angebot nicht gefunden.",
+      "lastChange": "11/21/2018 11:49:05",
+      "created": "11/20/2018 16:16:34",
+      "autor": "jpm"
+    },
+    {
+      "art": "tn",
+      "id": "1374269862272569088",
+      "eintrag": "AG021312 - Tätigkeitsnachweis - Angebot nicht gefunden.",
+      "lastChange": "11/21/2018 11:49:00",
+      "created": "11/20/2018 16:18:26",
+      "autor": "jpm"
+    },
+    {
+      "art": "tn",
+      "id": "1374269861972374272",
+      "eintrag": "AG021312 - Tätigkeitsnachweis - Angebot nicht gefunden.",
+      "lastChange": "11/21/2018 11:48:57",
+      "created": "11/21/2018 09:38:48",
+      "autor": "jpm"
+    },
+    {
+      "art": "tn",
+      "id": "1374269861427834816",
+      "eintrag": "AG021312 - Tätigkeitsnachweis - Angebot nicht gefunden.",
+      "lastChange": "11/27/2018 11:44:36",
+      "created": "11/26/2018 16:12:48",
+      "autor": "jpm"
+    },
+    {
+      "art": "tn",
+      "id": "1374269861048655424",
+      "eintrag": "AG021312 - Tätigkeitsnachweis - Angebot nicht gefunden.",
+      "lastChange": "11/27/2018 11:44:45",
+      "created": "11/26/2018 16:13:37",
+      "autor": "jpm"
+    },
+    {
+      "art": "tn",
+      "id": "1374269860746847104",
+      "eintrag": "AG021312 - Tätigkeitsnachweis - Angebot nicht gefunden.",
+      "lastChange": "11/27/2018 11:44:41",
+      "created": "11/26/2018 16:15:26",
+      "autor": "jpm"
+    }
+  ]
+}

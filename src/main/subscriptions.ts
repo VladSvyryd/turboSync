@@ -1,10 +1,10 @@
 import { join } from 'path'
 import { openNewWindow, openUrlDependingFromMode, popWindow } from './helpers'
-import { createPrintOrder } from '../preload/printer'
-import { BrowserWindow, ipcMain } from 'electron'
+import { app, BrowserWindow, ipcMain } from 'electron'
 import { store } from '../preload/store'
 import icon from '../../resources/icon.png?asset'
-import { getAllScanners } from '../preload/scan/scan'
+import { initPatientImport } from './turbomedMain'
+import { readdirSync, readFileSync } from 'fs'
 
 export let pdfWindow: BrowserWindow
 
@@ -43,27 +43,6 @@ export const openPDFPreviewWindow = (path: string) => {
     pdfWindow.webContents.send('onPDFWindowClose')
   })
 }
-ipcMain.on('openPDFPreviewWindow', async (_, path) => {
-  openPDFPreviewWindow(path)
-})
-
-ipcMain.handle('getPrinters', async () => {
-  return popWindow.webContents.getPrintersAsync()
-})
-ipcMain.handle('getScanners', async () => {
-  const scanners = getAllScanners()
-  console.log('getScanners', scanners)
-  return scanners
-})
-ipcMain.handle('printFileByPath', async (_, { path, defaultPrinter }) => {
-  try {
-    createPrintOrder(path, defaultPrinter)
-    return { printFile: true }
-  } catch (e) {
-    return { printFile: true }
-  }
-})
-
 ipcMain.handle('getStoreValue', async (_, { key }) => {
   try {
     return store.get(key)
@@ -79,4 +58,33 @@ ipcMain.handle('setStoreValue', async (_, { key, value }) => {
     console.log('getStoreValue', e)
     return null
   }
+})
+
+ipcMain.on('setProgress', async (event, progress) => {
+  event.reply('setProgress', progress)
+})
+
+ipcMain.on('test', async (_, id) => {
+  console.log('test', app.getAppPath(), id)
+  initPatientImport(id)
+})
+ipcMain.handle('getExportData', (_, id) => {
+  const filePath = app.getAppPath() + `/temp/export/${id}`
+  return readFileSync(filePath + '/data.json', 'utf8')
+})
+
+ipcMain.handle('getListOfExportData', () => {
+  const filePath = app.getAppPath() + `/temp/export/`
+  const folders = readdirSync(filePath, { withFileTypes: true })
+  const exports: any = []
+  folders.forEach((d) => {
+    const f = readFileSync(filePath + d.name + '/data.json', 'utf8')
+    const data = JSON.parse(f)
+    exports.push({
+      id: data?.id,
+      firstName: data?.firstName,
+      secondName: data?.secondName
+    })
+  })
+  return exports
 })

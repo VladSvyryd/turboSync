@@ -1,29 +1,9 @@
-import { FunctionComponent, ReactElement, useState } from 'react'
-import {
-  Button,
-  Popover,
-  PopoverArrow,
-  PopoverBody,
-  PopoverCloseButton,
-  PopoverContent,
-  PopoverHeader,
-  PopoverTrigger,
-  Stack,
-  Text,
-  useToken
-} from '@chakra-ui/react'
-import { SiGoogledocs } from 'react-icons/si'
-import { MdOutlineSyncDisabled } from 'react-icons/md'
-import {
-  ConditionOption,
-  DocumentStatus,
-  ExpiredStatus,
-  ExtendedDocumentStatus,
-  InternalErrorNumber,
-  Template
-} from '../../../types'
-import ErrorModal from '../../../container/Template/ErrorModal'
-import { useTemplatesStore } from '../../../store/TemplateStore'
+import { FunctionComponent, ReactElement } from 'react'
+import { Button, ButtonGroup, IconButton, Stack, Text } from '@chakra-ui/react'
+
+import { Patient } from '../../../types'
+import { IoMdPerson } from 'react-icons/io'
+import { MdDelete } from 'react-icons/md'
 
 export type ContextMenu = Array<{
   title: string
@@ -33,171 +13,81 @@ export type ContextMenu = Array<{
   contextMenuLinks?: ContextMenu
 }>
 interface OwnProps {
-  template: Template
-  onClick: (file: Template) => void
+  patient: Patient
+  active?: boolean
+  onClick: () => void
   loading: boolean
   placement?: 'bottom' | 'end'
   leftIcon?: ReactElement
   rightIcon?: ReactElement
+  onDelete?: (p: Patient) => void
 }
 
 type Props = OwnProps
 
-export const getColorByExtendedDocStatus = (status?: ExtendedDocumentStatus) => {
-  switch (status) {
-    case ExpiredStatus.EXPIRED:
-      return 'red.500'
-    case DocumentStatus.SIGNED:
-      return 'blue.500'
-    case DocumentStatus.INPROGRESS:
-      return 'orange.500'
-    case DocumentStatus.SAVED:
-      return 'green.600'
-    default:
-      return 'red.500'
-  }
-}
-const renderColor = (template: Template) => {
-  if (template.computedConditions === null) {
-    return 'blackAlpha.900'
-  }
-  const lastDocStatus = template.computedConditions?.lastDocStatus
-  if (lastDocStatus) {
-    return getColorByExtendedDocStatus(lastDocStatus)
-  }
-
-  if (template.computedConditions) {
-    if (
-      (Object.hasOwn(template.computedConditions, ConditionOption.FEMALE) &&
-        template.computedConditions.FEMALE) ||
-      (Object.hasOwn(template.computedConditions, ConditionOption.MALE) &&
-        template.computedConditions.MALE) ||
-      (Object.hasOwn(template.computedConditions, ConditionOption.UNDER18) &&
-        template.computedConditions.UNDER18) ||
-      (Object.hasOwn(template.computedConditions, ConditionOption.RETIRED) &&
-        template.computedConditions.RETIRED)
-    ) {
-      return getColorByExtendedDocStatus(lastDocStatus)
-    }
-  }
-
-  return 'green.600'
-}
 const ListButton: FunctionComponent<Props> = ({
-  template,
-  onClick,
+  patient,
+  onDelete,
   loading,
   leftIcon,
-  rightIcon
+  rightIcon,
+  active,
+  onClick
 }) => {
-  const errorColor = useToken('colors', 'red.500')
-
-  const { template: activeTemplate, setContextMenuRef } = useTemplatesStore()
   // const [arrowElement, setArrowElement] = useState<any>(null)
-  const [error, setError] = useState<string | null>(null)
 
-  const renderNoData = (template: Template) => {
-    if (template.computedConditions) {
-      if (Object.values(template.computedConditions).find((v) => v === 'NO_DATA') !== undefined) {
-        return 'No Data'
-      }
-    }
-    return undefined
-  }
   const renderButton = () => {
-    const lastDocDate = template.computedConditions?.lastDocDate
-    const date = lastDocDate
-      ? new Date(lastDocDate).toLocaleString('de-DE', {
-          dateStyle: 'short',
-          timeStyle: 'short'
-        })
-      : ''
-    const noData = renderNoData(template)
-    if (!template.noFile) {
-      return (
-        <Popover>
-          <PopoverTrigger>
-            <Button
-              variant={'ghost'}
-              onContextMenu={(e) => setContextMenuRef(e, template)}
-              leftIcon={leftIcon ?? <SiGoogledocs />}
-              w={'100%'}
-              justifyContent={'start'}
-              borderRadius={0}
-              isLoading={loading}
-              loadingText={`${template.title} (in Arbeit)`}
-              isActive={Boolean(activeTemplate?.uuid === template.uuid)}
-              rightIcon={<MdOutlineSyncDisabled color={errorColor} />}
-              color={'blackAlpha.600'}
-            >
-              <Text noOfLines={1}>{template.title}</Text>
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent>
-            <PopoverArrow />
-            <PopoverCloseButton />
-            <PopoverHeader>Datei fehlt!</PopoverHeader>
-            <PopoverBody>
-              Nach der Prüfung wurde leider festgestellt, dass diese Datei nicht gefunden werden
-              konnte. Dies handelt sich um einen Serverfehler. Bitte kontaktieren Sie den Support.
-              (Error: {InternalErrorNumber.FILE_NOT_FOUND})
-            </PopoverBody>
-          </PopoverContent>
-        </Popover>
-      )
-    }
     return (
-      <Button
-        variant={'ghost'}
-        onContextMenu={(e) => setContextMenuRef(e, template)}
-        onClick={() => onClick(template)}
-        leftIcon={leftIcon ?? <SiGoogledocs />}
-        w={'100%'}
-        justifyContent={'start'}
-        borderRadius={0}
-        isDisabled={loading}
-        isLoading={loading}
-        loadingText={`${template.title} (in Arbeit)`}
-        isActive={Boolean(activeTemplate?.uuid === template.uuid)}
-        rightIcon={rightIcon}
-        color={renderColor(template)}
-      >
-        <Stack
-          flex={1}
-          direction={'row'}
-          alignItems={'center'}
-          justifyContent={lastDocDate || noData ? 'space-between' : 'flex-start'}
+      <ButtonGroup size="sm" w={'100%'} isAttached variant="outline">
+        <Button
+          variant={active ? 'solid' : 'ghost'}
+          colorScheme={'blue'}
+          onClick={onClick}
+          leftIcon={leftIcon ?? <IoMdPerson />}
+          justifyContent={'start'}
+          borderRadius={0}
+          isDisabled={loading}
+          isLoading={loading}
+          // loadingText={`${patient.title} (in Arbeit)`}
+          // isActive={Boolean(activeTemplate?.uuid === patient.uuid)}
+          rightIcon={rightIcon}
+          whiteSpace={'initial'}
+          w={'100%'}
+          // color={renderColor(patient)}
         >
-          <Text noOfLines={1}>{template.title}</Text>
-          {(lastDocDate || noData) && (
-            <Stack direction={'row'}>
-              {lastDocDate && (
-                <Text noOfLines={1} fontSize={'xs'} title={`Versendet am ${date}`}>
-                  {date}
-                </Text>
-              )}
-              {noData && (
-                <Text noOfLines={1} fontSize={'xs'}>
-                  {noData}
-                </Text>
-              )}
-            </Stack>
-          )}
-        </Stack>
-      </Button>
+          <Stack flex={1} direction={'row'} alignItems={'center'} justifyContent={'space-between'}>
+            <Text textAlign={'left'} flex={1} noOfLines={1}>
+              {`${patient.id} - ${patient.firstName} ${patient.secondName}`}
+            </Text>
+            {/*{(lastDocDate || noData) && (*/}
+            {/*  <Stack direction={'row'}>*/}
+            {/*    {lastDocDate && (*/}
+            {/*      <Text noOfLines={1} fontSize={'xs'} title={`Versendet am ${date}`}>*/}
+            {/*        {date}*/}
+            {/*      </Text>*/}
+            {/*    )}*/}
+            {/*    {noData && (*/}
+            {/*      <Text noOfLines={1} fontSize={'xs'}>*/}
+            {/*        {noData}*/}
+            {/*      </Text>*/}
+            {/*    )}*/}
+            {/*  </Stack>*/}
+            {/*)}*/}
+          </Stack>
+        </Button>
+        {onDelete && (
+          <IconButton
+            variant={'ghost'}
+            aria-label={'Löschen'}
+            size={'sm'}
+            onClick={() => onDelete(patient)}
+            icon={<MdDelete />}
+          />
+        )}
+      </ButtonGroup>
     )
   }
-  return (
-    <>
-      <ErrorModal
-        error={error}
-        onClose={() => {
-          setError(null)
-        }}
-      />
-      {renderButton()}
-    </>
-  )
+  return <>{renderButton()}</>
 }
 
 export default ListButton

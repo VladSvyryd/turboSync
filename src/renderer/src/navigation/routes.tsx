@@ -1,10 +1,6 @@
 import { FunctionComponent, Suspense } from 'react'
 import { BrowserRouter, HashRouter, Route, Routes } from 'react-router-dom'
-import Home from '../pages/Home'
-import Template from '../pages/Templates'
-import Settings from '../pages/Settings'
-import PDFViewer from '../pages/PDFViewer'
-import PDFPrinter from '../pages/PDFPrinter'
+import TurboSync from '../pages/Sync'
 
 interface OwnProps {}
 
@@ -19,39 +15,7 @@ const Navigation: FunctionComponent<Props> = () => {
           path="/"
           element={
             <Suspense fallback={'Loading...'}>
-              <Home />
-            </Suspense>
-          }
-        />
-        <Route
-          path="/templates"
-          element={
-            <Suspense fallback={'Loading...'}>
-              <Template />
-            </Suspense>
-          }
-        />
-        <Route
-          path="/settings"
-          element={
-            <Suspense fallback={'Loading...'}>
-              <Settings />
-            </Suspense>
-          }
-        />
-        <Route
-          path="/pdf"
-          element={
-            <Suspense fallback={'Loading...'}>
-              <PDFViewer />
-            </Suspense>
-          }
-        />
-        <Route
-          path="/printer"
-          element={
-            <Suspense fallback={'Loading...'}>
-              <PDFPrinter />
+              <TurboSync />
             </Suspense>
           }
         />

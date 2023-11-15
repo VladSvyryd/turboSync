@@ -1,11 +1,10 @@
 import { Notification } from 'electron'
-import { ServerDocument } from './socket'
 import { openPDFPreviewWindow } from './subscriptions'
 import icon from '../../resources/iconNotification.png?asset'
 
 const NOTIFICATION_TITLE_SUCCESS = 'Neues Dokument erhalten.'
 
-export function showNotification(doc: ServerDocument) {
+export function showNotification(doc: any) {
   try {
     const n = new Notification({
       icon,

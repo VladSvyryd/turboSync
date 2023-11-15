@@ -1,7 +1,4 @@
-import './helpers'
-import '../preload/store'
 import './subscriptions'
-import './socket'
 import { app, shell, BrowserWindow, nativeTheme } from 'electron'
 import { join } from 'path'
 import { optimizer, is } from '@electron-toolkit/utils'
@@ -14,31 +11,24 @@ import closeWhiteIcon from '../../resources/close-white.png?asset'
 import closeBlackIcon from '../../resources/close-black.png?asset'
 import icon from '../../resources/icon.png?asset'
 
-const minWidth = 50
-const minHeight = 50
+const minWidth = 640
+const minHeight = 480
 export let mainWindow: BrowserWindow
 
 function createWindow(): void {
   // Create the browser window.
   mainWindow = new BrowserWindow({
-    width: 150,
-    height: 150,
-    maxWidth: 500,
-    maxHeight: 500,
     minWidth,
     minHeight,
+    width: 1280,
+    height: 720,
     show: false,
     autoHideMenuBar: true,
-    frame: false,
-    alwaysOnTop: true,
-    // focusable: false,
-    transparent: true, // this breaks resize feature
     icon,
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       sandbox: false,
-      // devTools: true,
-      plugins: true
+      devTools: true
     }
   })
 
@@ -53,6 +43,7 @@ function createWindow(): void {
   contextMenu({
     window: mainWindow,
     showSelectAll: false,
+    showInspectElement: true,
     append: () => [
       {
         icon: nativeTheme.shouldUseDarkColors ? settingsWhiteIcon : settingsBlackIcon,
@@ -70,7 +61,6 @@ function createWindow(): void {
     ]
   })
   creaeteWindowDragControl(mainWindow)
-  mainWindow.setAspectRatio(0.78)
   // const m = new Menu()
   // m.append({checked: true, label: 'test', type: 'checkbox'})
   // HMR for renderer base on electron-vite cli.
@@ -87,7 +77,7 @@ function createWindow(): void {
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
   // Set app user model id for windows
-  app.setAppUserModelId('com.DigiSign.app')
+  app.setAppUserModelId('com.TurboSync.app')
 
   // Default open or close DevTools by F12 in development
   // and ignore CommandOrControl + R in production.

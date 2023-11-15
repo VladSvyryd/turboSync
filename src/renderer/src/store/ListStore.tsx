@@ -1,40 +1,54 @@
 import { create } from 'zustand'
-import { devtools, persist } from 'zustand/middleware'
-import { SignType } from '../types'
+import { devtools } from 'zustand/middleware'
+import { Patient } from '../types'
 
 interface ListState {
-  titles: { [key in SignType]: string }
-  activeTitle: SignType | null
-  changeTitle: (title: SignType, newTitle: string) => void
-  setActiveTitle: (title: SignType | null) => void
+  patients: Array<Patient>
+  setPatients: (patients: Array<Patient>) => void
+  removePatient: (patient: Patient) => void
+  addPatient: (patient: Patient) => void
+  exports: Array<Patient>
+  setExports: (exports: Array<Patient>) => void
+  activeExport: Patient | null
+  setActiveExport: (patient: Patient | null) => void
+  activeImport: Patient | null | undefined
+  setActiveImport: (patient: Patient | null | undefined) => void
 }
 export const useListStore = create<ListState>()(
-  devtools(
-    persist(
-      (set) => ({
-        titles: {
-          [SignType.LINK]: 'Hoch',
-          [SignType.SIGNPAD]: 'Mittel',
-          [SignType.PRINT]: 'Niedrig'
-        },
-        activeTitle: null,
-        setActiveTitle: (title: SignType | null) => {
-          set(() => ({
-            activeTitle: title
-          }))
-        },
-        changeTitle: (title: SignType, newTitle: string) => {
-          set((state) => ({
-            titles: {
-              ...state.titles,
-              [title]: newTitle
-            }
-          }))
-        }
-      }),
-      {
-        name: 'list-storage'
-      }
-    )
-  )
+  devtools((set) => ({
+    patients: [],
+    setPatients: (patients: Array<Patient>) => {
+      set({
+        patients: patients
+      })
+    },
+    removePatient: (patient: Patient) => {
+      set(({ patients }) => ({
+        patients: patients.filter((p) => p.id !== patient.id)
+      }))
+    },
+    addPatient: (patient: Patient) => {
+      set(({ patients }) => ({
+        patients: [...patients, patient]
+      }))
+    },
+    exports: [],
+    setExports: (exports) => {
+      set({
+        exports: exports
+      })
+    },
+    activeExport: null,
+    setActiveExport: (patient) => {
+      set({
+        activeExport: patient
+      })
+    },
+    activeImport: undefined,
+    setActiveImport: (patient) => {
+      set({
+        activeImport: patient
+      })
+    }
+  }))
 )

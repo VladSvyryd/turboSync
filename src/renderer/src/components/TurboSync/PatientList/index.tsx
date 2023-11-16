@@ -10,7 +10,13 @@ type Props = OwnProps
 const PatientList: FunctionComponent<Props> = () => {
   const { patients, removePatient } = useListStore()
   return (
-    <List sx={{ py: 2 }} spacing={1} border={'2px solid red'} flex={1} maxWidth={400}>
+    <List
+      boxShadow={'inset 0 4px 7px 0 rgba(0,0,0,0.16)'}
+      sx={{ py: 2 }}
+      spacing={1}
+      flex={1}
+      maxWidth={400}
+    >
       {patients?.map((p) => (
         <ListItem key={'p.id'}>
           <ListButton

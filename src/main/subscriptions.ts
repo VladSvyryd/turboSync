@@ -3,8 +3,8 @@ import { openNewWindow, openUrlDependingFromMode, popWindow } from './helpers'
 import { app, BrowserWindow, ipcMain } from 'electron'
 import { store } from '../preload/store'
 import icon from '../../resources/icon.png?asset'
-import { importToTurbomedById, initPatientImport, Patient } from './turbomedMain'
-import { readdirSync, readFileSync } from 'fs'
+import { deleteExportById, importToTurbomedById, initPatientImport } from './turbomedMain'
+import { existsSync, readdirSync, readFileSync } from 'fs'
 
 export let pdfWindow: BrowserWindow
 
@@ -63,12 +63,8 @@ ipcMain.handle('setStoreValue', async (_, { key, value }) => {
 ipcMain.on('setProgress', async (event, progress) => {
   event.reply('setProgress', progress)
 })
-ipcMain.on('onLogs', async (event, progress) => {
-  event.reply('onLogs', progress)
-})
 
 ipcMain.on('initPatientImport', async (event, { id, turbomedPath }) => {
-  console.log(id, turbomedPath)
   initPatientImport(id, turbomedPath, event)
 })
 ipcMain.handle('getExportData', (_, id) => {
@@ -81,20 +77,22 @@ ipcMain.handle('getListOfExportData', () => {
   const folders = readdirSync(filePath, { withFileTypes: true })
   const exports: any = []
   folders.forEach((d) => {
-    const f = readFileSync(filePath + d.name + '/data.json', 'utf8')
-    const data = JSON.parse(f)
-    exports.push({
-      id: data?.id,
-      firstName: data?.firstName,
-      secondName: data?.secondName
-    })
+    const dataPath = filePath + d.name + '/data.json'
+    if (existsSync(dataPath)) {
+      const f = readFileSync(filePath + d.name + '/data.json', 'utf8')
+      const data = JSON.parse(f)
+      exports.push({
+        id: data?.id,
+        firstName: data?.firstName,
+        secondName: data?.secondName
+      })
+    }
   })
   return exports
 })
-ipcMain.on('importToTurbomedById', (event, id) => {
-  const filePath = app.getAppPath() + `/temp/export/` + id
-  const data = readFileSync(filePath + '/data.json', 'utf8')
-  if (!data) return
-  const patient = JSON.parse(data) as unknown as Patient
-  importToTurbomedById(id, patient, event)
+ipcMain.on('importToTurbomedById', (event, { fromId, toId, turbomedPath }) => {
+  importToTurbomedById(fromId, toId, turbomedPath, event)
+})
+ipcMain.on('deleteExportById', (event, { id }) => {
+  deleteExportById(id, event)
 })

@@ -1,7 +1,9 @@
-import { FunctionComponent, useRef, useState } from 'react'
+import { FunctionComponent, useEffect, useRef, useState } from 'react'
 import {
   Button,
   Input,
+  InputGroup,
+  InputRightElement,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -10,31 +12,82 @@ import {
   ModalHeader,
   ModalOverlay,
   Stack,
-  Text
+  Text,
+  useToast
 } from '@chakra-ui/react'
 import { useListStore } from '../../../store/ListStore'
-interface OwnProps {}
+import { Patient } from '../../../types'
+import { IoCheckmarkDoneSharp, IoClose } from 'react-icons/io5'
+
+interface OwnProps {
+  onSubmit: (toId: string) => void
+}
 
 type Props = OwnProps
 
-const ModalImport: FunctionComponent<Props> = ({}) => {
-  const [values, setValues] = useState('')
-  const { activeImport, activeExport, setActiveImport } = useListStore()
+const ModalImport: FunctionComponent<Props> = ({ onSubmit }) => {
+  const toast = useToast()
+  const [finalPatient, setFinalPatient] = useState<Patient | undefined>(undefined)
+  const { activeExport, setActiveImport } = useListStore()
   const initialRef = useRef(null)
   const handleCloseModal = () => {
     setActiveImport(undefined)
   }
 
-  const handleOnSubmit = async () => {
-    let id = values.trim()
-    if (activeImport) {
-      id = activeImport.id
-    }
-    console.log({ id })
-    try {
-      window.api.importToTurbomedById(id)
-    } catch (e) {}
+  const handleFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    const value = event.target['patientId'].value
+    getPatient(value)
   }
+
+  const getPatient = async (value: string) => {
+    console.log('NOW')
+    try {
+      const patient = await window.api.getPatientById(value)
+      if (patient?.error) {
+        toast({
+          title: 'Warnung',
+          description: 'Patient wurde nicht gefunden.'
+        })
+        setFinalPatient(undefined)
+        return
+      }
+      toast({
+        status: 'success',
+        title: 'Patient gefunden',
+        description: `${patient.data.firstName} ${patient.data.secondName}`
+      })
+      setFinalPatient(patient.data)
+    } catch (e) {
+      toast({
+        title: 'Error',
+        description: 'Turbomed.'
+      })
+    } finally {
+    }
+  }
+  const renderFinalPatient = () => {
+    if (!finalPatient)
+      return (
+        <Stack direction={'row'} alignItems={'center'}>
+          <Text color={'red'}> {'==>'} Patient mit dem selben ID wurde nicht gefunden</Text>
+          <IoClose color={'red'} />
+        </Stack>
+      )
+    return (
+      <Stack direction={'row'} alignItems={'center'}>
+        <Text>
+          {'==>'} {`${finalPatient?.id} - ${finalPatient?.secondName} ${finalPatient?.secondName}`}
+        </Text>
+        <IoCheckmarkDoneSharp color={'green'} />
+      </Stack>
+    )
+  }
+
+  useEffect(() => {
+    if (!activeExport) return
+    getPatient(activeExport.id)
+  }, [])
 
   return (
     <Modal
@@ -51,36 +104,40 @@ const ModalImport: FunctionComponent<Props> = ({}) => {
         <ModalHeader>Start Import</ModalHeader>
         <ModalCloseButton />
         <ModalBody pb={6}>
-          <Text>
-            {`${activeExport?.id}- ${activeExport?.secondName} ${activeExport?.secondName}`}
-          </Text>
-          <Text>{`=>`}</Text>
-          {activeImport ? (
-            <Text>{activeImport?.id}</Text>
-          ) : (
-            <Stack>
+          <Stack>
+            <Stack direction={'row'} alignItems={'center'}>
               <Text>
-                Patient {activeExport?.id} wurde nicht gefunden. Tragen Sie bitte ein, unter welchem
-                Patient soll man Daten importieren.
+                {'<=='}{' '}
+                {`${activeExport?.id} - ${activeExport?.secondName} ${activeExport?.secondName}`}
               </Text>
-              <Input
-                value={values}
-                name={'patientId'}
-                autoFocus
-                placeholder="Patientnummer"
-                onChange={(e) => {
-                  setValues(e.target.value)
-                }}
-              />
+              <IoCheckmarkDoneSharp color={'green'} />
             </Stack>
-          )}
+            {renderFinalPatient()}
+            <Stack alignItems={'center'} direction={'row'}>
+              <form onSubmit={handleFormSubmit}>
+                <InputGroup size="md">
+                  <Input autoFocus name={'patientId'} pr="4.5rem" placeholder="Patientnummer" />
+                  <InputRightElement width="4.5rem">
+                    <Button h="1.75rem" size="sm" type={'submit'}>
+                      {'Suchen'}
+                    </Button>
+                  </InputRightElement>
+                </InputGroup>
+              </form>
+            </Stack>
+          </Stack>
         </ModalBody>
         <ModalFooter>
           <Button
             colorScheme="blue"
             mr={3}
-            isDisabled={activeImport === null && values.trim() === ''}
-            onClick={handleOnSubmit}
+            isDisabled={!finalPatient}
+            onClick={() => {
+              if (finalPatient) {
+                onSubmit(finalPatient?.id)
+                handleCloseModal()
+              }
+            }}
           >
             Importieren
           </Button>

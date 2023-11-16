@@ -3,7 +3,7 @@ import { Stack, Tab, TabList, TabPanel, TabPanels, Tabs } from '@chakra-ui/react
 import PatientList from '../../components/TurboSync/PatientList'
 import PatientSelectForm from '../../components/Forms/PatientSelectForm'
 import PatientExportForm from '../../components/Forms/PatientExportForm'
-import ExportsList from '../../components/TurboSync/ExportsList'
+import ImportsList from '../../components/TurboSync/ImportsList'
 import PatientImportForm from '../../components/Forms/PatientImportForm'
 
 interface OwnProps {}
@@ -36,7 +36,7 @@ const TurboSync: FunctionComponent<Props> = () => {
         <TabPanel as={Stack} flex={1}>
           <Stack flex={1} direction={'row'}>
             <Stack>
-              <ExportsList />
+              <ImportsList />
             </Stack>
             <PatientImportForm />
           </Stack>

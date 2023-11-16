@@ -3,26 +3,35 @@ import { List, ListItem, ScaleFade, Spinner, Stack } from '@chakra-ui/react'
 import ListButton from '../../ListButton/ListButton/ListButton'
 import { useListStore } from '../../../store/ListStore'
 import { Patient } from '../../../types'
-import ModalImport from '../ModalImport'
 
 interface OwnProps {}
 
 type Props = OwnProps
 
-const ExportsList: FunctionComponent<Props> = () => {
-  const { exports, setExports, activeExport, setActiveExport, activeImport } = useListStore()
+const ImportsList: FunctionComponent<Props> = () => {
+  const { exports, setExports, activeExport, setActiveExport } = useListStore()
 
   const getData = async () => {
     const folders = (await window.api.getListOfExportData()) as Array<Patient>
     setExports(folders)
+  }
+  const removeExport = (p: Patient) => {
+    window.api.deleteExportById({ id: p.id })
+    getData()
   }
   useEffect(() => {
     getData()
   }, [])
   return (
     <>
-      {activeImport !== undefined && <ModalImport />}
-      <List sx={{ py: 2 }} spacing={1} border={'2px solid red'} flex={1} maxWidth={400}>
+      <List
+        boxShadow={'inset 0 4px 7px 0 rgba(0,0,0,0.16)'}
+        sx={{ py: 2 }}
+        spacing={1}
+        flex={1}
+        minWidth={300}
+        maxWidth={400}
+      >
         {exports?.map((p) => (
           <ListItem key={p.id}>
             <ListButton
@@ -32,7 +41,7 @@ const ExportsList: FunctionComponent<Props> = () => {
                 setActiveExport(p)
               }}
               loading={false}
-              // onDelete={(p) => removePatient(p)}
+              onDelete={(p) => removeExport(p)}
             />
           </ListItem>
         ))}
@@ -60,4 +69,4 @@ const ExportsList: FunctionComponent<Props> = () => {
   )
 }
 
-export default ExportsList
+export default ImportsList

@@ -13,11 +13,9 @@ const api = {
     electronAPI.ipcRenderer.on('setProgress', c)
   },
   initPatientImport: (c) => {
-    electronAPI.ipcRenderer.send('initPatientImport', c)
+    return electronAPI.ipcRenderer.send('initPatientImport', c)
   },
-  importToTurbomedById: (c) => {
-    electronAPI.ipcRenderer.send('importToTurbomedById', c)
-  },
+
   getExportData: (c) => {
     return electronAPI.ipcRenderer.invoke('getExportData', c)
   },
@@ -26,6 +24,17 @@ const api = {
   },
   onLogs: (c) => {
     return electronAPI.ipcRenderer.on('onLogs', c)
+  },
+  importToTurbomedById: (c) => {
+    electronAPI.ipcRenderer.send('importToTurbomedById', c)
+  },
+  deleteExportById: (c) => {
+    electronAPI.ipcRenderer.send('deleteExportById', c)
+  },
+  cleanUp: () => {
+    electronAPI.ipcRenderer.removeAllListeners('onLogs')
+    electronAPI.ipcRenderer.removeAllListeners('onProgressChanged')
+    electronAPI.ipcRenderer.removeAllListeners('setProgress')
   }
 }
 

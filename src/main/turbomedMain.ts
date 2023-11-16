@@ -1,6 +1,6 @@
 import { PowerShell } from 'node-powershell'
 
-import { accessSync, existsSync, mkdirSync, writeFileSync } from 'fs'
+import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'fs'
 import { app } from 'electron'
 import IpcMainEvent = Electron.IpcMainEvent
 import { writeFile, readFile } from 'fs/promises'
@@ -31,6 +31,8 @@ export type PatientRow = {
   lastChange: string
   created: string
   autor: string
+  filePath: string | null
+  originPath: string | null
 }
 export async function getPatientById(id: string) {
   const active = await canWorkWithPatient()
@@ -130,10 +132,11 @@ const getMaxPatientRows = async (id: string) => {
 
 export async function initPatientImport(id: string, turboPath: string, render: IpcMainEvent) {
   try {
+    progress = 1
     const patient = await getCurrentPatient(id)
     const count = await getMaxPatientRows(id)
-    render.sender.send('setProgress', count - 1)
-    const queryRows = [...new Array(7)].map((_, index) =>
+    render.sender.send('setProgress', count)
+    const queryRows = [...new Array(count)].map((_, index) =>
       getPatientRow(id, index, turboPath, render)
     )
     const rows = await Promise.all(queryRows)
@@ -176,7 +179,7 @@ export const getFileIfExists = async (id: string, index: number) => {
   }
 }
 
-const readWriteFile = async (inPath: string, id: string, index: number) => {
+const readWriteFile = async (inPath: string, id: string, index: number, render: IpcMainEvent) => {
   try {
     const fileBuffer = await readFile(inPath)
     const outputPath = app.getAppPath() + '/temp/export' + '/' + id + '/' + 'files'
@@ -186,6 +189,7 @@ const readWriteFile = async (inPath: string, id: string, index: number) => {
     await writeFile(outputPath + '/' + path.parse(inPath).base, fileBuffer)
     return '/' + path.parse(inPath).base
   } catch (e) {
+    render.sender.send('onLogs', `Datei nicht gefunden ${inPath}`)
     console.log('readWriteFile error', inPath, index)
     return null
   }
@@ -226,17 +230,16 @@ export const getPatientRow = async (
       if (filePath.startsWith('$')) {
         filePath = filePath.replaceAll('$\\TurboMed', turboPath)
       }
-      newPath = await readWriteFile(filePath, id, index)
+      newPath = await readWriteFile(filePath, id, index, render)
     } else {
       newPath = null
     }
 
     const res = await ps.invoke(cmd)
-    render.sender.send('onProgressChanged', index)
-    console.log(res.raw.replaceAll("'", '"'))
     if (res.raw === 'null') return null
     const parsedRow = JSON.parse(res.raw.replaceAll("'", '"').replace(/(\r\n|\n|\r)/gm, ''))
     render.sender.send('onLogs', `${parsedRow.id}: Fertig`)
+    render.sender.send('onProgressChanged', progress++)
     return { ...parsedRow, filePath: newPath, originPath: filePath }
   } catch (e) {
     console.log(e)
@@ -244,19 +247,21 @@ export const getPatientRow = async (
   }
 }
 
+let progress = 0
 export const setPatientRow = async (
-  id: String,
+  fromId: string,
+  toId: string,
   row: Patient['rows'][0],
-  index: number,
+  turbomedPath: string,
   render: IpcMainEvent
 ) => {
   const { art, eintrag, lastChange, created, autor, gueltigkeitsZeitpunkt } = row
-  const cmd = PowerShell.command`
+  let textCMD = PowerShell.command`
    [console]::OutputEncoding = New-Object System.Text.UTF8Encoding
    $progId = 'TMMain.Application';
     try {
        $app = [System.Runtime.InteropServices.Marshal]::GetActiveObject($progId);
-       $row = $app.Praxisgemeinschaft().PatientMitNummer(${id}).Karteikarte().NeuerTextEintrag(${autor},${eintrag})
+       $row = $app.Praxisgemeinschaft().PatientMitNummer(${toId}).Karteikarte().NeuerTextEintrag(${autor},${eintrag})
        $row.Properties().Item("iD") = ${art}
        $row.EnthalteneZeile().Properties().Item("erstellungsZeitpunkt") = ${created}
        $row.EnthalteneZeile().Properties().Item("letzteAenderungZeitpunkt") = ${lastChange}
@@ -271,22 +276,94 @@ export const setPatientRow = async (
   `
 
   try {
-    const res = await ps.invoke(cmd)
-    render.sender.send('onProgressChanged', index)
+    const file = await processWriteRow(fromId, row, turbomedPath)
+    if (file) {
+      textCMD = PowerShell.command`
+     [console]::OutputEncoding = New-Object System.Text.UTF8Encoding
+     $progId = 'TMMain.Application';
+      try {
+         $app = [System.Runtime.InteropServices.Marshal]::GetActiveObject($progId);
+         $row = $app.Praxisgemeinschaft().PatientMitNummer(${toId}).Karteikarte().NeuerHyperlinkEintrag(${eintrag},${file.path})
+         $row.EnthalteneZeile().Properties().Item("markierung") = ${autor}
+         $row.Properties().Item("iD") = ${art}
+         $row.EnthalteneZeile().Properties().Item("erstellungsZeitpunkt") = ${created}
+         $row.EnthalteneZeile().Properties().Item("letzteAenderungZeitpunkt") = ${lastChange}
+         $row.EnthalteneZeile().Properties().Item("gueltigkeitsZeitpunkt") = ${gueltigkeitsZeitpunkt}
+         echo $row.PublicId()
+         [System.GC]::Collect()
+      }
+      catch [System.Runtime.InteropServices.COMException] {
+        echo false
+        [System.GC]::Collect()
+      }
+    `
+    }
+
+    const res = await ps.invoke(textCMD)
     if (res.raw === 'null') return null
-    return JSON.parse(res.raw.replaceAll("'", '"'))
+    const pr = JSON.parse(res.raw.replaceAll("'", '"'))
+    render.sender.send('onProgressChanged', progress++)
+    render.sender.send('onLogs', String(res?.raw) + ': Fertig')
+    console.log(progress)
+    return pr
   } catch (e) {
     console.log(e)
     return null
   }
 }
-export const importToTurbomedById = async (id: string, data: Patient, render: IpcMainEvent) => {
-  try {
-    const mutateRows = data.rows.map((row, index) => setPatientRow(id, row, index, render))
-    render.sender.send('setProgress', data.rows.length)
 
+const processWriteRow = async (id: string, row: Patient['rows'][0], turbomedPath: string) => {
+  try {
+    if (row.filePath) {
+      const f = app.getAppPath() + '/temp/export' + '/' + id + '/' + 'files' + row.filePath
+      if (!existsSync(f)) return null
+      const readData = await readFile(f)
+      const turboPath = turbomedPath + '\\MCSYS'
+      if (!existsSync(turboPath)) mkdirSync(turboPath, { recursive: true })
+      await writeFile(turboPath + row.filePath, readData)
+      return { path: '$\\TurboMed' + '\\MCSYS' + row.filePath, type: 'File' }
+    }
+
+    if (row.originPath && row.originPath.startsWith('http')) {
+      return { path: row.originPath, type: 'Link' }
+    }
+    return null
+  } catch (e) {
+    console.log(e)
+    return null
+  }
+}
+
+export const importToTurbomedById = async (
+  fromId: string,
+  toId: string,
+  turbomedPath: string,
+  render: IpcMainEvent
+) => {
+  try {
+    const filePath = app.getAppPath() + `/temp/export/` + fromId
+    const data = readFileSync(filePath + '/data.json', 'utf-8')
+    if (!data) return
+    const patient = JSON.parse(data) as unknown as Patient
+    progress = 1
+    const mutateRows = patient.rows.map((row) =>
+      setPatientRow(fromId, toId, row, turbomedPath, render)
+    )
+    render.sender.send('setProgress', patient.rows.length)
     const res = await Promise.all(mutateRows)
-    console.log({ res })
+    console.log({ res: res.length, mutateRows: mutateRows.length })
+  } catch (e) {
+    console.log(e)
+  }
+}
+
+export const deleteExportById = async (id: string, render: IpcMainEvent) => {
+  try {
+    const filePath = app.getAppPath() + `/temp/export/` + id
+    if (existsSync(filePath)) {
+      rmSync(filePath, { recursive: true })
+      render.sender.send('onLogs', String(id) + ': Gelöscht')
+    }
   } catch (e) {
     console.log(e)
   }

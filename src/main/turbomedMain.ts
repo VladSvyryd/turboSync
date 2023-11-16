@@ -6,6 +6,7 @@ import IpcMainEvent = Electron.IpcMainEvent
 import { writeFile, readFile } from 'fs/promises'
 import * as path from 'path'
 const ps = new PowerShell({
+  inputEncoding: 'utf8',
   executableOptions: {
     '-ExecutionPolicy': 'Bypass',
     '-NoProfile': true
@@ -136,9 +137,7 @@ export async function initPatientImport(id: string, turboPath: string, render: I
     const patient = await getCurrentPatient(id)
     const count = await getMaxPatientRows(id)
     render.sender.send('setProgress', count)
-    const queryRows = [...new Array(count)].map((_, index) =>
-      getPatientRow(id, index, turboPath, render)
-    )
+    const queryRows = [...new Array(1)].map((_, index) => getPatientRow(id, 80, turboPath, render))
     const rows = await Promise.all(queryRows)
     const filePath = app.getAppPath() + '/temp/export' + '/' + id
     if (!existsSync(filePath)) {
@@ -256,12 +255,14 @@ export const setPatientRow = async (
   render: IpcMainEvent
 ) => {
   const { art, eintrag, lastChange, created, autor, gueltigkeitsZeitpunkt } = row
+  const castString = Buffer.from('äöüß')
+  const suka = castString.toString('utf-8')
   let textCMD = PowerShell.command`
-   [console]::OutputEncoding = New-Object System.Text.UTF8Encoding
+   #[console]::OutputEncoding = New-Object System.Text.UTF8Encoding
    $progId = 'TMMain.Application';
     try {
        $app = [System.Runtime.InteropServices.Marshal]::GetActiveObject($progId);
-       $row = $app.Praxisgemeinschaft().PatientMitNummer(${toId}).Karteikarte().NeuerTextEintrag(${autor},${eintrag})
+       $row = $app.Praxisgemeinschaft().PatientMitNummer(${toId}).Karteikarte().NeuerTextEintrag(${autor},${suka})
        $row.Properties().Item("iD") = ${art}
        $row.EnthalteneZeile().Properties().Item("erstellungsZeitpunkt") = ${created}
        $row.EnthalteneZeile().Properties().Item("letzteAenderungZeitpunkt") = ${lastChange}

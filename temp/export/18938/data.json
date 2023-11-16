@@ -10,16 +10,15 @@
   "zip": "72764",
   "rows": [
     {
-      "art": "ai",
-      "id": "1553436993815860736",
-      "gueltigkeitsZeitpunkt": "06/22/2023 10:08:01",
-      "eintrag": "äöüß",
-      "old": "Eintrag von SL für Ticket 1271: MB: Archivieren nicht möglich ins Praxis Archiv. Dazu Fass geschlossen und anschließend getestet-&gt;OK",
-      "lastChange": "06/22/2023 10:08:01",
-      "created": "06/22/2023 10:08:01",
-      "autor": "sl",
+      "art": "mk",
+      "id": "1374333402558660032",
+      "gueltigkeitsZeitpunkt": "07/06/2017 14:05:46",
+      "eintrag": "WG AG050865  K-18938  TURBOMED Laptop  Änderung Terminkalender:....Ehrlich gesagt ist uns diese Lösung deutlich zu teuer, da.....",
+      "lastChange": "07/06/2017 14:31:34",
+      "created": "07/06/2017 14:05:46",
+      "autor": "am",
       "filePath": null,
-      "originPath": "https://ticket.mcsys.de/tickets/id/1271"
+      "originPath": "C:\\TurboMed\\Dokumente\\Sonstiges\\201707\\Zimmermann18938-4E4D49D6-3F14-46cf-B1F4-22169C885555.msg"
     }
   ]
 }
